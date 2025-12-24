@@ -121,8 +121,8 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Membria CE",
-          "href": "https://membria.com",
+          "anchor": "Membria Community Edition",
+          "href": "https://membria.xyz",
           "icon": "book-open-cover"
         },
         {
@@ -141,13 +141,13 @@
     "links": [
       {
         "label": "Contact",
-        "href": "mailto:team@membria.com"
+        "href": "mailto:hello@membria.xyx"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Join waitlist",
-      "href": "https://membria.com/waitlist"
+      "href": "https://membria.xyz/whitelist"
     }
   },
   "contextual": {
