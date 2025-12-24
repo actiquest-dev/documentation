@@ -1,87 +1,26 @@
 ---
-title: 'Navigation'
-description: 'The navigation field in docs.json defines the pages that go in the navigation menu'
-icon: 'map'
+title: "Audience & go-to-market"
+description: "Who Membria CE serves and how we reach them"
 ---
 
-The navigation menu is the list of links on every website.
+## Target users
 
-You will likely update `docs.json` every time you add a new page. Pages do not show up automatically.
+| Tier | Archetype | Pain point | Value proposition |
+| --- | --- | --- | --- |
+| Tier 1 | Investors & traders | Emotion-driven bets, limited reasoning record | Immutable decision capture for trading choices |
+| Tier 2 | Rationalists & self-optimizers | Need calibration and data | Calibration metrics from real decisions |
+| Tier 3 | Life transition people | High-stakes choices, coaching is expensive | Structured decision capture without coaching costs |
+| Tier 4 | Anxious decision-makers | Rumination, decision paralysis | Reduced replay via explicit decision records |
 
-## Navigation syntax
+## Go-to-market roadmap
 
-Our navigation syntax is recursive which means you can make nested navigation groups. You don't need to include `.mdx` in page names.
+1. **Phase 1: Niche launch (investors).** Clear ROI and measurable outcomes.
+2. **Phase 2: Rationalists.** Community-driven adoption once calibration signals are visible.
+3. **Phase 3: Mainstream self-improvement.** Simplified UX and broader wellness positioning.
 
-<CodeGroup>
+## Key risks & mitigations
 
-```json Regular Navigation
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Getting Started",
-          "pages": ["quickstart"]
-        }
-      ]
-    }
-  ]
-}
-```
-
-```json Nested Navigation
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Getting Started",
-          "pages": [
-            "quickstart",
-            {
-              "group": "Nested Reference Pages",
-              "pages": ["nested-reference-page"]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-</CodeGroup>
-
-## Folders
-
-Simply put your MDX files in folders and update the paths in `docs.json`.
-
-For example, to have a page at `https://yoursite.com/your-folder/your-page` you would make a folder called `your-folder` containing an MDX file called `your-page.mdx`.
-
-<Warning>
-
-You cannot use `api` for the name of a folder unless you nest it inside another folder. Mintlify uses Next.js which reserves the top-level `api` folder for internal server calls. A folder name such as `api-reference` would be accepted.
-
-</Warning>
-
-```json Navigation With Folder
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Group Name",
-          "pages": ["your-folder/your-page"]
-        }
-      ]
-    }
-  ]
-}
-```
-
-## Hidden pages
-
-MDX files not included in `docs.json` will not show up in the sidebar but are accessible through the search bar and by linking directly to them.
+- **Users quit after two weeks** → AI lowers friction, quick wins, streak nudges.
+- **ChatGPT adds memory** → Focus on decision-specific immutability and signal stack.
+- **Psychological resistance** → Frame as scientific self-discovery, not an error log.
+- **Long feedback loops** → Micro-decisions and outcome reminders maintain engagement.

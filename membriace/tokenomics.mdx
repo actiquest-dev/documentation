@@ -1,0 +1,274 @@
+---
+title: "Tokenomics & incentives"
+description: "ACTI and kCREDIT economics, DoD pricing, gateway rewards, and governance"
+---
+
+## 1. Mission and scope
+
+Membria CE is building a decentralized, permanent knowledge base for small language models. The token model aligns knowledge creation, validation, and reuse with network incentives.
+
+## 2. Participants
+
+- **Users / knowledge creators**: initiate DoD requests and consume verified knowledge.
+- **Gateways**: validate, process, cache, and commit knowledge to the network.
+- **Validators**: secure the Peaq chain and participate in consensus.
+
+## 3. Token overview
+
+Two assets are used:
+
+1. **$ACTI (core token)**: deflationary utility token used for staking, governance, and rewards. Tradable.
+2. **$kCREDIT (knowledge credit)**: non-transferable credit used for bootstrap programs. Not tradable.
+
+## 4. DoD pricing (dynamic)
+
+- **Target price**: $0.10 per DoD request.
+- **Conversion**: `Fee_in_ACTI = $0.10 / Current_ACTI_Price`.
+- **Price stability**:
+  - 24h TWAP from oracles.
+  - Ceiling: $0.15.
+  - Floor: $0.05.
+
+## 5. Fee distribution (v2.0)
+
+```
+100% DoD payment
+- 25% burn
+- 60% gateway operator commission
+- 10% consensus quorum rewards
+- 5% ecosystem fund
+```
+
+Team-owned gateways do not receive commissions; their share is redistributed to independent operators.
+
+## 6. Network accumulation effect
+
+As KCG grows, cache hit rate increases (target 85%), so the average user cost trends downward even though DoD price remains fixed.
+
+## 7. Deflation model
+
+- **Primary burn**: 25% of every DoD payment.
+- **Secondary burn**: slashing penalties for malicious gateways.
+
+Illustrative burn at scale:
+
+- 10,000 users: ~$675,000/year, ~16.9M tokens/year at $0.04 (3.4% supply).
+- 50,000 users: ~$3.375M/year, ~84M tokens/year at $0.04 (16.8% supply).
+
+Supply dynamics:
+
+- **Phase 1 (0-24 months)**: vesting creates moderate inflation, burn offsets part of it.
+- **Phase 2 (24+ months)**: deflation as vesting ends and burn continues.
+
+## 8. Gateway economics (v2.0)
+
+### 8.1 Requirements
+
+| Requirement | Specification |
+| --- | --- |
+| Minimum stake | $100,000 in ACTI |
+| KYC/KYB | Mandatory |
+| Technical audit | 30-day testnet uptime monitoring |
+| DAO approval | 66% vote |
+| Slashing reserve | $20,000 (first 90 days) |
+| Geographic distribution | Minimum 3 continents |
+
+### 8.2 Revenue example (10,000 users)
+
+Assumptions: 2.25M paid DoD/month, 8 independent gateways.
+
+| Revenue source | Monthly | Annual |
+| --- | --- | --- |
+| Direct commissions (60%) | $16,875 | $202,500 |
+| Consensus rewards (10%) | $2,800 | $33,600 |
+| Staking APR (8% on $100K) | $667 | $8,000 |
+| **Total revenue** | **$20,342** | **$244,100** |
+| Operating costs | $10,000 | $120,000 |
+| **Net profit** | **$10,342** | **$124,100** |
+
+### 8.3 Monthly OPEX (per gateway)
+
+| Category | Cost |
+| --- | --- |
+| Server infrastructure | $800-1,200 |
+| GPU acceleration | $500-800 |
+| Storage | $200 |
+| CDN/edge | $300 |
+| LLM API costs | $5,100 |
+| Blockchain fees | $35 |
+| Monitoring/security | $300 |
+| DevOps support | $1,600 |
+| Contingency | $200 |
+| **Total** | **~$10,000** |
+
+### 8.4 Progressive decentralization
+
+| Phase | Period | Team gateways | Independent gateways | Governance |
+| --- | --- | --- | --- | --- |
+| Alpha | Q1-Q2 2025 | 10 (100%) | 0 | Team |
+| Beta | Q3-Q4 2025 | 12 (80%) | 3 (20%) | Hybrid |
+| Launch | Q1-Q2 2026 | 8 (50%) | 8 (50%) | DAO vote |
+| Growth | Q3-Q4 2026 | 6 (40%) | 9 (60%) | Full DAO |
+| Mature | 2027+ | 5 (30%) | 12 (70%) | Full DAO |
+
+## 9. Security and anti-attack mechanisms
+
+### 9.1 Anti-spam tiers
+
+| Tier | Stake required | DoD/day | Cache queries | Priority | Price multiplier |
+| --- | --- | --- | --- | --- | --- |
+| Free | $0 | 5 | 50 | Low | 1.5x |
+| Basic | $50 ACTI | 20 | 200 | Normal | 1.0x |
+| Pro | $500 ACTI | 100 | Unlimited | High | 0.8x |
+| Enterprise | $5,000 ACTI | 1,000 | Unlimited | Premium | 0.6x |
+
+Dynamic pricing formula:
+
+```
+Final_Price = $0.10 * Complexity_Mult * Network_Load_Mult * Reputation_Mult
+```
+
+### 9.2 Anti-sybil for gateways
+
+1. KYC/KYB + infra audit + 30-day testnet uptime.
+2. DAO vote (66% approval).
+3. 90-day probation with reduced rewards and slashing risk.
+4. Full operator status after probation.
+
+### 9.3 Consensus integrity
+
+Quorum of 5 gateways:
+
+- 2 random independent gateways
+- 2 team gateways
+- 1 elder gateway (top-3 by reputation)
+
+Approval: 4/5 votes or both team + 1 independent + 1 elder.
+
+Reputation weights:
+
+- Uptime: 30%
+- Validation accuracy: 40%
+- Response latency: 15%
+- Challenges won: 15%
+
+### 9.4 Knowledge challenge system
+
+- Challenger stakes $500 ACTI.
+- 9-gateway quorum re-validates.
+- If challenger correct: receives $1,000, original quorum slashed $5K each.
+- If incorrect: stake forfeited.
+
+Expiration policy:
+
+- Factual claims: 6 months.
+- Technical docs: 12 months.
+- Opinion/philosophy: permanent.
+
+## 10. Daily contributor contest
+
+- 50% of ecosystem fund allocated: 125M tokens over 4 years.
+- Daily prize pool scales with active users.
+
+Value scoring (illustrative): novelty, complexity, reusability, factual density, consensus quality.
+
+## 11. Network metrics (targets)
+
+### 10,000 users
+
+- Total queries: 15,000,000/month
+- Cache hit rate: 85%
+- Paid DoD: 2,250,000/month
+- Revenue: $225,000/month
+
+Token flow (monthly):
+
+| Flow | Amount |
+| --- | --- |
+| Burn (25%) | $56,250 |
+| Independent gateways | $135,000 |
+| Consensus rewards (10%) | $22,500 |
+| Ecosystem fund (5%) | $11,250 |
+| **Total** | **$225,000** |
+
+### 50,000 users
+
+- Paid DoD: 11,250,000/month
+- Revenue: $1,125,000/month
+- Independent gateway net profit: ~$46,000/month (example)
+
+## 12. Roadmap (tokenomics v2)
+
+- **Q3 2025**: tokenomics v2 finalized, gateway infra setup, testnet launch.
+- **Q4 2025**: TGE, mainnet alpha, daily contest starts, scale to 2,000 users.
+- **Q1 2026**: security audits, closed beta, pricing calibration, more independent gateways.
+- **Q2 2026**: 10,000 users target, 50/50 gateway split, DAO launch.
+- **Q3-Q4 2026**: 20,000+ users, 60% independent gateways.
+- **2027+**: 50,000+ users, 70% independent gateways.
+
+## 13. Partnerships and GTM
+
+- Hugging Face integration and co-marketing.
+- ASI Alliance integration (Fetch.ai).
+- Academic partnerships for scoring and validation.
+- Enterprise pilots in regulated industries.
+
+## 14. Differentiators
+
+1. Verified, permanent knowledge for edge AI.
+2. Economic incentives align users, operators, and knowledge quality.
+3. Hybrid edge/cloud architecture balances privacy and intelligence.
+4. Open ecosystem (any LLM).
+
+## 15. Risks and mitigations
+
+| Risk | Probability | Impact | Mitigation |
+| --- | --- | --- | --- |
+| Cache hit rate < 80% | Medium | High | Extended beta testing, adjust pricing | 
+| Scorer LLM bias | Medium | Medium | Academic audits, DAO-controlled versioning |
+| Arweave economics collapse | Low | High | Hybrid storage fallback, local cache |
+| Token price volatility | High | Medium | USD-pegged pricing, floor/ceiling |
+| Gateway centralization | Low | Medium | Ownership caps, decentralization schedule |
+
+## 16. Team and governance
+
+### 16.1 Governance model
+
+- Governance token: staked ACTI with time-weighted voting power.
+- Scope: pricing, burn rate, gateway admissions, ecosystem fund, upgrades.
+
+Voting power:
+
+```
+Voting Power = Staked_ACTI * 2.0 * Time_Weight
+```
+
+Time weight:
+
+- < 3 months: 0.5x
+- 3-6 months: 1.0x
+- 6-12 months: 1.5x
+- > 12 months: 2.0x
+
+Proposal process:
+
+1. Draft MIP (7 days discussion).
+2. Formal submission (10K ACTI bond).
+3. Voting period (14 days).
+4. 48h timelock before execution.
+
+## 17. Investment terms (current round)
+
+- Allocation: $500,000
+- Price: $0.05 per ACTI
+- Tokens: 10,000,000 (2% supply)
+- Minimum check: $20,000
+- Vesting: 20% at TGE, 5-month cliff, 18-month linear
+- Target close: November 2025
+
+Use of funds:
+
+- 40% gateway infrastructure
+- 30% team expansion
+- 20% marketing/community
+- 10% legal/compliance

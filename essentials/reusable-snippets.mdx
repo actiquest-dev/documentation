@@ -1,110 +1,33 @@
 ---
-title: "Reusable snippets"
-description: "Reusable, custom snippets to keep content in sync"
-icon: "recycle"
+title: "Business model & milestones"
+description: "Pricing tiers, MVP roadmap, and key metrics for Membria CE"
 ---
 
-import SnippetIntro from '/snippets/snippet-intro.mdx';
+## Pricing tiers
 
-<SnippetIntro />
+| Tier | Audience | Price | Highlights |
+| --- | --- | --- | --- |
+| Free | Newcomers | $0 | 3 decisions/month, basic journal view |
+| Personal | Enthusiasts | $9/mo | Unlimited decisions, AI interviewer, core patterns |
+| Pro | Serious users | $19/mo | Full analytics, exports, integrations |
+| Elite | Investors | $39/mo | Portfolio integration, deep bias analysis, API access |
 
-## Creating a custom snippet
+## MVP roadmap (24 weeks)
 
-**Pre-condition**: You must create your snippet file in the `snippets` directory.
+1. **Phase 1 (8 weeks) – Core loop:** Decision capture, DBB interviews, basic dashboard, outcome review with immutability.
+2. **Phase 2 (8 weeks) – Intelligence:** Pattern detection, principles tracker, calibration training.
+3. **Phase 3 (8 weeks) – Growth:** Social sharing, coach/mentor integrations, exports, calendar and portfolio integrations.
 
-<Note>
-  Any page in the `snippets` directory will be treated as a snippet and will not
-  be rendered into a standalone page. If you want to create a standalone page
-  from the snippet, import the snippet into another file and call it as a
-  component.
-</Note>
+## Success metrics
 
-### Default export
+- Registered users: 50,000
+- Paying users: 5,000
+- ARR: $600K (assuming $10 monthly average)
+- Retention (6 months): 40%
+- NPS: 50+
 
-1. Add content to your snippet file that you want to re-use across multiple
-   locations. Optionally, you can add variables that can be filled in via props
-   when you import the snippet.
+## Hypotheses to validate
 
-```mdx snippets/my-snippet.mdx
-Hello world! This is my content I want to reuse across pages. My keyword of the
-day is {word}.
-```
-
-<Warning>
-  The content that you want to reuse must be inside the `snippets` directory in
-  order for the import to work.
-</Warning>
-
-2. Import the snippet into your destination file.
-
-```mdx destination-file.mdx
----
-title: My title
-description: My Description
----
-
-import MySnippet from '/snippets/path/to/my-snippet.mdx';
-
-## Header
-
-Lorem impsum dolor sit amet.
-
-<MySnippet word="bananas" />
-```
-
-### Reusable variables
-
-1. Export a variable from your snippet file:
-
-```mdx snippets/path/to/custom-variables.mdx
-export const myName = 'my name';
-
-export const myObject = { fruit: 'strawberries' };
-```
-
-2. Import the snippet from your destination file and use the variable:
-
-```mdx destination-file.mdx
----
-title: My title
-description: My Description
----
-
-import { myName, myObject } from '/snippets/path/to/custom-variables.mdx';
-
-Hello, my name is {myName} and I like {myObject.fruit}.
-```
-
-### Reusable components
-
-1. Inside your snippet file, create a component that takes in props by exporting
-   your component in the form of an arrow function.
-
-```mdx snippets/custom-component.mdx
-export const MyComponent = ({ title }) => (
-  <div>
-    <h1>{title}</h1>
-    <p>... snippet content ...</p>
-  </div>
-);
-```
-
-<Warning>
-  MDX does not compile inside the body of an arrow function. Stick to HTML
-  syntax when you can or use a default export if you need to use MDX.
-</Warning>
-
-2. Import the snippet into your destination file and pass in the props
-
-```mdx destination-file.mdx
----
-title: My title
-description: My Description
----
-
-import { MyComponent } from '/snippets/custom-component.mdx';
-
-Lorem ipsum dolor sit amet.
-
-<MyComponent title={'Custom title'} />
-```
+- Investors will pay premium for immutable decision proofs.
+- Rationalists will evangelize once calibration signals are visible.
+- Outcome reminders and quick wins reduce early drop-off.

@@ -1,4 +1,7 @@
 ---
-title: 'New Plant'
-openapi: 'WEBHOOK /plant/webhook'
+title: 'Decision webhook'
+openapi: 'POST /webhooks/decision'
+description: 'Receive a push from DBB when it captures a new decision pivot.'
 ---
+
+Configure this webhook if you want the Decision Surface updates to trigger downstream automation or logging services.

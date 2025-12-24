@@ -1,97 +1,67 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Membria CE Overview"
+description: "Product positioning, client workflow, and backend architecture split for Membria CE"
 ---
 
-## Setting up
+# Membria CE
 
-Get your documentation site up and running in minutes.
+Membria CE documents a two-layer system: **client-side decision capture** and **backend knowledge infrastructure**. Visit https://membria.xyz and follow @membria_ai on Twitter/X for updates.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+## System layers
 
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
+- **Client layer (Decision Surface + DBB):** captures decision moments, freezes reasoning before outcomes, and surfaces read-only signals.
+- **Backend layer (KCG + DoD + Peaq + Arweave):** handles escalations, council reasoning, and immutable storage in the Knowledge Cache Graph.
 
 <Columns cols={2}>
   <Card
-    title="Edit locally"
-    icon="pen-to-square"
+    title="Client layer: Decision Surface"
+    icon="sparkles"
+    href="/quickstart"
+  >
+    Dashboard of open loops, drift alerts, and pending outcomes based on decision records.
+  </Card>
+  <Card
+    title="Client layer: Decision Black Box"
+    icon="shield"
     href="/development"
   >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+    Local capture engine that extracts decision pivots, stores immutable drafts, and keeps raw chat out of the signal layer.
   </Card>
 </Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
 
 <Columns cols={2}>
   <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
+    title="Backend: KCG + Gateways"
+    icon="diagram-project"
+    href="/membriace/kcg-gateways"
   >
-    Use MDX to style your docs pages.
+    Hybrid Peaq + Arweave graph that stores verified knowledge, manages gateway consensus, and powers DoD escalations.
   </Card>
   <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
+    title="Backend: Technical Notes"
+    icon="cubes"
+    href="/membriace/technical"
   >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+    Engineering dossier that maps the pipeline from client requests to immutable knowledge records.
   </Card>
 </Columns>
 
-## Need inspiration?
+## Design goals
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+- **Clarity over chat:** focus on decision pivots, not full conversation threads.
+- **Immutable records:** decisions are signed; outcomes are appended, not rewritten.
+- **Signal-first UI:** drift, consistency, and open loops are surfaced explicitly.
+
+## Guided paths
+
+<CardGroup cols={3}>
+  <Card title="Decision capture" icon="clipboard" href="/quickstart">
+    Learn how the client layer captures decisions and keeps them immutable.
+  </Card>
+  <Card title="Signals & metrics" icon="dial" href="/essentials/code">
+    Review track record, patterns, and principles tracked on the Decision Surface.
+  </Card>
+  <Card title="Knowledge backend" icon="server" href="/membriace/kcg-gateways">
+    Understand how DoD, councils, and KCG govern escalations and storage.
+  </Card>
+</CardGroup>

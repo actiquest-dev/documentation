@@ -1,0 +1,40 @@
+---
+title: "System architecture split"
+description: "Client-side decision capture vs backend knowledge graph and gateways"
+---
+
+## Two-layer system
+
+Membria CE is split into:
+
+1. **Client layer:** Decision Black Box (DBB) + Decision Surface (DS)
+2. **Backend layer:** Knowledge Cache Graph (KCG) + DoD + Peaq + Arweave + Gateway consensus
+
+The client captures decision truth locally; the backend handles knowledge escalations and immutable storage.
+
+## Client layer (DBB + DS)
+
+- Observes interaction streams (chat, files, tools).
+- Detects decision moments and freezes reasoning.
+- Writes immutable decision records (append-only outcomes).
+- Renders signal cards: open loops, drift, pending outcomes, track record.
+
+## Backend layer (KCG + gateways)
+
+- Handles DoD escalations and LLM council reasoning.
+- Stores knowledge payloads on Arweave, with Peaq as the logic/consensus layer.
+- Uses gateway validators to verify knowledge, batch consensus events, and maintain indexes.
+- Exposes a read path for clients via SCR bundles and cache-first retrieval.
+
+## Data models
+
+- `DecisionEvent` (client): immutable decision record, no raw chat.
+- `KnowledgeEvent` (backend): validated knowledge payload with ArTxID + Peaq event linkage.
+- `Outcome` (client): append-only results; does not mutate decision record.
+
+## End-to-end flow
+
+1. Client captures a decision (DBB) and renders signals (DS).
+2. If confidence is low or external knowledge is needed, the client triggers DoD.
+3. Backend council produces verified knowledge, writes to KCG (Peaq + Arweave).
+4. Client stores the verified reference without altering the original decision.

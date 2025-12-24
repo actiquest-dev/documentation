@@ -1,4 +1,7 @@
 ---
-title: 'Create Plant'
-openapi: 'POST /plants'
+title: 'Create a decision'
+openapi: 'POST /decisions'
+description: 'Record a new decision draft before the outcome is known.'
 ---
+
+Send context, alternatives, prediction, and confidence to the DBB ledger. The response confirms that the draft is immutable and ready for Decision Surface signals.

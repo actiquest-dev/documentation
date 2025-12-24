@@ -1,4 +1,7 @@
 ---
-title: 'Delete Plant'
-openapi: 'DELETE /plants/{id}'
+title: 'Archive decision'
+openapi: 'DELETE /decisions/{id}'
+description: 'Mark a decision as archived (admin use only).'
 ---
+
+This endpoint removes a draft from the active Decision Surface without deleting the immutable history. Archive only when a decision is invalid or deprecated.

@@ -1,0 +1,42 @@
+---
+title: "KCG & gateways (backend)"
+description: "Backend graph, DoD escalation, council validation, and immutable storage"
+---
+
+## Backend-only responsibility
+
+KCG + DoD + Peaq + Arweave is the backend for Membria CE, regardless of whether the client runs on-device or in the cloud. The client layer never writes to the graph directly; it only triggers a DoD escalation when external knowledge is needed.
+
+## Hybrid architecture
+
+- **Peaq:** logic/graph layer, event ordering, consensus rules.
+- **Arweave:** immutable storage for payloads (JSON-LD answers, archives, manifests).
+- **Gateways:** validators + indexers that read from Arweave and commit consensus on Peaq.
+
+## Lifecycle recap
+
+1. **Define a knowledge contract** on Peaq (Executable Semantic Model).
+2. **Write payload**: DoD agent packages JSON-LD, tags it, uploads to Arweave, receives ArTxID.
+3. **Propose on Peaq**: a lightweight event links payload to the originating query via `cause`.
+4. **Gateway consensus**: validators fetch, verify, and vote (batched to reduce cost).
+5. **Finalize**: validation event closes the Intent; knowledge becomes queryable.
+
+## Gateway read path
+
+Gateways never read chat. They:
+
+- Check hot cache first.
+- Consult semantic/vector indexes.
+- Fetch specific Arweave payloads by ArTxID.
+- Assemble SCR bundles for the client.
+- Escalate to teacher LLMs only when confidence is low.
+
+## Index + privacy
+
+- Hot cache + semantic + vector + ArTx pointer indexes keep latency low.
+- Payloads can be encrypted (encrypt-then-store with CEK + KeyGrant events).
+- Forks resolved via MergeEvents; batching and canonical hashes enforce idempotency.
+
+## Why this matters
+
+The backend graph is the source of truth for knowledge updates, council escalations, and immutable storage. Client captures decisions; backend validates and stores knowledge. They are separate by design but interlock through DoD.

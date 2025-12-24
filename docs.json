@@ -1,20 +1,20 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Membria CE Knowledge Base",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0F172A",
+    "light": "#2563EB",
+    "dark": "#0F172A"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Product",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Overview",
             "pages": [
               "index",
               "quickstart",
@@ -22,47 +22,97 @@
             ]
           },
           {
-            "group": "Customization",
+            "group": "Signals & metrics",
             "pages": [
               "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
               "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "essentials/markdown"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Strategy",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Audience & growth",
             "pages": [
-              "api-reference/introduction"
+              "essentials/navigation",
+              "essentials/reusable-snippets"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Systems & architecture",
             "pages": [
+              "essentials/images"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Signals stack",
+        "groups": [
+          {
+            "group": "DBB & Decision Surface",
+            "pages": [
+              "ai-tools/cursor",
+              "ai-tools/windsurf",
+              "ai-tools/claude-code"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API",
+        "groups": [
+          {
+            "group": "Decision API",
+            "pages": [
+              "api-reference/introduction",
               "api-reference/endpoint/get",
               "api-reference/endpoint/create",
               "api-reference/endpoint/delete",
               "api-reference/endpoint/webhook"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Due diligence",
+        "groups": [
+          {
+            "group": "Project dossier",
+            "pages": [
+              "membriace/overview",
+              "membriace/market"
+            ]
+          },
+          {
+            "group": "Team & token",
+            "pages": [
+              "membriace/team",
+              "membriace/tokenomics"
+            ]
+          },
+          {
+            "group": "Engineering",
+            "pages": [
+              "membriace/technical",
+              "membriace/kcg-gateways"
+            ]
+          },
+          {
+            "group": "Financials",
+            "pages": [
+              "membriace/business-model",
+              "membriace/revenue-economics",
+              "membriace/treasury"
+            ]
+          },
+          {
+            "group": "Competitive",
+            "pages": [
+              "membriace/competitive"
             ]
           }
         ]
@@ -71,14 +121,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
+          "anchor": "Membria CE",
+          "href": "https://membria.com",
           "icon": "book-open-cover"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Research log",
+          "href": "/membria",
+          "icon": "lightbulb"
         }
       ]
     }
@@ -90,33 +140,33 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Contact",
+        "href": "mailto:team@membria.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Join waitlist",
+      "href": "https://membria.com/waitlist"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/membriace",
+      "github": "https://github.com/membria",
+      "linkedin": "https://linkedin.com/company/membria"
     }
   }
 }

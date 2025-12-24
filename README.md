@@ -1,43 +1,15 @@
-# Mintlify Starter Kit
+# Membria CE Knowledge Base
 
-Use the starter kit to get your docs deployed and ready to customize.
+This folder now hosts the **Membria CE knowledge base**—a single source of product positioning, playbooks, and signals compiled directly from `membria.md`.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## How it works
+- `membria.md` is the research log. Add new insights at the bottom so that the polished pages can stay aligned with the latest thinking.
+- MDX pages (index, quickstart, development, essentials, ai-tools, api-reference) keep the knowledge base visitor-friendly and are published publicly.
+- Use `mint dev` to preview locally whenever you update a public page; the underlying tooling relies on the Mint CLI, but every page is about Membria CE.
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+## Contributing
+1. Capture new strategy, architecture, or pricing ideas in `membria.md`.
+2. When you want a broader audience to see the insight, translate it into the appropriate MDX page (landing, playbook, signal, API guide, etc.).
+3. Preview with `mint dev` and review in the browser before committing.
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
-
-## Development
-
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
-npm i -g mint
-```
-
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
-mint dev
-```
-
-View your local preview at `http://localhost:3000`.
-
-## Publishing changes
-
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
-
-## Need help?
-
-### Troubleshooting
-
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
-
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+If you need help triaging where something belongs, ask: does it belong in the research log or the knowledge base? Then proceed with edits and keep the tone consistent with the Membria CE voice.

@@ -1,33 +1,24 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'Decision API Reference'
+description: 'Immutable decision records and outcome endpoints'
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  The Decision API lets you read decision drafts, publish outcomes, and export the history that powers the Decision Surface.
 </Note>
 
-## Welcome
+## Overview
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+The DBB populates the Decision Ledger, and the Decision API exposes that ledger for integrations, dashboards, or export pipelines.
+
+- **Decision records** include the context, confidence, alternatives, prediction, and evidence references.
+- **Outcome append** ensures immutability—original entries remain, and outcome notes are added separately.
+- **Signals** such as drift, open loops, and principle violations are computed on top of the ledger but can be derived from the API if desired.
 
 <Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
+  title="Membria CE OpenAPI spec"
+  icon="terminal"
+  href="/api-reference/openapi.json"
 >
-  View the OpenAPI specification file
+  View or download the OpenAPI file describing `/decisions`, `/decisions/{id}`, and `/decisions/{id}/outcome`.
 </Card>
-
-## Authentication
-
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
-
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```

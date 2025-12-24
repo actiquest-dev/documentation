@@ -1,0 +1,49 @@
+---
+title: "Treasury & burn"
+description: "Cashflow, burn, and runway modeling derived from the treasury brief"
+---
+
+## Dual-flow economics
+
+Membria separates fiat/stablecoin cashflow (operating treasury) from token flow (ACTI). CE has two revenue modes:
+
+1. **Pay‑per‑distill (trial):** users pay only when a DoD escalation is required.
+2. **Full subscription:** $15–20/user/month for DBB + DS plus backend escalations.
+
+Both modes are USD‑pegged; protocol‑level operations are internally priced in ACTI with a USD conversion.
+
+## DoD pricing and distribution
+
+- **Target DoD price:** $0.10 per request.
+- **Conversion:** `Fee_in_ACTI = $0.10 / Current_ACTI_Price`.
+- **Distribution:** 25% burn, 60% gateway commission, 10% consensus, 5% ecosystem fund.
+
+## Token burn
+
+* 25% of every DoD‑related ACTI fee is burned protocol‑enforced and proportional to usage.
+* Example (10K subscribers, $17/mo, 15% paid DoD): monthly revenue ~$170K; monthly protocol revenue ~$225K; monthly burn ~$56K (16.9M ACTI/year, ~3.4% supply). Burn scales with usage automatically.
+
+## Operating costs (Year 1 cloud-heavy)
+
+| Category | Monthly USD |
+| --- | --- |
+| Modal inference & LoRA | $180K–$220K |
+| GraphRAG (TuGraph + GPU) | $40K–$60K |
+| Team-operated Gateways | $40K |
+| Backend/orchestration | $15K |
+| Security/monitoring/compliance | $10K |
+| **Total OPEX** | **$285K–$345K** |
+
+Costs are covered by subscription revenue and fiat treasury; early spend builds knowledge assets while cache hits improve.
+
+## Treasury → token loop
+
+More users → more DoD usage → more ACTI burned → lower circulating supply → stronger staking demand → healthier token economics. Treasury avoids token speculation; conversions are infrequent, planned, and DAO‑approved.
+
+## Runway & projection
+
+* Aim to keep 9–12 months runway in fiat/stablecoins.
+* 24‑month forecast (2K→25K users) shows cumulative revenue ~$5.9M, infrastructure OPEX ~$6.6M, treasury drawdown ~$700K, leaving ~ $950K buffer. ~108–115M ACTI burned (~21–23% supply).
+* Break-even expected months 16–18 as cache hits rise, inference shifts local, and hybrid costs drop.
+
+Membria uses treasury discipline instead of token sales to pay for infra. The model targets operating break-even while reinforcing long-term deflationary token dynamics.

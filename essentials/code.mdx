@@ -1,35 +1,23 @@
 ---
-title: 'Code blocks'
-description: 'Display inline code and code blocks'
-icon: 'code'
+title: "Patterns & principles"
+description: "How Membria CE detects biases, principle violations, and calibration gaps"
 ---
 
-## Inline code
+## Pattern detection
 
-To denote a `word` or `phrase` as code, enclose it in backticks (`).
+The system analyzes decision history for:
 
-```
-To denote a `word` or `phrase` as code, enclose it in backticks (`).
-```
+- **Cognitive biases** (optimism bias, recency bias, underweighting health consequences).
+- **Behavioral patterns** (decisions after 8 PM, under deadline pressure, impulsive purchases).
+- **Blind spots** (topics consistently missing from decision criteria).
 
-## Code blocks
+Signals combine frequency, confidence, and outcome data so you can compare predicted confidence with actual results.
 
-Use [fenced code blocks](https://www.markdownguide.org/extended-syntax/#fenced-code-blocks) by enclosing code in three backticks and follow the leading ticks with the programming language of your snippet to get syntax highlighting. Optionally, you can also write the name of your code after the programming language.
+## Principles tracker
 
-```java HelloWorld.java
-class HelloWorld {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
-    }
-}
-```
+Set personal rules ("never work for free", "sleep on $1000+ decisions") and receive alerts when a decision candidate violates them. Each violation is logged so trends are visible over time.
 
-````md
-```java HelloWorld.java
-class HelloWorld {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
-    }
-}
-```
-````
+## Calibration training
+
+- Daily micro-predictions keep calibration active.
+- Outcome reviews compare confidence vs. actual results and highlight persistent overconfidence or underconfidence.
