@@ -140,6 +140,24 @@ DBB is the sole authority on what counts as a decision.
 
 ---
 
+# 7.1 DBB False Positives and User Correction
+
+Decision Black Box (DBB) detections are non-destructive and reversible by design. DBB may occasionally detect a "decision" where the user intended only exploratory reasoning or contextual discussion. In such cases, the system provides lightweight correction mechanisms without interrupting the user flow.
+
+Supported corrections:
+- Mark as context - the event is treated as non-decisional reasoning
+- Merge with existing decision - useful when a decision evolved gradually
+- Dismiss detection - removes the event from Decision Surface signals
+
+Correction effects:
+- Corrections do not modify raw logs
+- Corrections do not affect past DBB history
+- Corrections are used only for future calibration
+
+DBB never blocks actions, pauses interaction, or forces confirmation. Silence and non-interruption are first-class design principles.
+
+---
+
 # Part II - LoRA Router Policy
 
 ## 8. Purpose of LoRA Routing
@@ -163,6 +181,28 @@ Goal: maximize speed and personalization without hallucination.
 | Council-derived LoRA | Sanitized expert synthesis |
 
 All LoRAs are versioned, immutable, and explicitly activated.
+
+---
+
+## 9.1 LoRA Ownership and Governance Model
+
+Each LoRA adapter in Membria belongs to a single explicit scope:
+- Personal LoRA - owned by an individual user
+- Team LoRA - shared within a workspace or organization
+- Global LoRA - derived from Council synthesis and shared via the Global Knowledge Cache
+
+Default behavior:
+- All LoRAs start as Personal
+- No LoRA is promoted automatically across scopes
+
+Promotion rules:
+- Personal -> Team: explicit user action
+- Team -> Global: Council evaluation + governance approval
+
+Governance guarantees:
+- No silent LoRA activation
+- No retroactive impact on past decisions
+- Full auditability of LoRA activation and rollback events
 
 ---
 
@@ -243,6 +283,18 @@ Rollback does not affect DBB history and does not modify past decisions.
 
 ---
 
+## 13.1 LoRA Safety Invariants
+
+The following invariants are enforced across all deployments:
+- LoRA adapters never modify historical DBB records
+- LoRA adapters never rewrite past decisions
+- LoRA rollback is instantaneous and side-effect free
+- LoRA changes affect only future inference
+
+LoRA adapters are treated as runtime expertise overlays, not memory.
+
+---
+
 ## 14. Key Design Principles
 
 - Decisions > conversations
@@ -256,3 +308,23 @@ Rollback does not affect DBB history and does not modify past decisions.
 ## 15. Summary
 
 DBB ensures that important moments are captured without user effort. LoRA routing ensures that expertise compounds without degrading trust. Together, they form the reasoning backbone of Membria CE.
+
+---
+
+## 16. Council Cost and Escalation Governance
+
+Escalation to the Council of LLMs is governed by explicit policies.
+
+Triggers:
+- Confidence below threshold
+- Conflicting reasoning signals
+- High-risk or irreversible decision context
+
+Cost governance:
+- Personal CE users operate under capped monthly Council usage
+- Enterprise deployments define explicit budgets
+- All Council calls are logged and auditable
+
+By design:
+- No silent escalation is allowed
+- Escalation decisions are explainable post-hoc
