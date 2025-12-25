@@ -1,0 +1,40 @@
+---
+title: "Decentralized backend"
+description: "KCG, DoD, gateways, and decentralized storage roles in Membria CE"
+---
+
+# Decentralized backend
+
+Membria CE uses a decentralized backend to verify, store, and share knowledge artifacts that exceed local confidence. This backend is separate from the client runtime and is invoked only when escalation is required.
+
+## What the backend does
+
+- Verifies escalated answers via a Council and Curator workflow.
+- Stores validated artifacts in the Knowledge Cache Graph (KCG) with provenance.
+- Anchors immutable payloads on decentralized storage.
+- Provides a cache-first retrieval path for future requests.
+
+## Core components
+
+### KCG (Knowledge Cache Graph)
+A shared, decentralized knowledge cache that stores verified answers and citations. Clients query KCG before escalating to the Council.
+
+### DoD (Decision-on-Demand)
+The escalation path that routes queries to the Council when local confidence is insufficient. DoD enforces policy, cost limits, and provenance rules.
+
+### Gateways and consensus
+Gateway validators verify and fuse Council outputs, apply governance rules, and write final artifacts to KCG.
+
+### Decentralized storage
+Immutable knowledge payloads are anchored on decentralized storage (e.g., Arweave), while consensus logic and indexing are coordinated through the network layer (e.g., Peaq).
+
+## How it connects to the client
+
+1. The client runs local SLM + GraphRAG and attempts a grounded answer.
+2. If confidence is low, it escalates through DoD.
+3. The Council produces candidate answers; the Curator verifies and fuses them.
+4. The verified artifact is written to KCG and returned to the client with citations.
+
+## Why it matters
+
+The backend ensures that escalated knowledge is validated, traceable, and reusable without forcing the client to keep all reasoning in the prompt. It also prevents repeated costs for the same question across users and devices.
