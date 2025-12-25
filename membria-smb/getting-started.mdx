@@ -1,13 +1,119 @@
 ---
 title: "Getting started"
-description: "Initial onboarding for Membria SMB"
+description: "Initial onboarding for Membria for SMBs (SaaS)."
 ---
 
 # Getting started
 
-This page will expand as SMB onboarding is finalized.
+This guide walks you through the first steps of setting up Membria for SMBs.
+The goal is simple: get shared context working fast, without configuration overhead.
 
-## Steps
-1. Create a workspace and invite team members.
-2. Connect shared sources and set access scopes.
-3. Run initial ingestion and review the Decision Surface.
+Membria is designed so that you can see value before you finish full ingestion.
+
+---
+
+## Step 1: Create a workspace
+
+A workspace represents one team or organization.
+
+When you create a workspace:
+- You define the shared context boundary
+- You establish ownership and admin rights
+- You isolate data, LoRA scopes, and audit logs
+
+Best practice:
+- One workspace per company or independent team
+- Avoid mixing unrelated teams in the same workspace
+
+---
+
+## Step 2: Invite team members
+
+Invite colleagues who participate in decisions or consume shared knowledge.
+
+Roles are lightweight by default:
+- **Admin**: manages sources, access, and settings
+- **Member**: queries, contributes, and reviews knowledge
+
+You can adjust permissions later. Early onboarding works best when at least 3-5 people join, so Membria can capture real decision flow.
+
+---
+
+## Step 3: Connect shared sources
+
+Connect the systems where your team already works.
+
+Typical sources include:
+- Document storage (Drive, SharePoint, folders)
+- Knowledge bases and wikis
+- Internal notes and project documentation
+
+For each source, define:
+- Who can access it
+- Whether it is read-only or update-aware
+- Whether it contributes to shared reasoning
+
+Membria respects existing access boundaries. It does not bypass permissions.
+
+---
+
+## Step 4: Run initial ingestion
+
+Start ingestion to build the first shared knowledge graph.
+
+During this phase:
+- Documents are indexed
+- Key entities and events are extracted
+- Initial decision signals are detected
+
+You do not need perfect coverage at this stage.
+Partial ingestion is enough to begin querying and exploring.
+
+---
+
+## Step 5: Review the Decision Surface
+
+After ingestion, open the Decision Surface.
+
+This is where Membria differs from standard search:
+- You see what the team already knows
+- You see gaps and repeated questions
+- You can explore decisions, not just documents
+
+Use this step to validate that:
+- Sources are connected correctly
+- Access scopes behave as expected
+- Early signals match real team context
+
+---
+
+## Step 6: Start using Membria in daily work
+
+From here, treat Membria as part of normal work:
+- Ask questions
+- Revisit past decisions
+- Share findings with teammates
+
+Membria improves as it observes real usage.
+You do not need to train it manually.
+
+---
+
+## What to do next
+
+After basic onboarding, most teams proceed to:
+- Refining access scopes
+- Adding domain-specific LoRA patches
+- Enabling alerts and governance features
+
+These steps are optional and can be done gradually.
+
+---
+
+## Notes on expectations
+
+Membria is not a one-time setup tool.
+It compounds value as your team works.
+
+The first week focuses on visibility.
+The following weeks focus on reuse and decision continuity.
