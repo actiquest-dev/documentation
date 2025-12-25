@@ -45,29 +45,20 @@ When local AI is not enough, Membria escalates, then **brings back** what it lea
 
 ```mermaid
 flowchart LR
-  U[User] --> UI[Membria Client UI
-(Chat - Decision Surface - Search)]
+  U[User] --> UI[Membria Client UI\n(Chat - Decision Surface - Search)]
   UI --> ORCH[Router / Orchestrator]
 
-  ORCH --> SLM[Local SLM Runtime
-(optional now, default later)]
-  ORCH --> MEM[Local Memory Layer
-(SQLite + DuckDB)]
-  ORCH --> GR[Local GraphRAG
-(Temporal Ontology + Vectors)]
-  ORCH --> DBB[Decision Black Box
-(decision extraction agent)]
+  ORCH --> SLM[Local SLM Runtime\n(optional now, default later)]
+  ORCH --> MEM[Local Memory Layer\n(SQLite + DuckDB)]
+  ORCH --> GR[Local GraphRAG\n(Temporal Ontology + Vectors)]
+  ORCH --> DBB[Decision Black Box\n(decision extraction agent)]
 
-  ORCH -->|Escalate only if needed| COUNCIL[LLM Council
-(10 models)]
-  COUNCIL --> KCG[Global Knowledge Cache / KCG
-(decentralized)]
-  COUNCIL --> CUR[Knowledge Curator
-(verification + fusion)]
+  ORCH -->|Escalate only if needed| COUNCIL[LLM Council\n(10 models)]
+  COUNCIL --> KCG[Global Knowledge Cache / KCG\n(decentralized)]
+  COUNCIL --> CUR[Knowledge Curator\n(verification + fusion)]
   CUR -->|Updates| GR
   CUR -->|CAG / cache entries| MEM
-  CUR -->|Optional training artifacts| SF[SkillForge
-(LoRA generation)]
+  CUR -->|Optional training artifacts| SF[SkillForge\n(LoRA generation)]
   SF --> SLM
 ```
 
@@ -243,8 +234,7 @@ flowchart TD
   end
 
   subgraph SkillForge["SkillForge"]
-      H["Selective SFT -> LoRA patch
-(scoped to one expert)"]
+      H["Selective SFT -> LoRA patch\n(scoped to one expert)"]
   end
 
   A["User Query"] --> R{"Router / Orchestrator"}
