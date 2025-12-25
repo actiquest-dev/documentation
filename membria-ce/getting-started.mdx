@@ -1,16 +1,127 @@
 ---
 title: "Getting started"
-description: "Initial setup steps for Membria CE"
+description: "How expertise accumulates in Membria CE with LoRA patches."
 ---
 
-> This is a short starter guide for Membria CE. It will expand as onboarding and release packaging are finalized.
+# How Expertise Accumulates (LoRA)
 
-## Steps
-1. Choose Membria Cloud or waitlist for self-hosted access.
-2. Connect at least one source (drive, chat export, or docs).
-3. Run an initial ingestion and review the Decision Surface.
-4. Verify your first Decision Black Box captures and confirm or dismiss signals.
+Membria does not rely on a single static model.
 
-## Next
-- Review the Concepts page for core terms and data flows.
-- Open the Client page to understand the runtime stack.
+Instead, it builds **personal and domain-specific expertise** over time using LoRA patches.
+
+This happens automatically.
+
+---
+
+## What LoRA means in Membria
+
+A LoRA patch is a **small expert adapter** applied on top of a base model.
+
+In Membria, LoRAs are used to:
+- Reduce hallucinations
+- Improve domain accuracy
+- Preserve personal or organizational context
+- Avoid retraining full models
+
+LoRAs do **not** replace the base model.
+They specialize it.
+
+---
+
+## Where LoRA patches come from
+
+LoRA patches in Membria are created from three sources:
+
+### 1. Your decisions and outcomes
+
+When DBB captures decisions and later observes outcomes:
+- Correct reasoning patterns are reinforced
+- Incorrect assumptions are marked as failures
+
+These signals form training examples.
+
+---
+
+### 2. Escalation results
+
+When local AI escalates to stronger models:
+- The final validated answer is cached
+- Repeated gaps are detected
+- Candidate LoRA improvements are generated
+
+LoRAs close **knowledge gaps**, not just add facts.
+
+---
+
+### 3. Explicit domain imports (optional)
+
+You may optionally add:
+- Domain rules
+- Internal guidelines
+- Structured reference material
+
+These can seed initial LoRA specialization.
+
+---
+
+## How LoRAs are applied
+
+When you ask a question, Membria evaluates:
+
+- Is this within a known domain?
+- Does a LoRA improve confidence?
+- Has this LoRA reduced escalation in the past?
+
+If yes:
+- The LoRA is applied automatically
+- The base model remains unchanged
+- Confidence is re-evaluated
+
+If not:
+- Membria escalates or answers without LoRA
+
+You never need to select LoRAs manually.
+
+---
+
+## What LoRAs do not do
+
+LoRAs do not:
+- Make the model generally smarter
+- Override uncertainty
+- Prevent escalation when confidence is low
+
+Membria prefers **explicit escalation** over false certainty.
+
+---
+
+## LoRA lifecycle (simplified)
+
+1. Signals detected (DBB plus outcomes)
+2. Candidate LoRA created
+3. Evaluated against fixed test prompts
+4. Applied only if accuracy improves
+5. Rolled back instantly if degradation occurs
+
+Past decisions are never modified.
+
+---
+
+## Why this matters
+
+Over time:
+- The same questions stop triggering escalation
+- Answers become more consistent
+- Your AI reflects *your* way of thinking
+- Knowledge compounds instead of resetting
+
+This is how Membria becomes personal without becoming opaque.
+
+---
+
+## Important note
+
+LoRAs are **local to you or your workspace**.
+
+They are not shared globally unless explicitly published.
+Your expertise remains yours.
