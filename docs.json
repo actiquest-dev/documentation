@@ -130,7 +130,7 @@
             "group": "Product",
             "pages": [
               "membria-smb/decision-surface",
-              "membria-smb/decision-brief-builder"
+              "membria-smb/decision-black-box"
             ]
           },
           {
