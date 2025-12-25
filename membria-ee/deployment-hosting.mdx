@@ -23,8 +23,8 @@ It runs a fast XLAM model (under 1 second) for 95 percent of tasks and escalates
 
 | Function | Description | SLA |
 | --- | --- | --- |
-| Router | Classifies the request (FAQ, analysis, action), selects the domain (AML, Fraud, Legal), checks security (DLP, RBAC, PII) | <= 50 ms |
-| Planner | Breaks tasks into steps, selects tools (graph query, vector search, API), controls XLAM or Qwen routing, validates policy | <= 200 ms |
+| Router | Classifies the request (FAQ, analysis, action), selects the domain (AML, Fraud, Legal), checks security (DLP, RBAC, PII) | &le; 50 ms |
+| Planner | Breaks tasks into steps, selects tools (graph query, vector search, API), controls XLAM or Qwen routing, validates policy | &le; 200 ms |
 
 ### XLAM Large (action model for orchestration)
 
@@ -104,7 +104,7 @@ Event 4: AML_Decision (2025-11-20 14:10)
 | --- | --- |
 | What it is | Embeddings live inside graph nodes, not in a separate database |
 | Retrieval | 1) Graph filter (RBAC) -> 2) Subgraph select -> 3) Vector similarity inside subgraph -> 4) Temporal filter -> 5) Full context to the model |
-| Latency | Total retrieval <= 300 ms p95 |
+| Latency | Total retrieval &le; 300 ms p95 |
 | Advantage | Context, security, and versioning are built in |
 
 ### TuGraph vs Neo4j
@@ -124,7 +124,7 @@ Event 4: AML_Decision (2025-11-20 14:10)
 | Nodes | 353M (50K organizations, 500K customers, 250M events) |
 | Edges | 2B relationships |
 | Storage | 52GB compressed plus 85GB vectors |
-| Query latency p95 | <= 1000 ms (all types) |
+| Query latency p95 | &le; 1000 ms (all types) |
 | Throughput | 8,500 parallel queries/sec |
 | Uptime | 99.95 percent (3 replicas) |
 | Cache hit rate | 30-40 percent (Redis semantic cache) |
@@ -155,10 +155,10 @@ _Diagram placeholder_
 
 | Scenario | Method | Latency |
 | --- | --- | --- |
-| Real-time copilot | REST sync | <= 1.2 sec |
+| Real-time copilot | REST sync | &le; 1.2 sec |
 | Batch scoring | ETL nightly | 1-2 hours |
-| Streaming fraud | Kafka or event stream | <= 100 ms |
-| Legacy query | REST or SOAP via ESB | <= 2 sec |
+| Streaming fraud | Kafka or event stream | &le; 100 ms |
+| Legacy query | REST or SOAP via ESB | &le; 2 sec |
 
 ---
 
@@ -363,8 +363,8 @@ _Diagram placeholder_
 
 | Component | Functions | SLA |
 | --- | --- | --- |
-| Router | Classifies task (FAQ, analysis, action), selects domain (AML, Fraud, Legal), checks security (DLP, RBAC), chooses XLAM or Qwen | <= 50 ms |
-| Planner | Breaks into steps, selects tools (graph, vector, API), builds context, controls XLAM or Qwen, checks compliance | <= 200 ms |
+| Router | Classifies task (FAQ, analysis, action), selects domain (AML, Fraud, Legal), checks security (DLP, RBAC), chooses XLAM or Qwen | &le; 50 ms |
+| Planner | Breaks into steps, selects tools (graph, vector, API), builds context, controls XLAM or Qwen, checks compliance | &le; 200 ms |
 
 ## Slide 8: Component 2 - XLAM Large
 
@@ -404,4 +404,4 @@ When deep reasoning is required.
 
 - AML: beneficiary tracing (6 levels)
 - Legal: interpretation of new law
-- Fraud: ring fraud detection (graph > 10 nodes)
+- Fraud: ring fraud detection (graph &gt; 10 nodes)
