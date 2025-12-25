@@ -1,12 +1,135 @@
 ---
 title: "Concepts"
-description: "Core enterprise concepts and governance model"
+description: "Core enterprise concepts and governance model for Membria Enterprise Edition (EE)."
 ---
 
 # Concepts
 
-## Core concepts
-- Private knowledge domains and tenancy
-- Policy-driven escalation and cost controls
-- Compliance-grade audit trails
-- Security review and approval workflows
+Core enterprise concepts and governance model for Membria Enterprise Edition (EE).
+
+Membria EE is designed for organizations operating in regulated, high-risk, and high-complexity environments.
+Its core concepts reflect how knowledge, decisions, and reasoning must be handled in enterprise contexts.
+
+---
+
+## Core Concepts
+
+### 1. Private Knowledge Domains and Tenancy
+
+Membria EE operates on the principle of **explicit knowledge boundaries**.
+
+A **Knowledge Domain** is a logically isolated space that defines:
+- What data is accessible
+- Which models and LoRA patches apply
+- Who can see, query, or influence decisions
+- How escalation and retention policies behave
+
+Domains may correspond to:
+- Business units
+- Legal entities
+- Jurisdictions
+- Projects or regulatory scopes
+
+**Key properties:**
+- Strict isolation by default (no cross-domain leakage)
+- Optional controlled sharing via policy
+- Independent retention and deletion rules
+- Independent audit trails
+
+This allows enterprises to run multiple regulated contexts inside a single deployment without risk of contamination.
+
+---
+
+### 2. Policy-Driven Escalation and Cost Controls
+
+All non-local reasoning in Membria EE is governed by **explicit policies**, not hidden heuristics.
+
+Escalation policies define:
+- When local inference is sufficient
+- When external or stronger models may be used
+- Which models are allowed per domain
+- Cost ceilings and token budgets
+- Risk thresholds that force escalation or block it
+
+**Important characteristics:**
+- Escalation is opt-in, not mandatory
+- Policies can enforce fully local operation
+- Cost exposure is predictable and bounded
+- Every escalation is logged and reviewable
+
+This ensures that enterprises remain in control of:
+- Spend
+- Risk
+- Data exposure
+- Model behavior
+
+---
+
+### 3. Compliance-Grade Audit Trails
+
+Membria EE treats reasoning and decisions as **first-class audit objects**.
+
+Audit trails capture:
+- What information was used
+- Which assumptions were present
+- Which models participated
+- What decision or conclusion was produced
+- Who accessed or approved outputs
+- When changes occurred
+
+**Properties:**
+- Append-only
+- Tamper-evident
+- Time-indexed
+- Queryable for compliance and forensic review
+
+Audit data is retained according to enterprise-defined policies and supports regulatory requirements such as:
+- SOX
+- AML/KYC
+- GDPR accountability
+- Internal risk management
+
+---
+
+### 4. Security Review and Approval Workflows
+
+Membria EE supports **human-in-the-loop governance** where required.
+
+Security and approval workflows allow organizations to:
+- Require approval before certain escalations
+- Review high-impact decisions
+- Gate access to sensitive knowledge domains
+- Enforce separation of duties
+
+Typical use cases include:
+- Compliance sign-off before regulatory interpretation
+- Legal review of contract reasoning
+- Risk committee approval for sensitive decisions
+
+These workflows integrate directly into the Decision Surface and audit system, ensuring that governance does not rely on external tools or informal processes.
+
+---
+
+## Design Principles
+
+Membria EE concepts are guided by the following principles:
+
+- **Isolation before sharing**
+- **Policies over heuristics**
+- **Auditability over convenience**
+- **Explicit governance over implicit behavior**
+- **Local-first by default**
+
+These principles ensure Membria EE can be deployed in environments where trust, compliance, and accountability are non-negotiable.
+
+---
+
+## Summary
+
+Membria EE is not just an AI deployment.
+It is a **governed reasoning system** designed to operate safely inside enterprise constraints.
+
+Its core concepts enable organizations to:
+- Accumulate intelligence without losing control
+- Scale reasoning without scaling risk
+- Use AI without violating compliance boundaries
