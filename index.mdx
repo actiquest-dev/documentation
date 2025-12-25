@@ -1,45 +1,90 @@
 ---
 title: "Membria Documentation"
-description: "Overview of Membria products and links to CE, SMB, and EE docs"
+description: "Persistent intelligence across AI tools, decisions, and time."
 ---
 
-# Membria product documentation
+## Membria Documentation
 
-Membria is a family of products that share a common runtime philosophy: local-first reasoning where possible, explicit memory, and selective escalation. This documentation is organized by product.
+**Membria is a persistent intelligence layer that preserves reasoning, decisions, and knowledge across AI tools and time.**
+It runs as a personal system, a team SaaS, or an enterprise platform -- with the same core architecture.
 
-## Products
+Membria is not built to generate better answers.
+It is built to make intelligence compound instead of resetting.
 
-<Columns cols={3}>
-  <Card
-    title="Membria CE (Personal)"
-    icon="sparkles"
-    href="/membria-ce/overview"
-  >
-    Local-first personal runtime with Decision Surface, DBB, and a shared knowledge backend.
-  </Card>
-  <Card
-    title="Membria for SMBs (SaaS)"
-    icon="building"
-    href="/membria-smb/overview"
-  >
-    Managed SaaS for teams that need shared memory, governance, and fast onboarding.
-  </Card>
-  <Card
-    title="Membria EE (Enterprise)"
-    icon="shield"
-    href="/membria-ee/overview"
-  >
-    Enterprise-grade deployment, compliance controls, and private knowledge domains.
-  </Card>
-</Columns>
+---
 
-## How to use these docs
+## Choose your product
 
-Each product branch includes:
-- Overview of the product and audience
-- Getting started
-- Core concepts
-- Deployment and hosting
-- Security and privacy
+### Membria CE -- Personal (Community Edition)
 
-If you are unsure where to start, begin with the CE overview and then follow the branch that matches your deployment needs.
+Membria CE is designed for individual power users who work across many AI tools, chats, and contexts.
+
+It runs local-first, accumulates personal knowledge and reasoning, and extracts decisions automatically from everyday work.
+Cloud models are used only when needed, and results are cached to strengthen your local system over time.
+
+**Best for:** founders, engineers, researchers, independent creators.
+
+-> [Go to Membria CE docs](/membria-ce/overview)
+
+---
+
+### Membria for SMBs -- Team SaaS
+
+Membria for SMBs is a managed SaaS for small teams that need shared reasoning, decision continuity, and organizational memory.
+
+It turns team discussions, chats, and documents into a living Decision Surface that shows what is open, unresolved, drifting, or risky.
+The system is shared, but reasoning remains explainable and auditable.
+
+**Best for:** startups, product teams, research groups.
+
+-> [Go to Membria for SMBs docs](/membria-smb/overview)
+
+---
+
+### Membria EE -- Enterprise Edition
+
+Membria EE is an enterprise-grade deployment for organizations that require governance, compliance, and long-term institutional memory.
+
+It supports on-prem and hybrid deployments, strict access control, audit trails, and policy enforcement -- without sacrificing explainability.
+Decisions remain traceable even when people, tools, or models change.
+
+**Best for:** regulated enterprises, financial institutions, large organizations.
+
+-> [Go to Membria Enterprise docs](/membria-ee/overview)
+
+---
+
+## Core concepts (shared across all products)
+
+All Membria products are built on the same core architecture:
+
+- **Decision Surface** -- a live view of open, unresolved, drifting, or risky decisions.
+- **Decision Black Box (DBB)** -- an agent that detects and records decisions as they happen.
+- **Persistent Memory** -- a combination of long-context, GraphRAG, and decision records.
+- **LoRA Expertise Routing** -- domain-specific skill amplification without global model drift.
+- **Council Escalation** -- controlled use of stronger models when local intelligence is insufficient.
+
+The difference between products is not *what* Membria does --
+but *where it runs*, *who shares it*, and *how it is governed*.
+
+-> [Explore core architecture](/membria-ce/concepts)
+
+---
+
+## How to use this documentation
+
+- Start with **Core Concepts** if you want to understand how Membria works.
+- Jump directly to your product section if you already know what you are deploying.
+- Enterprise readers should review governance and compliance sections early.
+
+This documentation is designed for technical users and decision-makers.
+If something feels underspecified, it probably is -- and should be made explicit.
+
+---
+
+## Where to go next
+
+- New user? -> [Getting Started](/membria-ce/getting-started)
+- Evaluating architecture? -> [Core Concepts](/membria-ce/concepts)
+- Deploying at scale? -> [Enterprise Edition](/membria-ee/overview)
+- Running locally? -> [Membria CE](/membria-ce/overview)
