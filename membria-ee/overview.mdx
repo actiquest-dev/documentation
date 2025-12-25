@@ -7,14 +7,19 @@ description: "What Membria EE is and who it serves"
 
 ## What is Membria EE and who it serves
 
-## Membria EE (Enterprise Edition)
+Membria EE (Enterprise Edition) is an on-premise AI reasoning platform for organizations that operate under strict compliance, data residency, and security requirements. It preserves institutional memory by turning decisions, assumptions, and rationale into durable, auditable records.
 
-Membria EE is an on-premise AI reasoning platform designed for enterprises operating under strict compliance, data residency, and security requirements.
+Membria EE is not a chatbot and not a document management system. It is a **reasoning and decision infrastructure** that integrates with existing enterprise tools rather than replacing them.
 
-It provides a controlled environment where human and AI-assisted decisions can be captured, preserved, and reviewed over time -- without relying on public cloud models or shared knowledge layers.
+---
 
-Membria EE is not a chatbot and not a document management system.
-It is a **reasoning and decision infrastructure** that integrates with existing enterprise tools rather than replacing them.
+## Why enterprises need institutional memory
+
+Enterprises already generate critical decisions across chats, tickets, documents, internal copilots, and analytics systems. What is usually missing is a **persistent layer that preserves why decisions were made**, not just what happened.
+
+Relying on long context windows does not solve this problem. Retrieval quality degrades in the middle of long contexts, and costs rise with every query. Traditional vector RAG systems help search, but they do not capture causality, versioning, or decision lineage.
+
+Membria EE addresses this by modeling decisions as structured events inside a temporal graph so that reasoning, causality, and outcomes remain traceable over time.
 
 ---
 
@@ -35,19 +40,16 @@ Typical users include:
 
 ---
 
-## What problems it addresses
+## Core architectural approach
 
-Enterprises already make critical decisions across many systems:
+Membria EE captures institutional memory with a **temporal knowledge graph**:
 
-- chats and internal messengers,
-- tickets and incident tools,
-- documents and knowledge bases,
-- internal copilots and AI assistants,
-- analytics and reporting platforms.
+- **Event-centric memory:** decisions are stored as events with who, what, when, and why.
+- **Causality and lineage:** decisions link to inputs, alternatives, and outcomes.
+- **Versioning over time:** superseded decisions remain auditable, not overwritten.
+- **GraphRAG retrieval:** queries traverse graph context instead of raw text similarity.
 
-What is usually missing is a **persistent layer that preserves why decisions were made**, not just what happened.
-
-Membria EE fills this gap by extracting and structuring decisions, assumptions, and reasoning from existing workflows and interactions.
+This preserves the reasoning chain, not just the final artifact.
 
 ---
 
