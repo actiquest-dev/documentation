@@ -1,18 +1,144 @@
 ---
 title: "Overview"
-description: "What Membria for SMBs is and who it serves"
+description: "What Membria for SMBs is, who it serves, and what you get."
 ---
 
-# Membria for SMBs (SaaS)
+# Overview
 
-Membria for SMBs is a managed SaaS offering for teams that need shared context, decision continuity, and fast onboarding.
+## Membria for SMBs (SaaS)
+
+Membria for SMBs is a managed SaaS product for small and mid-sized teams that work in documents, decisions, and ongoing projects. It gives your team a shared intelligence layer that does not reset across chats, tools, or people. You can onboard fast, keep context over time, and stay in control without running enterprise infrastructure.
+
+Membria SaaS is built for document-heavy professional services teams that need answers they can trust. It connects to the tools you already use (Drive/SharePoint, Slack/Teams, email exports, ticketing, CRMs, folders of PDFs) and turns scattered work into a single, searchable intelligence layer.
+
+This is not chat with your docs. The core promise is compounding institutional intelligence: Membria keeps reasoning, decisions, and outcomes tied to evidence so the next search is faster, more accurate, and easier to defend.
+
+## What problem it solves
+
+Most teams work across dozens of chats and document systems. The result is fragmented knowledge: decisions get buried, reasons get lost, and new work repeats old mistakes.
+
+Membria fixes the non-accumulating intelligence problem by turning everyday work (docs, chats, notes, threads) into persistent, queryable knowledge with decision continuity. The pain is retrieval plus trust plus reuse across time.
 
 ## Who it is for
-- Small and mid-sized teams
-- Cross-functional groups with shared decisions
-- Teams that need governance without enterprise overhead
+
+Membria for SMBs fits teams that need shared context but do not want enterprise deployment complexity:
+
+- Small and mid-sized teams that rely on documents and past work
+- Cross-functional groups where decisions happen in many places (chat, docs, tickets)
+- Professional services and heavy-document businesses (legal, accounting, consulting, agencies, real estate)
+- Teams that need governance and traceability without enterprise overhead
+
+Typical team size: 10-250 users. The common pattern is high document volume, high reuse, and low tolerance for hallucinations.
 
 ## What you get
-- Shared GraphRAG and decision capture
-- Team-level LoRA scopes
-- Workspace controls and audit logs
+
+Membria SaaS gives professional teams four capabilities that general assistants do not deliver together:
+
+### 1) Connected search across everything (GraphRAG)
+
+Membria does not just find documents that look similar. It connects related facts across sources and returns results with structure:
+
+- which document is relevant
+- which paragraph or page supports the answer
+- what decision or precedent it relates to
+- how it connects to other cases or projects over time
+
+This is how you go from 15 documents that mention the term to 3 precedents that actually match the scenario.
+
+### 2) Audit-grade answers (proof, not vibes)
+
+For every important claim, Membria can show where it came from:
+
+- citations to the source
+- traceable chains (how multiple pieces of evidence support the conclusion)
+- query and access logs (who asked what, when)
+
+This matters for regulated work (audit, legal, finance) and for any team that needs to defend decisions to clients.
+
+### 3) Compounding expertise (knowledge plus LoRA patches)
+
+Membria can run with a baseline model and improve its domain behavior over time using two levers:
+
+- Knowledge layer: a growing graph plus retrieval memory that improves grounding and reduces repeated work
+- LoRA patches: small expert adapters that teach your model to behave like your practice (formatting, terminology, structured outputs, policy interpretation)
+
+The point is not a smarter model. The point is a model that becomes more useful in your domain and escalates less over time.
+
+### 4) Decision-aware memory (why and outcome)
+
+Membria is optimized for turning activity into reusable knowledge:
+
+- decisions extracted from workstreams (memos, threads, analyses, discussions)
+- reasoning and assumptions captured (what we believed at the time)
+- outcome tracking (what happened after)
+
+This makes the system valuable at day 30 and day 90 because it can surface patterns and drift, not just summarize.
+
+## How it works in practice
+
+You still use Membria like a normal chat when you want. The difference is that chat is not the final product. Membria continuously builds a shared knowledge layer from your work and keeps it usable across time. Over weeks, your team gets faster at finding precedents, reusing prior decisions, and avoiding repeated confusion.
+
+## How Membria SaaS works (high level)
+
+1. Connect sources: documents and collaboration tools plus structured systems.
+2. Ingest and normalize: parse, dedupe, classify, extract entities and events.
+3. Build the knowledge layer: vector index plus graph relationships plus timelines.
+4. Answer with grounding: retrieval plus reasoning plus citations.
+5. Learn from use: feedback, corrections, outcomes, and promoted patterns improve future answers.
+6. Escalate only when needed: route to stronger models and cache validated results.
+## Real examples
+
+### Accounting and audit
+
+- Find similar client situations where passive income exceeded a threshold and what approach worked.
+- Show the precedent and the exact sections we cited last year.
+- What changed in policy since the last audit cycle, and what workpapers are affected?
+
+### Legal
+
+- Which past contracts had a clause like this and what negotiation position worked?
+- Show the decision trail: who approved the exception, why, and what happened later.
+
+### Consulting
+
+- Draft a proposal using our best-performing templates and cite comparable past outcomes.
+- Find the last time we tried this strategy and why it failed.
+
+## How this differs from generic chat assistants
+
+Generic assistants can answer questions, but they do not reliably preserve your team's context across tools and months. Membria is designed to keep knowledge and decisions alive across projects, people, and model upgrades, with citations and traceability when it matters.
+
+In most firms, they coexist:
+
+- ChatGPT or Copilot for generic work
+- Membria for institutional memory, precedent search, compliance-grade reasoning, and decision tracking
+
+## Security and governance (SaaS)
+
+Membria for SMBs is built for teams that handle sensitive client data:
+
+- access controls per user and domain
+- audit logs
+- controlled retention policies
+- deployment and residency options aligned with regulated workflows (depending on plan)
+
+If you require strict data residency or on-prem deployment, Membria EE is the enterprise path.
+
+## Deployment model
+
+Membria for SMBs is SaaS-first for fast onboarding and minimal setup. A global knowledge layer can be maintained in the cloud, while teams keep control over what is shared versus private at the workspace level.
+
+## When you should not use Membria SaaS
+
+Membria is not the best fit if:
+
+- you only need a writing assistant
+- your work has low reuse and low risk
+- you cannot connect data sources (nothing to index)
+- you need full on-prem from day one (use Membria EE)
+
+## Summary
+
+Membria SaaS is for professional teams where documents are the work, decisions must be defensible, and knowledge must compound.
+
+It turns scattered files and conversations into a living institutional brain: grounded answers, connected precedents, and decision memory that improves with every use.
