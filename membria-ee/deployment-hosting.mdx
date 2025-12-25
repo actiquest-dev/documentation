@@ -77,6 +77,7 @@ SuperGraphRAG uses a temporal event graph with embedded vectors. This reduces ha
 
 Each event is a fact with history:
 
+```
 Event 1: KYC_Check_Started (2025-11-20 09:00)
   - cause: new_customer_registered
 
@@ -93,6 +94,7 @@ Event 4: AML_Decision (2025-11-20 14:10)
   - cause: Event 3, sanction_check_passed
   - decision: "APPROVED"
   - audit_trail: "Full UBO chain verified"
+```
 
 **Advantage:** the model sees the full causal chain, leading to far fewer hallucinations.
 
@@ -147,7 +149,7 @@ Event 4: AML_Decision (2025-11-20 14:10)
 
 ### Typical AML flow
 
-(Diagram placeholder)
+_Diagram placeholder_
 
 ### Integration methods
 
@@ -294,7 +296,7 @@ A: Operators: 1 day. IT: 2 days. Architects: 3 days plus 4 weeks hands-on.
 
 ---
 
-# Membria Enterprise AI Hub - presentation outline
+## Membria Enterprise AI Hub - presentation outline
 
 ## Slide 1: Title
 
@@ -340,7 +342,7 @@ Payback: 1 year (staff savings)
 
 ## Slide 4: Architecture (high level)
 
-(Diagram placeholder)
+_Diagram placeholder_
 
 ## Slide 5: Key features
 
@@ -355,7 +357,7 @@ Payback: 1 year (staff savings)
 
 ## Slide 6: Request flow (AML UBO tracing)
 
-(Diagram placeholder)
+_Diagram placeholder_
 
 ## Slide 7: Component 1 - Router + Planner
 
