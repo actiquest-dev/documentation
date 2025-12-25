@@ -1,50 +1,191 @@
 ---
-title: "Decision Brief Builder"
-description: "Structured decision documentation and precedent creation."
+title: "Decision Black Box (DBB)"
+description: "Background decision capture for SMB workspaces"
 ---
 
-# Decision Brief Builder (DBB)
+# Decision Black Box (DBB) for SMBs
 
 ## Overview
 
-Decision Brief Builder is the structured decision documentation tool. It creates a decision brief that becomes part of institutional memory.
+Decision Black Box (DBB) is a background reasoning agent in Membria for SMBs that **automatically captures team decisions as they happen**.
 
-## When it is used
+DBB does not replace chat, workflows, or tools.
+It observes them and extracts **decision signals** from everyday work -- conversations, documents, reviews, and approvals -- turning ephemeral activity into **institutional memory**.
 
-- A partner makes a client decision
-- A committee reviews an exception
-- A team closes an engagement and documents learnings
-- A new precedent is created for future use
+For SMB teams, DBB solves a core problem:
+> important decisions happen constantly, but are rarely documented, tracked, or revisited.
 
-## Decision brief structure
+---
 
-| Section | Purpose | AI assistance |
-| --- | --- | --- |
-| Decision | Clear statement of what was decided | Butler suggests wording |
-| Context | Background and client situation | Auto-extracted from docs |
-| Reasoning | Why the decision was made | Butler prompts for completeness |
-| Alternatives | What else was considered | Butler suggests common alternatives |
-| Approvals | Who signed off and when | Workflow automation |
-| Documents | Supporting materials | Auto-linked from discussion |
-| Precedents | Related past decisions | Butler finds automatically |
+## What DBB is (and is not)
 
-## AI features
+### DBB is:
+- A **non-intrusive background agent**
+- Focused on **decision capture**, not summarization
+- Designed to work across **multiple tools and sources**
+- Always on, but **rarely visible**
 
-**1) Precedent finder**
-- Surfaces similar past decisions
-- Shows match percentage and similarities
-- One-click to view the full precedent
+### DBB is not:
+- A chat interface
+- A task manager
+- A monitoring or surveillance tool
+- A judgment or scoring system
 
-**2) Reasoning completeness check**
-- Butler prompts for missing elements
-- Ensures institutional standards are met
+DBB records *what was decided*, not *who said what*.
 
-**3) Discussion integration**
-- Chat is attached to the brief
-- Attachments from chat are auto-linked
-- Butler participates in the discussion
+---
 
-**4) Precedent creation**
-- One-click "make this a precedent"
-- Butler suggests categorization
-- Future decisions reference it automatically
+## How DBB works in a team environment
+
+### 1. Observation layer
+
+DBB continuously observes team activity across connected sources:
+- Team chat (Slack, Teams, internal chat)
+- Documents and comments
+- Reviews, approvals, and status changes
+- AI-assisted outputs generated in Membria
+
+At this stage, **no reasoning or conclusions are produced**.
+
+---
+
+### 2. Decision signal detection
+
+DBB looks for **decision patterns**, such as:
+- Explicit resolutions ("We'll proceed with option B")
+- Repeated convergence after discussion
+- Approval events
+- Rejected alternatives
+- Commitments tied to actions or owners
+
+Signals are detected probabilistically, with confidence scores.
+
+---
+
+### 3. Decision extraction
+
+When confidence crosses a threshold, DBB extracts:
+- The decision itself
+- The context in which it was made
+- Key assumptions
+- Considered alternatives (if present)
+- Responsible parties (if identifiable)
+- Timestamp and source references
+
+This extraction is **structural**, not interpretive.
+
+---
+
+### 4. Persistence into the workspace SPL
+
+Captured decisions are written into the workspace's **Smart Persistence Layer**:
+- Linked to relevant documents and discussions
+- Connected to prior related decisions
+- Available to the Decision Surface and search
+
+Once stored, decisions become part of the **shared reasoning fabric** of the team.
+
+---
+
+## Visibility and user experience
+
+### Default behavior
+
+DBB operates silently.
+Most of the time, teams do not interact with DBB directly.
+
+Its output surfaces indirectly through:
+- Decision Surface signals
+- Search results with provenance
+- Historical context in AI responses
+
+---
+
+### Optional review and correction
+
+When needed, teams can:
+- Review captured decisions
+- Add clarifications or annotations
+- Mark decisions as outdated or superseded
+
+Corrections do not erase history.
+DBB preserves the original capture and records updates as new events.
+
+---
+
+## False positives and confidence handling
+
+DBB uses conservative heuristics to minimize noise:
+- Low-confidence signals are not persisted
+- Ambiguous discussions remain uncaptured
+- Long discussions without closure are flagged, not recorded
+
+If a false positive occurs:
+- Teams can mark it as "not a decision"
+- DBB learns from the correction
+- Future confidence thresholds are adjusted
+
+---
+
+## Team governance and scope
+
+### Workspace-level control
+
+In Membria for SMBs:
+- DBB operates at the **workspace level**
+- All captured decisions belong to the team, not individuals
+- Access follows workspace permissions
+
+---
+
+### Escalation awareness
+
+DBB is escalation-aware:
+- It records when AI escalation influenced a decision
+- It links decisions to escalated knowledge when applicable
+- It helps teams understand *why* certain answers were trusted
+
+---
+
+## Why DBB matters for SMB teams
+
+Without DBB:
+- Decisions live in chats, emails, and meetings
+- Context is lost when people leave
+- Teams repeat mistakes or re-litigate old choices
+
+With DBB:
+- Decisions persist beyond tools and people
+- New team members ramp up faster
+- AI responses improve using real team history
+- Institutional memory compounds naturally
+
+DBB turns **daily collaboration into durable knowledge** -- without adding process overhead.
+
+---
+
+## Relationship to Decision Surface
+
+DBB feeds the Decision Surface.
+The Decision Surface shows:
+- Open decisions
+- Unresolved assumptions
+- Drift and contradictions
+- Historical outcomes
+
+DBB captures.
+Decision Surface reveals.
+
+Together, they form the reasoning layer of Membria for SMBs.
+
+---
+
+## Summary
+
+Decision Black Box enables SMB teams to:
+- Preserve decisions without manual effort
+- Maintain continuity across tools and time
+- Build shared reasoning capital
+- Reduce repeated discussions and hidden risk
+
+DBB works quietly in the background, ensuring that **what matters is never lost**.
