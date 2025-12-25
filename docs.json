@@ -206,80 +206,80 @@
   },
   "redirects": [
     {
-      "from": "/membriace/business-model",
-      "to": "/membria-ce/business-model"
+      "source": "/membriace/business-model",
+      "destination": "/membria-ce/business-model"
     },
     {
-      "from": "/membriace/client-runtime",
-      "to": "/membria-ce/client-runtime"
+      "source": "/membriace/client-runtime",
+      "destination": "/membria-ce/client-runtime"
     },
     {
-      "from": "/membriace/client",
-      "to": "/membria-ce/client"
+      "source": "/membriace/client",
+      "destination": "/membria-ce/client"
     },
     {
-      "from": "/membriace/competitive",
-      "to": "/membria-ce/competitive"
+      "source": "/membriace/competitive",
+      "destination": "/membria-ce/competitive"
     },
     {
-      "from": "/membriace/concepts",
-      "to": "/membria-ce/concepts"
+      "source": "/membriace/concepts",
+      "destination": "/membria-ce/concepts"
     },
     {
-      "from": "/membriace/dbb-and-lora-runtime",
-      "to": "/membria-ce/dbb-and-lora-runtime"
+      "source": "/membriace/dbb-and-lora-runtime",
+      "destination": "/membria-ce/dbb-and-lora-runtime"
     },
     {
-      "from": "/membriace/deployment-hosting",
-      "to": "/membria-ce/deployment-hosting"
+      "source": "/membriace/deployment-hosting",
+      "destination": "/membria-ce/deployment-hosting"
     },
     {
-      "from": "/membriace/diagrams",
-      "to": "/membria-ce/diagrams"
+      "source": "/membriace/diagrams",
+      "destination": "/membria-ce/diagrams"
     },
     {
-      "from": "/membriace/getting-started",
-      "to": "/membria-ce/getting-started"
+      "source": "/membriace/getting-started",
+      "destination": "/membria-ce/getting-started"
     },
     {
-      "from": "/membriace/kcg-gateways",
-      "to": "/membria-ce/kcg-gateways"
+      "source": "/membriace/kcg-gateways",
+      "destination": "/membria-ce/kcg-gateways"
     },
     {
-      "from": "/membriace/market",
-      "to": "/membria-ce/market"
+      "source": "/membriace/market",
+      "destination": "/membria-ce/market"
     },
     {
-      "from": "/membriace/overview",
-      "to": "/membria-ce/overview"
+      "source": "/membriace/overview",
+      "destination": "/membria-ce/overview"
     },
     {
-      "from": "/membriace/revenue-economics",
-      "to": "/membria-ce/revenue-economics"
+      "source": "/membriace/revenue-economics",
+      "destination": "/membria-ce/revenue-economics"
     },
     {
-      "from": "/membriace/security-privacy",
-      "to": "/membria-ce/security-privacy"
+      "source": "/membriace/security-privacy",
+      "destination": "/membria-ce/security-privacy"
     },
     {
-      "from": "/membriace/team",
-      "to": "/membria-ce/team"
+      "source": "/membriace/team",
+      "destination": "/membria-ce/team"
     },
     {
-      "from": "/membriace/technical",
-      "to": "/membria-ce/technical"
+      "source": "/membriace/technical",
+      "destination": "/membria-ce/technical"
     },
     {
-      "from": "/membriace/tokenomics",
-      "to": "/membria-ce/tokenomics"
+      "source": "/membriace/tokenomics",
+      "destination": "/membria-ce/tokenomics"
     },
     {
-      "from": "/membriace/treasury",
-      "to": "/membria-ce/treasury"
+      "source": "/membriace/treasury",
+      "destination": "/membria-ce/treasury"
     },
     {
-      "from": "/membriace/utility",
-      "to": "/membria-ce/utility"
+      "source": "/membriace/utility",
+      "destination": "/membria-ce/utility"
     }
   ]
 }
