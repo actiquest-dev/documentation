@@ -5,12 +5,36 @@ description: "Core Membria CE concepts and vocabulary"
 
 # Concepts
 
-## Core concepts
-- Decision Surface (DS) and Decision Black Box (DBB)
-- ThoughtUnits and GraphRAG
-- Cache-augmented generation (CAG)
-- Escalation and Council governance
-- LoRA adapters and SkillForge
+Membria CE is built around a small set of runtime primitives. This page summarizes them and points to the deeper docs.
 
-## Why it matters
-These concepts define how Membria captures decisions, explains reasoning, and compounds knowledge over time.
+## Core concepts
+
+### Decision Surface (DS)
+The Decision Surface is the user-facing layer that shows open loops, drift, and outcomes. It is derived from DBB records, not raw chat.
+See [Client overview](/membria-ce/client) and [Runtime diagrams](/membria-ce/diagrams).
+
+### Decision Black Box (DBB)
+DBB is the capture engine that detects decisions and records structured evidence with confidence scores.
+See [DBB and LoRA runtime](/membria-ce/dbb-and-lora-runtime) and [Client runtime RFC](/membria-ce/client-runtime).
+
+### ThoughtUnits and GraphRAG
+ThoughtUnits are normalized fragments that feed the graph and vector layers. GraphRAG uses the temporal graph + vectors to produce explainable retrieval.
+See [Client runtime RFC](/membria-ce/client-runtime) and [Runtime diagrams](/membria-ce/diagrams).
+
+### Cache-augmented generation (CAG)
+Verified answers are cached locally and in the KCG so responses improve over time without re-computation.
+See [KCG and gateways](/membria-ce/kcg-gateways).
+
+### Escalation and Council governance
+Escalation routes queries to stronger models only when local confidence fails. The Council output is verified and written back with provenance.
+See [KCG and gateways](/membria-ce/kcg-gateways) and [Client runtime RFC](/membria-ce/client-runtime).
+
+### LoRA adapters and SkillForge
+LoRA adapters provide scoped expertise without changing the base model or rewriting history.
+See [DBB and LoRA runtime](/membria-ce/dbb-and-lora-runtime).
+
+## Where to go next
+
+- Want the product view? Start at [Membria CE overview](/membria-ce/overview).
+- Evaluating architecture? Read [System architecture split](/membria-ce/technical).
+- Planning deployment? See [Deployment and hosting](/membria-ce/deployment-hosting) and [Security and privacy](/membria-ce/security-privacy).
