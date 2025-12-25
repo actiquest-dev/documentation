@@ -1,12 +1,167 @@
 ---
 title: "Concepts"
-description: "Core SMB concepts and workspace behavior"
+description: "Core concepts and workspace behavior in Membria for SMBs."
 ---
 
 # Concepts
 
-## Core concepts
-- Workspace-level decision capture
-- Team LoRA scopes and governance
-- Shared knowledge cache with provenance
-- Escalation budgets by workspace
+This page describes the core concepts behind Membria for SMBs and how a workspace behaves over time.
+
+Membria SMB is designed for teams that need shared context and continuity, without enterprise-level operational overhead.
+
+---
+
+## Workspace
+
+A **workspace** is the primary boundary in Membria SMB.
+
+It defines:
+- who shares context,
+- what knowledge is accumulated,
+- how decisions are remembered,
+- and where governance applies.
+
+Everything Membria captures belongs to a workspace, not to individual users.
+
+Typical examples:
+- One firm
+- One department
+- One project-oriented team
+
+Workspaces are isolated from each other by default.
+
+---
+
+## Workspace-level decision capture
+
+Membria does not treat conversations as the main artifact.
+It treats **decisions** as the durable unit of knowledge.
+
+Within a workspace, Membria continuously observes interactions and extracts:
+- decisions that affect future work,
+- conclusions that are reused,
+- reasoning patterns tied to outcomes.
+
+Decision capture is:
+- automatic,
+- passive (no tagging required),
+- shared across the workspace.
+
+Over time, this creates a consistent decision history that outlives individual chats and team members.
+
+---
+
+## Shared knowledge cache with provenance
+
+Membria maintains a **shared knowledge cache** per workspace.
+
+This cache stores:
+- validated answers,
+- extracted decisions,
+- distilled reasoning,
+- references to original sources.
+
+Every cached item includes provenance:
+- source documents or systems,
+- time of capture,
+- decision context,
+- confidence signals.
+
+This allows the system to:
+- reuse past answers safely,
+- explain where conclusions came from,
+- avoid silent hallucinations.
+
+The cache is not a document store.
+It is a reasoning store tied to evidence.
+
+---
+
+## Team LoRA scopes
+
+Membria SMB supports **team-scoped LoRA adapters**.
+
+LoRAs are used to:
+- adapt models to domain language,
+- reflect team-specific conventions,
+- reduce repetitive clarifications.
+
+In SMB mode:
+- LoRAs are scoped to a workspace
+- They are not global across customers
+- They evolve based on actual usage patterns
+
+LoRAs are not trained manually by users.
+They emerge from validated decisions and repeated successful outcomes.
+
+This ensures personalization without sacrificing control.
+
+---
+
+## Governance and control
+
+Membria SMB includes lightweight governance by default.
+
+Governance covers:
+- who can see which sources,
+- which decisions are shared,
+- how corrections are applied,
+- when escalation is allowed.
+
+There is no need to define complex policies upfront.
+Governance grows with usage.
+
+Corrections are treated as first-class signals, not failures.
+
+---
+
+## Escalation budgets by workspace
+
+Membria uses a tiered reasoning approach.
+
+Most queries are handled by:
+- local or lightweight models,
+- workspace knowledge cache,
+- team LoRAs.
+
+When confidence is insufficient, Membria may escalate to stronger models.
+
+In SMB mode:
+- escalations are controlled by a workspace-level budget,
+- usage is transparent,
+- results are cached to reduce future cost.
+
+This prevents:
+- uncontrolled spend,
+- unnecessary external calls,
+- repeated expensive reasoning.
+
+The goal is predictable behavior, not maximum model usage.
+
+---
+
+## How these concepts work together
+
+In practice:
+- chats feed decision capture,
+- decisions populate the knowledge cache,
+- the cache improves local answers,
+- LoRAs adapt to team patterns,
+- escalation fills true gaps only when needed.
+
+The system improves through normal work,
+not through configuration or manual training.
+
+---
+
+## Key takeaway
+
+Membria for SMBs is designed to behave like a shared cognitive layer.
+
+It:
+- remembers what matters,
+- forgets what does not,
+- compounds useful knowledge,
+- and stays governable as teams grow.
+
+This makes it suitable for document-heavy, decision-driven teams that need continuity without enterprise complexity.
