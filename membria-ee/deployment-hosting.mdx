@@ -1,8 +1,405 @@
 ---
 title: "Deployment and hosting"
-description: "Deployment options for Membria EE"
+description: "On-premise deployment architecture, performance, and compliance model for Membria EE."
 ---
 
-# Deployment and hosting
+# Deployment and hosting (Enterprise Edition)
 
-Membria EE supports dedicated SaaS, VPC deployment, or on-prem installations depending on enterprise requirements.
+## Membria Enterprise Copilot - Technical architecture (on-premise)
+
+**Audience:** IT, security teams
+
+## Summary in two sentences
+
+Membria is a closed AI platform deployed inside a bank data center. It does not send data to the public cloud and automates up to 80 percent of operational workload (AML, fraud, documents, support).
+
+It runs a fast XLAM model (under 1 second) for 95 percent of tasks and escalates to Qwen 235B for complex cases.
+
+---
+
+## Components
+
+### Router + Planner
+
+| Function | Description | SLA |
+| --- | --- | --- |
+| Router | Classifies the request (FAQ, analysis, action), selects the domain (AML, Fraud, Legal), checks security (DLP, RBAC, PII) | <= 50 ms |
+| Planner | Breaks tasks into steps, selects tools (graph query, vector search, API), controls XLAM or Qwen routing, validates policy | <= 200 ms |
+
+### XLAM Large (action model for orchestration)
+
+| Parameter | Value |
+| --- | --- |
+| Type | Action model optimized for speed |
+| Latency p95 | 0.6-0.9 sec |
+| Throughput | 2,000 req/sec per cluster |
+| Hardware | CPU optimized (1x H100 or 2x A100 if inference boost required) |
+| Context window | 32K tokens |
+| Usage | 95 percent of requests (FAQ, documents, simple decisions) |
+
+**LoRA specializations (domain models):**
+
+| Domain | Example usage |
+| --- | --- |
+| Legal | Contract analysis, clause extraction, risk scoring |
+| AML | Counterparty screening, UBO tracing, SAR or STR generation |
+| Fraud | Anomaly detection, transaction scoring, velocity checks |
+| Risk | Credit scoring, exposure calculation |
+| Support | FAQ matching, IT helpdesk, troubleshooting |
+
+### Qwen 235B (deep reasoning engine)
+
+| Parameter | Value |
+| --- | --- |
+| Type | 235B parameters, deep reasoning model |
+| Latency p95 | 2-4 sec |
+| Throughput | 100 req/sec (GPU bound) |
+| Hardware | 4x H100 80GB (INT8 quantization: 80-100GB VRAM used) |
+| Real VRAM | about 80-100GB with quantization, not 1.8TB |
+| Cost | 150K USD GPU hardware (4x H100), not 2.5M USD |
+| Usage | about 5 percent of requests (complex cases) |
+
+**Escalate XLAM to Qwen when:**
+
+- Multi-level UBO tracing (6+ levels)
+- Complex legal interpretations
+- Fraud ring detection (graph patterns)
+- M&A risk assessment
+- Regulatory ambiguity resolution
+
+---
+
+## SuperGraphRAG: Temporal event graph plus embedded vectors plus TuGraph
+
+SuperGraphRAG uses a temporal event graph with embedded vectors. This reduces hallucinations and yields 95 percent or higher answer accuracy.
+
+### Event graph (Boldsea approach)
+
+Each event is a fact with history:
+
+Event 1: KYC_Check_Started (2025-11-20 09:00)
+  - cause: new_customer_registered
+
+Event 2: Document_Uploaded (2025-11-20 10:30)
+  - cause: Event 1
+  - value: "Certificate of incorporation"
+
+Event 3: UBO_Found (2025-11-20 14:00)
+  - cause: Event 2 (extracted)
+  - value: "John Smith, 75 percent ownership"
+  - confidence: 0.94
+
+Event 4: AML_Decision (2025-11-20 14:10)
+  - cause: Event 3, sanction_check_passed
+  - decision: "APPROVED"
+  - audit_trail: "Full UBO chain verified"
+
+**Advantage:** the model sees the full causal chain, leading to far fewer hallucinations.
+
+### Vector index embedded in the graph
+
+| Aspect | Details |
+| --- | --- |
+| What it is | Embeddings live inside graph nodes, not in a separate database |
+| Retrieval | 1) Graph filter (RBAC) -> 2) Subgraph select -> 3) Vector similarity inside subgraph -> 4) Temporal filter -> 5) Full context to the model |
+| Latency | Total retrieval <= 300 ms p95 |
+| Advantage | Context, security, and versioning are built in |
+
+### TuGraph vs Neo4j
+
+| Metric | Neo4j | TuGraph | Membria choice |
+| --- | --- | --- | --- |
+| Speed (10M nodes) | 50 ms | 5 ms | TuGraph |
+| Throughput | 1K q/s | 50K q/s | TuGraph |
+| Built-in vectors | No | Yes | TuGraph |
+| Multi-tenant | Hard | Native | TuGraph |
+| Open source | No | Yes (MIT) | TuGraph |
+
+### Real production stats (large bank, Nov 2025)
+
+| Metric | Value |
+| --- | --- |
+| Nodes | 353M (50K organizations, 500K customers, 250M events) |
+| Edges | 2B relationships |
+| Storage | 52GB compressed plus 85GB vectors |
+| Query latency p95 | <= 1000 ms (all types) |
+| Throughput | 8,500 parallel queries/sec |
+| Uptime | 99.95 percent (3 replicas) |
+| Cache hit rate | 30-40 percent (Redis semantic cache) |
+
+---
+
+## Security (six layers of defense)
+
+### DLP (data loss prevention)
+
+| Stage | Action |
+| --- | --- |
+| Input | "Kurban Aliev (Passport: 123-45-6789) defaulted" |
+| DLP Scan | Detect PassID -> CRITICAL |
+| Masking | Replace -> PASSID_REDACTED |
+| LLM Input | "Customer [NAME] ([PASSID_REDACTED]) defaulted" |
+| Output | Clean, no PII |
+
+---
+
+## Integration with legacy systems
+
+### Typical AML flow
+
+(Diagram placeholder)
+
+### Integration methods
+
+| Scenario | Method | Latency |
+| --- | --- | --- |
+| Real-time copilot | REST sync | <= 1.2 sec |
+| Batch scoring | ETL nightly | 1-2 hours |
+| Streaming fraud | Kafka or event stream | <= 100 ms |
+| Legacy query | REST or SOAP via ESB | <= 2 sec |
+
+---
+
+## Deployment (Kubernetes on-premise)
+
+### Components
+
+| Component | Count | Purpose |
+| --- | --- | --- |
+| Master nodes | 3 | etcd, API server, scheduler (HA) |
+| CPU worker nodes | 4-8 | Router, Planner, XLAM Large, RPA |
+| GPU worker nodes | 2-4 | Qwen 235B (4x H100 per node) |
+| Storage nodes | 3 | TuGraph, vector DB, PostgreSQL, Redis |
+| SAN or NAS | 1 | 10TB data plus 10TB backup |
+
+### Sizing for a medium bank
+
+| Parameter | Value |
+| --- | --- |
+| Total servers | 18 |
+| CPU cores | about 200 |
+| RAM | about 450GB |
+| GPU | 4x H100 (320GB VRAM total) |
+| Storage | 52GB compressed (graph plus vectors) |
+| Hardware cost | about 900K USD |
+| Annual OpEx | 180K USD (power, cooling, staff, support) |
+| Concurrent users | 2,000 |
+| Throughput | 50K req/sec |
+
+---
+
+## Performance SLA
+
+| Scenario | Model | p95 latency |
+| --- | --- | --- |
+| Simple FAQ | XLAM | 0.45 sec |
+| Summarization with citations | XLAM | 0.8 sec |
+| Graph query | TuGraph | 0.15 sec |
+| Vector search | TuGraph vectors | 0.2 sec |
+| Complex AML | Qwen 235B | 3.0 sec |
+| End-to-end | XLAM | 1.2 sec |
+
+**Throughput:**
+
+- XLAM: 2,000 req/sec
+- Qwen: 100 req/sec
+- Graph: 5,000 queries/sec
+- Vector: 10,000 searches/sec
+
+---
+
+## Compliance coverage
+
+| Requirement | Status | How |
+| --- | --- | --- |
+| On-premise | Yes | 100 percent inside bank data center |
+| Zero data leakage | Yes | No external APIs |
+| Data residency (central bank) | Yes | Everything internal |
+| GDPR | Yes | Field encryption, DPIA |
+| AML or CFT | Yes | Native agents, STR or SAR workflows |
+| ISO 27001 | Yes | Zero-trust, audit controls |
+| Basel III | Yes | Model governance |
+| PCI-DSS | Yes | Tokenization |
+
+---
+
+## ROI and economics
+
+### Capex and inference
+
+| Item | Cost |
+| --- | --- |
+| Hardware (K8s cluster) | 300K USD |
+| Setup (4 months) | 200K USD |
+| Training | 50K USD |
+| Total | 1.15M USD |
+
+### Annual costs
+
+| Item | Cost |
+| --- | --- |
+| Power and cooling | 80K USD |
+| Maintenance | 50K USD |
+| Staff (0.5 FTE) | 30K USD |
+| Support and updates | 20K USD |
+| Total | 180K USD per year |
+
+### Annual benefit
+
+| Process | Improvement | Savings |
+| --- | --- | --- |
+| AML analyst | 2.5x productivity | 200K USD |
+| Call center | 4x faster | 100K USD |
+| Legal | 30 min vs 2 hours | 150K USD |
+| Fraud resolution | 70 percent faster | 100K USD |
+| Total |  | at least 550K USD per year |
+
+**Payback period: 1.2 years**
+
+---
+
+## Implementation (16 weeks)
+
+| Phase | Weeks | Work | Deliverable |
+| --- | --- | --- | --- |
+| Foundation | 1-4 | K8s cluster, security setup, XLAM deploy | Core system operational |
+| Integration | 5-8 | REST or SOAP connectors, knowledge base, DLP | First use case working |
+| Features | 9-12 | AML, Fraud, Legal, Qwen deploy, templates | Production-ready use case |
+| Production | 13-16 | Monitoring, audit log, pilot, SLA validation | System live with metrics |
+
+---
+
+## FAQ
+
+**Q: Is GPU inference expensive?**
+A: XLAM runs on CPU for 95 percent of load. Qwen is used only for about 5 percent of requests (often in batch). ROI is under 1 year.
+
+**Q: Why is this better than ChatGPT?**
+A: On-premise deployment, domain-specific models (AML-focused), deep legacy integration, and no per-query cost.
+
+**Q: What if Membria shuts down?**
+A: The stack is open source (K8s, PostgreSQL, TuGraph). Models can be replaced with Llama or Mistral. No lock-in.
+
+**Q: Is it secure?**
+A: Six layers of defense, zero-trust, immutable audit, regular pen-testing, HSM keys.
+
+**Q: Can we update without downtime?**
+A: Blue-green deployment with sub-100 ms traffic switch and instant rollback.
+
+**Q: Mainframe compatibility?**
+A: REST or SOAP via ESB, batch ETL for data, real-time API for queries.
+
+**Q: Training effort?**
+A: Operators: 1 day. IT: 2 days. Architects: 3 days plus 4 weeks hands-on.
+
+---
+
+# Membria Enterprise AI Hub - presentation outline
+
+## Slide 1: Title
+
+Membria Enterprise AI Hub
+
+Closed AI platform for banks
+
+On-premise. No data in the cloud.
+
+On-prem AI, graph analytics, agents, and LLM orchestration. Runs anywhere: Russia, Kazakhstan, Europe, Asia.
+
+Audience: IT architects
+
+November 2025
+
+## Slide 2: Problem context
+
+What is changing in banks? The perfect storm:
+
+| Challenge | Details |
+| --- | --- |
+| Load is growing | 2x more customers (mobile), stricter AML or KYC, fraud waves grow exponentially |
+| People do not scale | Shortage of risk analysts, legal is expensive and slow, call center turnover 40 percent plus |
+| Technology is restricted | ChatGPT sends data abroad, public cloud is restricted, must be on-premise |
+| Budgets are limited | Cost pressure but regulation cost is higher than AI |
+
+Bottom line: banks need AI inside their data center.
+
+## Slide 3: Solution
+
+Membria: AI hub inside your data center.
+
+| Benefit | Result |
+| --- | --- |
+| No data leaves | Zero regulatory risk |
+| Domain-specific (AML, Fraud, Legal) | 40 percent higher accuracy vs generic |
+| Integration in 6 weeks | Fast start |
+| Works above 99 percent | HA, K8s, failover |
+| Saves 5 FTE (AML, Fraud, Support) | 550K USD per year |
+
+Cost: 250K USD equipment plus 180K USD per year operations
+Payback: 1 year (staff savings)
+
+## Slide 4: Architecture (high level)
+
+(Diagram placeholder)
+
+## Slide 5: Key features
+
+| Feature | Why it matters | Business result |
+| --- | --- | --- |
+| On-premise | Required by regulators and GDPR | Zero regulatory risk |
+| Zero data leakage | No external APIs | Reduced compliance risk |
+| Domain-specific | AML differs from legal and fraud | 40 percent higher accuracy |
+| SuperGraphRAG | Graph context leads to correct answers | Reduced hallucination |
+| Voice AI | Call center copilot | 50 percent calls automated |
+| Immutable audit | Every decision logged | Compliance in days |
+
+## Slide 6: Request flow (AML UBO tracing)
+
+(Diagram placeholder)
+
+## Slide 7: Component 1 - Router + Planner
+
+| Component | Functions | SLA |
+| --- | --- | --- |
+| Router | Classifies task (FAQ, analysis, action), selects domain (AML, Fraud, Legal), checks security (DLP, RBAC), chooses XLAM or Qwen | <= 50 ms |
+| Planner | Breaks into steps, selects tools (graph, vector, API), builds context, controls XLAM or Qwen, checks compliance | <= 200 ms |
+
+## Slide 8: Component 2 - XLAM Large
+
+XLAM Large is the fast action model for orchestration.
+
+| Parameter | Value |
+| --- | --- |
+| Latency p95 | 0.6-0.9 sec |
+| Batch | 32 parallel requests |
+| Throughput | 2,000 req/sec per cluster |
+| Uptime | 99.95 percent |
+| Cost | Low |
+
+**LoRA specializations (domain fine-tuning):**
+
+- Legal: clause extraction, risk scoring
+- AML: screening, network analysis
+- Fraud: anomaly detection, pattern match
+- Risk: credit scoring, exposure calculation
+- Support: FAQ, IT helpdesk
+
+**When XLAM is enough:** FAQ, documents, simple decisions, 90 percent of call center requests
+
+## Slide 9: Component 3 - Qwen 235B
+
+When deep reasoning is required.
+
+| Parameter | Value |
+| --- | --- |
+| Latency p95 | 2-4 sec |
+| Capacity | 235B parameters |
+| Hardware | 4x H100 (INT8 quantization: 80-100GB VRAM) |
+| Cost | about 150K USD (GPU hardware) |
+| Usage | about 5 percent of requests |
+
+**Escalate XLAM to Qwen when:**
+
+- AML: beneficiary tracing (6 levels)
+- Legal: interpretation of new law
+- Fraud: ring fraud detection (graph > 10 nodes)
