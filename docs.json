@@ -11,64 +11,31 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Product",
+        "tab": "Home / Overview",
         "groups": [
           {
-            "group": "Overview",
+            "group": "Welcome",
             "pages": [
-              "index",
-              "essentials/faq",
+              "index"
+            ]
+          },
+          {
+            "group": "Getting started",
+            "pages": [
               "quickstart",
               "development"
             ]
           },
           {
-            "group": "Signals & metrics",
+            "group": "Developer tools",
             "pages": [
-              "essentials/settings",
-              "essentials/code",
-              "essentials/markdown"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Strategy",
-        "groups": [
-          {
-            "group": "Audience & growth",
-            "pages": [
-              "essentials/navigation",
-              "essentials/reusable-snippets"
+              "ai-tools/cursor",
+              "ai-tools/windsurf",
+              "ai-tools/claude-code"
             ]
           },
           {
-            "group": "Systems & architecture",
-            "pages": [
-              "essentials/images"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Signals stack",
-        "groups": [
-          {
-            "group": "Runtime & decision systems",
-            "pages": [
-              "membriace/client",
-              "membriace/client-runtime",
-              "membriace/dbb-and-lora-runtime",
-              "membriace/diagrams"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API",
-        "groups": [
-          {
-            "group": "Decision API",
+            "group": "API",
             "pages": [
               "api-reference/introduction",
               "api-reference/endpoint/get",
@@ -76,45 +43,111 @@
               "api-reference/endpoint/delete",
               "api-reference/endpoint/webhook"
             ]
+          },
+          {
+            "group": "Documentation utilities",
+            "pages": [
+              "essentials/markdown",
+              "essentials/code",
+              "essentials/images",
+              "essentials/navigation",
+              "essentials/reusable-snippets",
+              "essentials/settings"
+            ]
           }
         ]
       },
       {
-        "tab": "Due diligence",
+        "tab": "Membria CE (Personal)",
         "groups": [
           {
-            "group": "Project dossier",
+            "group": "Overview",
             "pages": [
-              "membriace/overview",
-              "membriace/market"
+              "membria-ce/overview",
+              "membria-ce/getting-started",
+              "membria-ce/concepts"
             ]
           },
           {
-            "group": "Team & token",
+            "group": "Client runtime",
             "pages": [
-              "membriace/team",
-              "membriace/tokenomics"
+              "membria-ce/client",
+              "membria-ce/client-runtime",
+              "membria-ce/dbb-and-lora-runtime",
+              "membria-ce/diagrams"
             ]
           },
           {
-            "group": "Engineering",
+            "group": "Architecture & backend",
             "pages": [
-              "membriace/technical",
-              "membriace/kcg-gateways"
+              "membria-ce/technical",
+              "membria-ce/kcg-gateways"
             ]
           },
           {
-            "group": "Financials",
+            "group": "Business & token",
             "pages": [
-              "membriace/business-model",
-              "membriace/revenue-economics",
-              "membriace/treasury"
+              "membria-ce/market",
+              "membria-ce/business-model",
+              "membria-ce/revenue-economics",
+              "membria-ce/tokenomics",
+              "membria-ce/treasury",
+              "membria-ce/competitive",
+              "membria-ce/team",
+              "membria-ce/utility"
             ]
           },
           {
-            "group": "Competitive",
+            "group": "Deployment & security",
             "pages": [
-              "membriace/competitive"
+              "membria-ce/deployment-hosting",
+              "membria-ce/security-privacy"
+            ]
+          },
+          {
+            "group": "FAQ",
+            "pages": [
+              "essentials/faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Membria for SMBs (SaaS)",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "membria-smb/overview",
+              "membria-smb/getting-started",
+              "membria-smb/concepts"
+            ]
+          },
+          {
+            "group": "Deployment & security",
+            "pages": [
+              "membria-smb/deployment-hosting",
+              "membria-smb/security-privacy"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Membria EE (Enterprise)",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "membria-ee/overview",
+              "membria-ee/getting-started",
+              "membria-ee/concepts"
+            ]
+          },
+          {
+            "group": "Deployment & security",
+            "pages": [
+              "membria-ee/deployment-hosting",
+              "membria-ee/security-privacy"
             ]
           }
         ]
@@ -170,5 +203,83 @@
       "github": "https://github.com/membria",
       "linkedin": "https://linkedin.com/company/membria"
     }
-  }
+  },
+  "redirects": [
+    {
+      "from": "/membriace/business-model",
+      "to": "/membria-ce/business-model"
+    },
+    {
+      "from": "/membriace/client-runtime",
+      "to": "/membria-ce/client-runtime"
+    },
+    {
+      "from": "/membriace/client",
+      "to": "/membria-ce/client"
+    },
+    {
+      "from": "/membriace/competitive",
+      "to": "/membria-ce/competitive"
+    },
+    {
+      "from": "/membriace/concepts",
+      "to": "/membria-ce/concepts"
+    },
+    {
+      "from": "/membriace/dbb-and-lora-runtime",
+      "to": "/membria-ce/dbb-and-lora-runtime"
+    },
+    {
+      "from": "/membriace/deployment-hosting",
+      "to": "/membria-ce/deployment-hosting"
+    },
+    {
+      "from": "/membriace/diagrams",
+      "to": "/membria-ce/diagrams"
+    },
+    {
+      "from": "/membriace/getting-started",
+      "to": "/membria-ce/getting-started"
+    },
+    {
+      "from": "/membriace/kcg-gateways",
+      "to": "/membria-ce/kcg-gateways"
+    },
+    {
+      "from": "/membriace/market",
+      "to": "/membria-ce/market"
+    },
+    {
+      "from": "/membriace/overview",
+      "to": "/membria-ce/overview"
+    },
+    {
+      "from": "/membriace/revenue-economics",
+      "to": "/membria-ce/revenue-economics"
+    },
+    {
+      "from": "/membriace/security-privacy",
+      "to": "/membria-ce/security-privacy"
+    },
+    {
+      "from": "/membriace/team",
+      "to": "/membria-ce/team"
+    },
+    {
+      "from": "/membriace/technical",
+      "to": "/membria-ce/technical"
+    },
+    {
+      "from": "/membriace/tokenomics",
+      "to": "/membria-ce/tokenomics"
+    },
+    {
+      "from": "/membriace/treasury",
+      "to": "/membria-ce/treasury"
+    },
+    {
+      "from": "/membriace/utility",
+      "to": "/membria-ce/utility"
+    }
+  ]
 }

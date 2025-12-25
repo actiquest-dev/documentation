@@ -1,67 +1,45 @@
 ---
-title: "Membria CE Overview"
-description: "Product positioning, client workflow, and backend architecture split for Membria CE"
+title: "Membria Documentation"
+description: "Overview of Membria products and links to CE, SMB, and EE docs"
 ---
 
-# Membria CE
+# Membria product documentation
 
-Membria CE documents a two-layer system: **client-side decision capture** and **backend knowledge infrastructure**. Visit https://membria.xyz and follow @membria_ai on Twitter/X for updates.
+Membria is a family of products that share a common runtime philosophy: local-first reasoning where possible, explicit memory, and selective escalation. This documentation is organized by product.
 
-## System layers
+## Products
 
-- **Client layer (Decision Surface + DBB):** captures decision moments, freezes reasoning before outcomes, and surfaces read-only signals.
-- **Backend layer (KCG + DoD + Peaq + Arweave):** handles escalations, council reasoning, and immutable storage in the Knowledge Cache Graph.
-
-<Columns cols={2}>
+<Columns cols={3}>
   <Card
-    title="Client layer: Decision Surface"
+    title="Membria CE (Personal)"
     icon="sparkles"
-    href="/quickstart"
+    href="/membria-ce/overview"
   >
-    Dashboard of open loops, drift alerts, and pending outcomes based on decision records.
+    Local-first personal runtime with Decision Surface, DBB, and a shared knowledge backend.
   </Card>
   <Card
-    title="Client layer: Decision Black Box"
+    title="Membria for SMBs (SaaS)"
+    icon="building"
+    href="/membria-smb/overview"
+  >
+    Managed SaaS for teams that need shared memory, governance, and fast onboarding.
+  </Card>
+  <Card
+    title="Membria EE (Enterprise)"
     icon="shield"
-    href="/development"
+    href="/membria-ee/overview"
   >
-    Local capture engine that extracts decision pivots, stores immutable drafts, and keeps raw chat out of the signal layer.
+    Enterprise-grade deployment, compliance controls, and private knowledge domains.
   </Card>
 </Columns>
 
-<Columns cols={2}>
-  <Card
-    title="Backend: KCG + Gateways"
-    icon="diagram-project"
-    href="/membriace/kcg-gateways"
-  >
-    Hybrid Peaq + Arweave graph that stores verified knowledge, manages gateway consensus, and powers DoD escalations.
-  </Card>
-  <Card
-    title="Backend: Technical Notes"
-    icon="cubes"
-    href="/membriace/technical"
-  >
-    Engineering dossier that maps the pipeline from client requests to immutable knowledge records.
-  </Card>
-</Columns>
+## How to use these docs
 
-## Design goals
+Each product branch includes:
+- Overview of the product and audience
+- Getting started
+- Core concepts
+- Deployment and hosting
+- Security and privacy
 
-- **Clarity over chat:** focus on decision pivots, not full conversation threads.
-- **Immutable records:** decisions are signed; outcomes are appended, not rewritten.
-- **Signal-first UI:** drift, consistency, and open loops are surfaced explicitly.
-
-## Guided paths
-
-<CardGroup cols={3}>
-  <Card title="Decision capture" icon="clipboard" href="/quickstart">
-    Learn how the client layer captures decisions and keeps them immutable.
-  </Card>
-  <Card title="Signals & metrics" icon="dial" href="/essentials/code">
-    Review track record, patterns, and principles tracked on the Decision Surface.
-  </Card>
-  <Card title="Knowledge backend" icon="server" href="/membriace/kcg-gateways">
-    Understand how DoD, councils, and KCG govern escalations and storage.
-  </Card>
-</CardGroup>
+If you are unsure where to start, begin with the CE overview and then follow the branch that matches your deployment needs.
