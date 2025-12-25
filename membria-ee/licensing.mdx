@@ -1,0 +1,220 @@
+---
+title: "Licensing"
+description: "Open-source vs commercial components in Membria Enterprise Edition."
+---
+
+# Membria Enterprise Edition - Licensing
+
+This document describes what is open source and what is commercially licensed in Membria Enterprise Edition (EE).
+
+Membria EE is designed to be deployable in regulated, on-premise environments while keeping core infrastructure transparent and auditable.
+
+---
+
+## Licensing overview
+
+Membria EE follows a **hybrid licensing model**:
+
+- **Core infrastructure is open source**
+- **Reasoning, decision intelligence, and governance layers are proprietary**
+- **No license is required for basic deployment**
+- **Commercial licenses apply to advanced decision systems and enterprise features**
+
+This separation allows enterprises to inspect, audit, and operate the core system independently, while licensing higher-level intelligence components as needed.
+
+---
+
+## Open-source components (free)
+
+The following components are open source and can be used, modified, and deployed without a commercial license.
+
+### 1. Membria EE core platform
+
+Includes:
+
+- Core runtime and orchestration
+- Ingestion pipelines (documents, chats, logs, structured sources)
+- Vector storage and indexing
+- Graph storage integration (e.g., FalkorDB or compatible graph stores)
+- Base GraphRAG execution engine
+- Local model inference integration
+- Basic API and CLI interfaces
+
+**Purpose:** provides a transparent, auditable foundation for knowledge ingestion and retrieval.
+
+**License:** open source (license specified in repository, e.g., Apache 2.0 or equivalent)
+
+---
+
+### 2. Storage and infrastructure layer
+
+Includes:
+
+- Graph schema definitions
+- Embedding storage and retrieval logic
+- Event ingestion framework
+- Basic provenance metadata (timestamps, source IDs)
+
+**Purpose:** allows enterprises to fully control where and how data is stored and processed.
+
+---
+
+### 3. Self-hosted deployment
+
+- On-premise deployment
+- Air-gapped environments
+- Custom infrastructure (bare metal, private cloud, sovereign cloud)
+
+No license is required to deploy or operate Membria EE Core.
+
+---
+
+## Commercial and licensed components (paid)
+
+The following components are **proprietary** and require a commercial Membria EE license.
+
+---
+
+### 4. Decision Surface (DS)
+
+**What it is:**
+
+- The Decision Surface is the primary enterprise UI and reasoning layer.
+- It surfaces:
+  - open decisions
+  - assumption drift
+  - conflicting reasoning
+  - unresolved or high-risk areas
+- Provides longitudinal views across time, teams, and systems.
+
+**Why it is licensed:**
+
+- Encodes proprietary reasoning models
+- Includes enterprise-grade visualization logic
+- Implements decision lifecycle semantics
+
+**License scope:**
+
+- Per deployment
+- May be limited by number of users or nodes (contractual)
+
+---
+
+### 5. Decision Black Box (DBB)
+
+**What it is:**
+
+- An autonomous reasoning agent that detects, extracts, and records decisions from:
+  - chats
+  - documents
+  - workflows
+  - system events
+- Acts as a black-box recorder for organizational decisions.
+
+**Why it is licensed:**
+
+- Contains proprietary heuristics and confidence models
+- Includes false-positive suppression logic
+- Implements decision lineage and causality tracking
+
+**License scope:**
+
+- Required for decision capture and long-term reasoning
+- Mandatory for regulated decision workflows
+
+---
+
+### 6. Skill-Forge (LoRA lifecycle and governance)
+
+**What it is:**
+
+- Management layer for domain-specific LoRA patches
+- Includes:
+  - routing policies
+  - evaluation datasets
+  - promotion and rollback logic
+  - drift and degradation detection
+
+**Why it is licensed:**
+
+- Encodes proprietary expertise-compounding mechanisms
+- Critical for maintaining model reliability over time
+- Governs how expertise accumulates safely
+
+---
+
+### 7. Policy-controlled escalation and Council orchestration
+
+**What it is:**
+
+- Optional escalation framework for:
+  - multi-model reasoning
+  - expert consensus synthesis
+- Can be fully local, hybrid, or disabled.
+
+**Why it is licensed:**
+
+- Includes cost, risk, and confidence-based routing
+- Provides auditability and replay guarantees
+- Integrates with enterprise governance controls
+
+---
+
+### 8. Enterprise governance and compliance features
+
+Includes:
+
+- Full audit logs for reasoning and escalations
+- Decision replay and forensic inspection
+- Governance APIs
+- Compliance reporting exports
+- Policy enforcement mechanisms
+
+These features are licensed as part of Membria EE.
+
+---
+
+## What is not licensed
+
+The following are explicitly **not restricted**:
+
+- Choice of local LLM or SLM
+- Custom models trained by the customer
+- External tools and integrations built by the customer
+- Internal extensions built on top of the open-source core
+
+Membria does **not** claim ownership over customer data, models, or derived knowledge.
+
+---
+
+## Licensing philosophy
+
+Membria EE licensing is based on the following principles:
+
+- **Infrastructure should be inspectable**
+- **Reasoning systems are intellectual property**
+- **Enterprises should choose how much intelligence to activate**
+- **Nothing critical is hidden behind a black box**
+
+You can run Membria EE Core without any paid components.
+You license Membria EE when you want **decision intelligence, continuity, and governance**.
+
+---
+
+## Summary table
+
+| Component | License |
+| --- | --- |
+| EE Core Platform | Open source |
+| GraphRAG Engine (base) | Open source |
+| Storage and ingestion | Open source |
+| Self-hosted deployment | Free |
+| Decision Surface (DS) | Commercial |
+| Decision Black Box (DBB) | Commercial |
+| Skill-Forge (LoRA governance) | Commercial |
+| Escalation / Council orchestration | Commercial |
+| Enterprise audit and governance | Commercial |
+
+---
+
+For licensing terms, pricing, and deployment models, contact Membria Enterprise Sales.
