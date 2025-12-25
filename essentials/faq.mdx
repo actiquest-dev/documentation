@@ -1,31 +1,31 @@
 ---
 title: "FAQ"
-description: "Membria CE basics, client vs backend, and decision capture"
+description: "Membria CE basics, client vs backend, and runtime behavior"
 ---
 
 ## What is Membria Community Edition?
 
-Membria CE is a local-first AI system with a client layer (Decision Surface + Decision Black Box) and a backend knowledge layer (KCG + DoD + Peaq + Arweave). It is designed for decision capture, long-term reasoning, and reusable knowledge—not just chat.
+Membria CE is a local-first AI runtime with two layers: a **client layer** (Decision Surface + Decision Black Box) and a **backend knowledge layer** (KCG + DoD + Peaq + Arweave). The client captures decisions and reasoning locally, while the backend handles escalations and verified knowledge storage.
 
 ## Is Membria just another AI assistant?
 
-No. Chat is only one interface. Membria extracts decisions, reasoning, and knowledge from conversations and stores them as structured records so they can be reused over time.
+No. Chat is only one interface. Membria extracts decisions, reasoning, and knowledge from conversations and stores them as structured artifacts that can be reused across time, tools, and models.
 
 ## What makes Membria useful for power users?
 
-Membria is built for people who work across many tools, models, and chats. It captures decisions and reasoning as structured memory and keeps the original context intact so intelligence accumulates across sessions.
+It preserves decision context and assumptions that usually vanish in chat history. Power users get long-term continuity: precedents, drift detection, and outcome tracking based on real decision records.
 
 ## What should I expect from chat mode in Membria?
 
-Chat feels familiar, but the output is captured as decisions, knowledge, and outcomes. The system treats chat as input, not the source of truth.
+Chat feels familiar, but the system treats it as input. Durable artifacts (decisions, assumptions, citations) are extracted and stored so intelligence compounds rather than resets.
 
 ## What problem does Membria solve?
 
-Reasoning happens across many systems, but it rarely accumulates. Membria captures the reasoning and decisions behind work so patterns, drift, and outcomes can be reviewed later.
+Reasoning and decisions happen everywhere but rarely accumulate. Membria captures those decisions and turns them into a structured memory layer with provenance and outcomes.
 
 ## Who is Membria for?
 
-Power users: founders, researchers, PMs, engineers, and developers who make frequent decisions and need long-term context.
+Founders, researchers, PMs, engineers, and developers who make frequent decisions across multiple tools and need long-term context.
 
 ## How is Membria different from ChatGPT?
 
@@ -33,52 +33,172 @@ ChatGPT optimizes for the current session. Membria preserves decision reasoning,
 
 ## How is Membria different from Notion AI?
 
-Notion AI summarizes and searches documents. Membria indexes decisions and causal links across time, with explicit provenance and reasoning chains.
+Notion AI summarizes documents in a workspace. Membria indexes decisions and causal links across time, with explicit provenance and reasoning chains.
 
 ## Does Membria run locally or in the cloud?
 
-Membria CE supports both. The client layer runs locally; the backend knowledge layer is decentralized. A managed cloud path is available for faster onboarding.
+Both. Membria Cloud is the initial managed path. Self‑hosted/local execution is planned so local SLMs, memory, and GraphRAG can run on device. The backend knowledge layer remains shared and decentralized.
 
 ## What happens when local AI is not enough?
 
-The client escalates a request to the backend via DoD. A council of models validates the response, stores it in the KCG, and returns a verified result that the client can reuse.
-
-## What are LoRA patches in Membria?
-
-LoRA patches are local adapters that encode expertise learned from escalations, decisions, and verified answers. They reduce repeated mistakes and improve specialization over time.
-
-## How does memory work in Membria?
-
-Membria does not store raw chat history. It stores decision records, knowledge artifacts, and outcomes. Only stable, reusable information is retained.
+The client triggers a DoD escalation. The backend council verifies and fuses a response, writes it to the KCG, and returns a verified answer that the client can cache and reuse.
 
 ## What is the Decision Surface?
 
-The Decision Surface is the client dashboard showing open loops, drift, and pending outcomes derived from decision records.
+The Decision Surface is a client dashboard that shows open loops, drift, pending outcomes, and precedents. It reads decision records and the memory graph, not raw chat.
 
 ## What is the Decision Black Box (DBB)?
 
-DBB is a client-side agent that detects decisions, captures reasoning, and writes immutable decision records at the moment they occur.
+DBB is a client-side agent that detects decisions and turning points. It stores structured decision records with assumptions, evidence links, and outcome hooks.
 
-## What insights does Membria provide over time?
+## How does memory work in Membria?
 
-It surfaces repeated assumptions, blind spots, and calibration gaps by comparing predictions to outcomes.
+Membria does not store raw chat history as memory. It stores structured decision records, knowledge artifacts, and outcomes. Only stable, reusable information is retained.
 
-## Why use Membria instead of just thinking things through?
+## What are ThoughtUnits and why do they matter?
 
-Because reasoning without durable capture does not accumulate. Membria turns decisions into a compounding record that can be reviewed and improved.
+ThoughtUnits are normalized fragments extracted from sources (message, doc, comment) with timestamps and provenance. They power GraphRAG and DBB without heavy reasoning.
+
+## How does GraphRAG work in Membria?
+
+GraphRAG combines a temporal knowledge graph with vector similarity search and explainable link chains. Retrieval results include citations and causal paths.
+
+## What is CAG (cache‑augmented generation)?
+
+CAG reuses verified answers from the local cache or KCG. It avoids recomputation and reduces latency by returning pre‑verified results with citations.
+
+## What is the KCG and how does it differ from local memory?
+
+The KCG is the global, decentralized knowledge cache. Local memory is personal and device‑scoped. The client reads from KCG only when local context is insufficient.
+
+## What are LoRA patches in Membria?
+
+LoRA patches are small, scoped adapters that improve domain performance. They are created selectively from verified artifacts and can be enabled or rolled back per domain.
+
+## How does Membria avoid LoRA overfitting?
+
+LoRA creation is gated by quality checks, scoped to recurring gaps, and trained only on verified artifacts. Bad or noisy outputs are excluded.
+
+## How are escalations controlled for cost?
+
+The orchestrator checks confidence, citations, and policy thresholds before escalation. It prefers cache hits, then local SLM + GraphRAG, and only escalates when needed.
+
+## What data sources can Membria ingest?
+
+Initial ingestion targets: Google Drive, email, Slack, chat exports (ChatGPT, Claude Code, Codex logs), and forum/comment exports. Sources are permissioned and scoped.
+
+## How are permissions handled?
+
+The client requires explicit source access, time‑range scoping, and revocation controls. Tool usage follows a permission model similar to mobile apps.
+
+## What happens if a knowledge entry is wrong?
+
+A challenge system allows disputes with staking. Re‑validation is performed by an expanded gateway quorum; incorrect entries are invalidated and corrected.
+
+## How is privacy handled when using the backend?
+
+Local data stays local by default. Only the query (not user documents) is sent during escalation, and responses are returned with citations and provenance.
+
+## How is latency managed?
+
+Membria uses staged retrieval, aggressive caching, and optimistic UI states. Most queries are answered locally or from cache to avoid RAG latency.
+
+## Can Membria work offline?
+
+Local SLM, memory, and GraphRAG can run offline in self‑hosted mode. Backend escalations and KCG access require connectivity.
+
+## How is the system observable and debuggable?
+
+The client tracks latency, cache hit ratio, escalation rate, citation coverage, and DBB extraction rate. A power‑user debug panel can show execution plans.
 
 ## How does Membria help developers using Claude Code or Codex?
 
-Membria captures trade-offs, constraints, and architectural decisions across code discussions so teams can review why choices were made.
+It captures trade‑offs, constraints, and architectural decisions across coding sessions so teams can review why choices were made.
 
 ## How does Membria help consultants or strategists?
 
-It records the assumptions and context behind recommendations and later compares them to outcomes, reducing repeated mistakes across clients.
+It records assumptions and context behind recommendations and later compares them to outcomes, reducing repeated mistakes across clients.
 
 ## How does Membria help researchers?
 
-It records hypotheses, abandoned paths, and the reasons they were dropped, preventing repeated dead ends.
+It preserves hypotheses, abandoned paths, and the reasons they were dropped, preventing repeated dead ends.
 
-## Why is this useful for AI power users?
+## What is the Orchestrator and why does it matter?
 
-Power users make frequent decisions across many contexts. Membria preserves the original reasoning so learning compounds instead of resetting.
+The Orchestrator is the runtime router that decides whether to answer locally, use cache, or escalate. It also controls retrieval depth, tool calls, and citation requirements so responses stay fast and explainable.
+
+## How does Membria decide between local, cache, and escalation paths?
+
+It runs a self‑knowledge checkpoint: Do we have grounded evidence, enough graph context, and acceptable uncertainty? If any threshold fails, it escalates; otherwise it uses local SLM + GraphRAG or cached answers.
+
+## What are the main client execution paths?
+
+There are three: local (SLM + GraphRAG), cache (local cache or KCG), and escalation (Council + Curator). All paths return citations and can write back verified artifacts.
+
+## What is “Idem‑Prompts” and why use it?
+
+Idem‑Prompts are deterministic tool‑calling templates. They keep JSON/schema calls stable, reduce tool errors, and make the orchestration layer more predictable.
+
+## How are decisions extracted without interrupting work?
+
+DBB watches the event stream and extracts decision candidates asynchronously. It only surfaces a prompt if confidence is high, so it feels like instrumentation rather than a forced workflow.
+
+## What does the Decision Surface actually show?
+
+It aggregates decision records into “what matters now”: open loops, drift, precedents, and risk flags. It does not show raw chat; it shows structured outcomes and evidence links.
+
+## What are the stages of ingestion for new sources?
+
+Ingestion is cost‑aware: structural parsing → ThoughtUnits → embeddings → clustering → reasoning skeleton → conservative heuristics. This keeps costs low while enabling GraphRAG and DBB.
+
+## What is the difference between hot, warm, and cold memory?
+
+Hot memory is in‑session scratchpad. Warm memory is SQLite for fast transactional access. Cold memory is DuckDB plus embeddings for analytics and deep search.
+
+## Why use both SQLite and DuckDB?
+
+SQLite handles frequent writes, event logs, and permissions. DuckDB handles fast scans, analytics, and large embedding queries without slowing down the client.
+
+## How does the graph layer stay explainable?
+
+GraphRAG stores entities and relations with timestamps and provenance so the system can show link chains (“why this follows from that”) and cite evidence.
+
+## What is a “ThoughtUnit” in practice?
+
+It is a normalized atom with author, timestamp, thread id, type, and source URI. ThoughtUnits keep indexing cheap and make reasoning reproducible.
+
+## How are citations generated for answers?
+
+Citations come from GraphRAG link chains or cached artifacts with provenance. The Orchestrator can require citations by policy, especially for high‑stakes queries.
+
+## What is the Curator’s role in escalation?
+
+The Curator verifies multi‑model outputs, fuses them into a single answer, attaches provenance, and writes back to the cache and graph so the result can be reused.
+
+## How do cache entries expire or refresh?
+
+Cache entries carry TTLs and provenance hashes. Stale entries can be re‑verified by the Council or re‑linked to new evidence.
+
+## How does Membria prevent cache pollution?
+
+Only verified artifacts pass through Curator policies, and questionable entries can be challenged and invalidated. This keeps the KCG clean over time.
+
+## Can I tune the latency vs accuracy trade‑off?
+
+Yes. Policies can set retrieval depth, escalation thresholds, and citation strictness so power users can choose faster or more rigorous responses.
+
+## How does Membria handle model switching?
+
+The client can route between local SLMs and the Council based on capability and policy. Switching is tracked in provenance so answers remain auditable.
+
+## What is SkillForge and when is it used?
+
+SkillForge manages LoRA adapters created from verified artifacts. It is used only when recurring domain gaps appear and quality thresholds are met.
+
+## What observability metrics matter most?
+
+Key metrics include cache hit rate, escalation rate, citation coverage, DBB extraction rate, and end‑to‑end latency. These help tune reliability and cost.
+
+## Is there a path for exporting or migrating my data?
+
+Yes. Decision records, graph artifacts, and caches can be exported with provenance, enabling migration or backups without losing explainability.
