@@ -1,0 +1,129 @@
+---
+title: "Runtime diagrams"
+description: "Mermaid reference diagrams for Membria CE runtime"
+---
+
+# Membria CE - Diagrams
+
+This file contains reference diagrams for the Membria CE runtime.
+All diagrams use Mermaid so they can render in GitHub/GitLab/docs pipelines.
+
+---
+
+## 1) System overview
+
+```mermaid
+flowchart LR
+  U[User] --> UI[Client UI\nChat - Decision Surface - Search]
+  UI --> ORCH[Orchestrator / Router]
+
+  ORCH --> MEM[Local Stores\nSQLite - DuckDB]
+  ORCH --> GR[GraphRAG Engine\nGraph + Vectors + Ranking]
+  ORCH --> SLM[Local SLM Runtime]
+  ORCH --> DBB[Decision Black Box\nExtraction Engine]
+
+  ORCH -->|Escalate| GW[Escalation Gateway]
+  GW --> KCG[Global Knowledge Cache\nDecentralized]
+  GW --> COUNCIL[LLM Council\nStronger models]
+  COUNCIL --> CUR[Curator\nVerify + Fuse + Provenance]
+
+  CUR -->|Write-back| KCG
+  CUR -->|CAG cache| MEM
+  CUR -->|Ontology updates| GR
+  CUR --> SF[SkillForge\nLoRA lifecycle]
+  SF --> SLM
+```
+
+---
+
+## 2) Query routing decision tree
+
+```mermaid
+flowchart TD
+  Q[User query] --> M{Mode?}
+  M -->|Chat| C1[Chat pipeline]
+  M -->|Decision Surface| D1[DS pipeline]
+  M -->|Search| S1[Search pipeline]
+
+  C1 --> P[Orchestrator builds plan]
+  S1 --> P
+  D1 --> P
+
+  P --> K{KCG / local cache hit?}
+  K -->|Yes| OUT1[Answer + citations]
+  K -->|No| L{Local SLM confident?}
+  L -->|Yes| R1[GraphRAG retrieve + rank]
+  R1 --> OUT2[Answer + citations]
+  L -->|No| E1[Escalate to Council]
+  E1 --> CUR[Curator]
+  CUR --> OUT3[Answer + citations + write-back]
+```
+
+---
+
+## 3) Ingestion pipeline (cold start)
+
+```mermaid
+flowchart LR
+  A[Connected sources\nDrive - Email - Slack - Chat logs] --> B[Structural parsing\n(no heavy reasoning)]
+  B --> C[ThoughtUnits\n(ts, author, thread, uri, type)]
+  C --> D[Cheap embeddings]
+  D --> E[Semantic clustering]
+  E --> F[Reasoning skeleton\n(form only)]
+  F --> G[Conservative heuristics\nstability/drift flags]
+  G --> H[DBB candidates + Graph updates]
+  H --> I[Decision Surface can render]
+```
+
+---
+
+## 4) Decision Black Box lifecycle
+
+```mermaid
+sequenceDiagram
+  participant S as Streams (Chats/Tools)
+  participant P as Parser (ThoughtUnits)
+  participant B as DBB Engine
+  participant G as GraphRAG Store
+  participant D as Decisions Store
+  participant DS as Decision Surface
+
+  S->>P: New message / event
+  P->>B: ThoughtUnit + metadata
+  B->>B: Detect decision candidates
+  B->>D: Upsert Decision object
+  B->>G: Add/update entities/relations
+  DS->>D: Query decisions + status
+  DS->>G: Fetch precedents + links
+  DS-->>DS: Render cards
+```
+
+---
+
+## 5) Council escalation + caching loop
+
+```mermaid
+sequenceDiagram
+  participant UI as Client UI
+  participant OR as Orchestrator
+  participant KC as KCG (Cache)
+  participant C as Council
+  participant CU as Curator
+  participant LM as Local Memory
+  participant GR as GraphRAG
+
+  UI->>OR: Ask question
+  OR->>KC: Lookup cache
+  alt Cache hit
+    KC-->>OR: Verified answer + citations
+    OR-->>UI: Respond
+  else Cache miss
+    OR->>C: Escalate request
+    C-->>CU: Multi-model outputs
+    CU-->>CU: Verify + fuse + provenance
+    CU->>LM: Store CAG entry
+    CU->>GR: Update ontology / links
+    CU->>KC: (Optional) write shared artifact
+    OR-->>UI: Respond with citations
+  end
+```

@@ -1,0 +1,404 @@
+---
+title: "Client runtime RFC"
+description: "Full runtime specification and execution model"
+---
+
+# Membria CE Client Runtime - Full Specification (RFC)
+
+**Status:** Draft  
+**Audience:** Engineering, Product, Security  
+**Scope:** Membria CE Client runtime architecture and execution model (Cloud first, Self-Hosted later)  
+**Related:** `client_updated.md` (high-level overview), `diagrams.md` (reference diagrams)
+
+---
+
+## 0. Executive summary
+
+Membria CE Client is a **runtime** that sits between the user and a fleet of AI capabilities. It provides:
+
+- A **normal chat** experience (expected baseline for power users).
+- A **persistent intelligence layer** that compounds over time: memory, GraphRAG, and expert skill adapters.
+- A **Decision Black Box (DBB)** that extracts durable decision artifacts from noisy work streams.
+- A **Decision Surface (DS)** that reads DBB + memory (not raw chat) to show what matters.
+- A **local-first execution model** (when self-hosted is available), with **cloud escalation** and a **decentralized knowledge cache** to prevent intelligence reset.
+
+The client must feel fast, predictable, and explainable. Latency spikes and "RAG slowness" must be actively mitigated with caching, staged retrieval, and optimistic UX.
+
+---
+
+## 1. Goals
+
+### 1.1 Product goals
+1. **Compounding intelligence:** user knowledge and reasoning should accumulate instead of resetting per chat/tool/model.
+2. **Explainability by default:** answers should be traceable to sources and reasoning artifacts (citations, link chains, provenance).
+3. **Local-first posture:** run as much as possible locally (SLM + memory + GraphRAG) when self-hosted is enabled.
+4. **Selective escalation:** use expensive models only when local capability + cache + graph are insufficient.
+5. **Decision capture at scale:** extract turning points and decisions across dozens of chats/tools without forcing rituals.
+6. **Power user throughput:** minimize friction; support terminal-like visibility without turning the UI into a console.
+
+### 1.2 Engineering goals
+- Modular components with clear contracts.
+- Deterministic tool calling (schema-validated).
+- Measurable reliability: latency budgets, cache hit rates, citation coverage, escalation rate.
+- Secure-by-design permissions for sources, tools, and export.
+
+---
+
+## 2. Non-goals
+
+- Replace every external tool UI (Slack, Gmail, GitHub, IDEs) in v1.
+- Train a frontier foundation model from scratch.
+- "Perfect truth" or guaranteed correctness; instead: **confidence + provenance + escalation**.
+- A single monolithic "one prompt to rule them all" architecture.
+
+---
+
+## 3. Definitions and terminology
+
+- **Client:** the user-facing app + local runtime services (desktop/mobile/web, depending on platform).
+- **SLM:** small local model used for fast, cheap reasoning (open weights).
+- **Council:** a set of stronger LLMs used during escalation (cloud).
+- **KCG / Global Knowledge Cache:** decentralized layer storing verified knowledge artifacts and their provenance.
+- **CAG:** cache-augmented generation; reusing verified answers and intermediate artifacts.
+- **GraphRAG:** retrieval using a knowledge graph + vector similarity + graph-aware ranking with citations.
+- **ThoughtUnit:** a normalized atomic fragment extracted from sources (message/doc chunk) with metadata.
+- **DBB:** Decision Black Box; agent/process that detects decisions and turning points and logs them structurally.
+- **DS:** Decision Surface; the "home screen" built from DBB + memory graph.
+
+---
+
+## 4. System context and product lines
+
+Membria is shipped as:
+
+1. **Membria Cloud (managed service)** - first release path.
+2. **Membria Self-Hosted / Local** - later release path for local/on-device execution.
+3. **Decentralized knowledge backend** - remains in the cloud and is shared across products (personal/SMB/enterprise), subject to permissions and tenancy.
+
+The client runtime must be compatible with both Cloud and Self-Hosted modes without rewriting the UI.
+
+---
+
+## 5. Architecture overview
+
+### 5.1 Core modules
+- **UI Shell**: Chat, Decision Surface, Search, Sources/Files tray.
+- **Orchestrator (Router)**: chooses model path, retrieval depth, tool calls, caching strategy.
+- **Local stores**: SQLite (transactional), DuckDB (analytics), embedding store, graph store.
+- **GraphRAG Engine**: indexing, retrieval, ranking, citation assembly.
+- **DBB Engine**: event stream ingestion -> extraction -> decision objects.
+- **Escalation Gateway**: Council calls, KCG lookup, cost controls.
+- **Curator**: verification, fusion, provenance, write-back policy.
+- **SkillForge**: LoRA management and optional training workflow.
+
+### 5.2 Execution paths
+- **Path A (local)**: UI -> Orchestrator -> SLM + GraphRAG + local memory -> answer + citations.
+- **Path B (cache)**: UI -> Orchestrator -> local cache/KCG -> answer + citations.
+- **Path C (escalation)**: UI -> Orchestrator -> Council -> Curator -> write back -> answer.
+
+---
+
+## 6. Data sources and ingestion
+
+### 6.1 Supported sources (initial)
+- Google Drive (docs, pdfs)
+- Email
+- Slack
+- WhatsApp exports (where feasible)
+- Chat tools: Claude Code, Codex logs (CLI traces), ChatGPT exports
+- Forums/comments (import-based)
+
+### 6.2 Access & scope control (must-have)
+The onboarding must ask:
+- which sources to connect,
+- scope per source: full history / last 12 months / custom range,
+- estimated volume preview ("~18k messages · ~1.2k documents · ~3 years"),
+- explicit permission grants and revocation.
+
+### 6.3 Ingestion stages (cost-aware)
+1. **Structural parsing (no heavy reasoning)**  
+   - normalize to ThoughtUnits  
+   - extract: timestamps, author, thread id, source URI, message type  
+2. **Cheap embeddings**  
+   - compute embeddings per ThoughtUnit  
+3. **Semantic clustering**  
+   - group by topic/entity/thread  
+4. **Reasoning skeleton (form, not conclusions)**  
+   - detect: decisions, alternatives, unresolved loops, revisions, return patterns  
+5. **Conservative heuristics**  
+   - stability flags, drift flags, missing evidence flags  
+
+> Important: These stages must be observable and UI-friendly (progress, estimates), but not "terminal cosplay".
+
+---
+
+## 7. Storage and data model
+
+### 7.1 SQLite (transactional core)
+**Purpose:** fast local writes, sync state, metadata, event logs, permissions.
+
+Minimum tables (suggested):
+- `sources` (id, type, auth_ref, scope, status)
+- `thought_units` (id, source_id, uri, type, ts, author, text_ref, hash, metadata_json)
+- `threads` (id, source_id, external_thread_id, topic_hint)
+- `events` (id, ts, kind, payload_json, correlation_id)
+- `decisions` (id, ts, title, status, confidence, provenance_json)
+- `decision_links` (decision_id, thought_unit_id, relation)
+- `cache_entries` (key, value_json, citations_json, ttl, created_at, provenance)
+- `skills` (id, name, domain, version, enabled, checksum)
+
+Recommended:
+- WAL mode
+- JSON1 for flexible artifacts
+- content-addressed hashes to dedupe
+
+### 7.2 DuckDB (analytics + batch)
+**Purpose:** fast scans, clustering analytics, retention metrics, DS metrics.
+
+### 7.3 Embeddings store
+Options:
+- local vector store (Qdrant embedded / sqlite-vss / pgvector in self-hosted)
+- store embeddings in DuckDB extensions (if acceptable)
+
+### 7.4 Graph store
+GraphRAG needs:
+- entity nodes, relation edges, timestamps, source provenance
+- ability to run explainable queries ("show path from A to B through evidence")
+
+Candidate engines:
+- local: TUgraph (if embedded mode exists) or alternative graph DB
+- accelerated: GPU-based graph analytics (cuGraph) for ranking/centrality, where feasible
+
+> Note: GPU acceleration should be treated as an optimization layer, not a hard dependency.
+
+---
+
+## 8. Orchestrator: routing policy
+
+### 8.1 Inputs
+- user message + mode (Chat / DS / Search)
+- active context (selected card, selected sources, selected timeframe)
+- cost policy (user tier, budget)
+- latency policy (interactive vs background)
+- safety policy (tool permissions)
+
+### 8.2 Outputs
+- selected execution plan: local/cache/escalate
+- retrieval depth: shallow/standard/deep
+- tool call plan (schemas)
+- caching plan (keys, TTL)
+- provenance requirements (citations mandatory or optional)
+
+### 8.3 Self-knowledge checkpoint (minimum viable)
+The local model must answer:
+- "Do I have grounded evidence?"
+- "Do I have enough context from GraphRAG?"
+- "Is my uncertainty too high?"
+- "Is the user asking for expert-level domain correctness?"
+
+If any threshold fails -> escalate.
+
+---
+
+## 9. Council escalation and knowledge cache
+
+### 9.1 Escalation triggers
+- confidence below threshold
+- missing citations for required domains
+- conflicts detected in local graph
+- user explicitly requests "verify / deep check"
+- high-stakes domains (configurable)
+
+### 9.2 Council workflow
+1. **KCG lookup first** (avoid recompute)
+2. If miss: query Council models with task decomposition
+3. Curator fuses responses (agreement, evidence coverage, conflict detection)
+4. Produce:
+   - final answer
+   - citations + provenance bundle
+   - reusable artifacts (snippets, entity/relation updates)
+5. Write back to:
+   - local cache (CAG)
+   - local graph updates
+   - optional KCG write (tenancy rules)
+
+### 9.3 Cost controls
+- modal-based compute budgets (e.g., Modal mode expensive)
+- per-user daily cap + burst allowance
+- "verify only if needed" toggles
+- caching aggressively on common queries
+
+---
+
+## 10. Skill system (LoRA patches)
+
+### 10.1 What LoRA is in Membria
+LoRA patches are **small expert adapters** that improve performance on:
+- domain vocab
+- task formatting
+- reasoning style constraints
+- codebase conventions (for coding use cases)
+
+### 10.2 Critical caution (do not oversell)
+LoRA does not magically create intelligence. It can:
+- reduce hallucinations in narrow domains (by shaping priors),
+- improve adherence to conventions,
+- improve recall over a domain distribution.
+
+But it can also:
+- overfit to low-quality artifacts,
+- entrench wrong patterns,
+- degrade general performance.
+
+Therefore LoRA creation must be:
+- curated (only from verified fused artifacts),
+- scoped (per domain/task),
+- reversible (easy disable/rollback),
+- measurable (A/B eval on held-out tasks).
+
+### 10.3 How LoRAs "accumulate"
+Correct framing:
+- Membria accumulates **verified training artifacts** from the Council + cache.
+- Only recurring gaps with stable evaluation are candidates for LoRA updates.
+
+---
+
+## 11. Decision Black Box (DBB)
+
+### 11.1 DBB mission
+Across dozens of chats and tools, DBB extracts:
+- "what changed"
+- "what got decided"
+- "why it was decided"
+- "what to check later" (outcomes)
+
+### 11.2 DBB detection heuristics (minimal)
+- commit-like language: "we decided", "let's ship", "final", "go with"
+- change events: PR merged, config changed, dependency swapped
+- repeated unresolved topics
+- confidence markers: % confidence, risk statements, tradeoffs
+- escalation events and Council outputs
+
+### 11.3 DBB output object (example)
+A Decision object should include:
+- title (human readable)
+- timestamp (first commit and closure)
+- status: proposed / pending / decided / reviewed / invalidated
+- reasoning summary (structured)
+- assumptions list (each with evidence)
+- evidence links (thought units, PRs, docs)
+- outcome hooks (what to check, when)
+
+DBB stores structure; raw logs can stay in source systems, referenced via URIs.
+
+---
+
+## 12. Decision Surface (DS)
+
+### 12.1 Why DS is the home screen
+Power users drown in context. DS answers:
+- "What is open?"
+- "Where did I drift?"
+- "What must be decided?"
+- "What did we decide before, and how did it turn out?"
+
+### 12.2 DS reads DBB, not chat
+DS is built from:
+- decisions table + links
+- stability flags
+- unresolved loops
+- precedent links
+- outcome tracking state
+
+### 12.3 DS cards (safer, less scary semantics)
+Avoid jargon as defaults. Prefer "normal people" labels:
+- Open loops
+- Decisions awaiting sign-off
+- Assumptions that changed
+- Similar past choices (precedents)
+- Missing evidence / unclear
+
+Advanced labels can exist behind an "expert mode".
+
+---
+
+## 13. UI behaviors relevant to runtime
+
+### 13.1 Modes
+- **Chat:** primary interaction surface
+- **Decision Surface:** daily dashboard derived from DBB
+- **Search:** explainable retrieval with citations and link chains
+
+### 13.2 Source handling (files, links, snippets)
+Files are never "silently dumped into context".
+Instead:
+- user adds sources into a **Sources Tray**
+- each source has scope: include/ignore, time range, permissions
+- retrieval uses citations; the model sees only retrieved chunks
+
+### 13.3 Speed UX (non-negotiable)
+- show partial progress ("retrieving", "verifying", "caching")
+- allow user to continue interacting while deep retrieval runs
+- persist results into DS artifacts when relevant
+
+---
+
+## 14. Observability and metrics
+
+### 14.1 Required telemetry (privacy-safe)
+- latency by stage (route, retrieval, rank, generate, verify)
+- cache hit ratio (local + KCG)
+- escalation rate
+- citation coverage rate
+- DBB extraction rate + false positive rate
+- DS engagement (cards opened, decisions reviewed)
+
+### 14.2 Debug views for power users
+Optional "verbose panel":
+- shows plan and stages
+- never exposes sensitive tokens/keys
+- can be toggled per workspace
+
+---
+
+## 15. Security model
+
+- explicit source authorization and revocation
+- encryption at rest for local stores (optional but recommended)
+- key management: OS keychain where possible
+- tool permission prompts: first-use + per-scope
+- sandboxed skill execution and export controls
+
+---
+
+## 16. Deployment modes
+
+### 16.1 Cloud first
+- client UI + thin local cache
+- orchestrator mostly server-side
+- GraphRAG and DBB can run as managed services
+
+### 16.2 Self-hosted later
+- local orchestrator + local stores + local SLM
+- optional offline mode
+- cloud used for KCG sync + Council escalation (optional)
+
+---
+
+## 17. Roadmap (runtime-facing)
+
+1. Cloud MVP: Chat + Sources + explainable retrieval + caching.
+2. DBB MVP: decision extraction from chat + minimal DS.
+3. Council + Curator + KCG caching loop.
+4. Self-hosted runtime: local SLM + local stores + local GraphRAG.
+5. SkillForge: curated LoRA updates + evaluation harness.
+6. GPU acceleration: optional graph ranking and embedding speedups.
+
+---
+
+## 18. Open questions
+
+- Best graph store for embedded self-hosted mode?
+- KCG tenancy: what is shared vs private by default?
+- DBB false positives: best UI pattern for corrections without friction?
+- LoRA lifecycle: distribution, rollback, evaluation dataset governance.

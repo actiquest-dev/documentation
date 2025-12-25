@@ -54,11 +54,12 @@
         "tab": "Signals stack",
         "groups": [
           {
-            "group": "DBB & Decision Surface",
+            "group": "Runtime & decision systems",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/windsurf",
-              "ai-tools/claude-code"
+              "membriace/client",
+              "membriace/client-runtime",
+              "membriace/dbb-and-lora-runtime",
+              "membriace/diagrams"
             ]
           }
         ]

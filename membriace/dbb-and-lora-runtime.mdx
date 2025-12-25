@@ -1,0 +1,258 @@
+---
+title: "DBB heuristics and LoRA routing"
+description: "Decision detection, confidence scoring, and LoRA router policy"
+---
+
+Membria CE
+
+Decision Black Box (DBB) Heuristics & LoRA Router Policy
+
+Status: Draft
+Audience: Core engineering, AI infra, platform architects
+Scope: Runtime decision detection, confidence scoring, LoRA selection & escalation
+
+---
+
+## 1. Decision Black Box (DBB)
+
+### 1.1 Purpose
+
+Decision Black Box (DBB) is a backend reasoning agent responsible for:
+- Detecting decisions, not conversations
+- Extracting reasoning context at the moment decisions happen
+- Preserving causal structure for Decision Surface (DS)
+- Operating silently without interrupting user workflows
+
+DBB is not a UX feature. It is an inference-time system that turns noisy interaction streams into durable decision records.
+
+---
+
+## 2. DBB Input Streams
+
+DBB consumes multiple user-originated streams:
+- AI chat conversations (Membria, Claude, Codex, etc.)
+- Code commits / diffs
+- Documents and notes
+- Task descriptions
+- Explicit user actions (accept, reject, deploy, merge)
+
+All streams are treated as unstructured signals.
+
+---
+
+## 3. Decision Detection Heuristics
+
+DBB does not rely on a single classifier. It uses heuristic composition with confidence scoring.
+
+### 3.1 Decision Signal Types
+
+Each detected event is evaluated across the following dimensions:
+
+| Signal type | Description |
+| --- | --- |
+| Commitment language | "We will", "Let's do", "I'm going with", "Final decision" |
+| Irreversibility | Actions that create cost or lock-in (deploy, merge, pay, publish) |
+| Alternatives closure | Explicit rejection of other options |
+| Temporal anchoring | References to deadlines, timelines, next steps |
+| Responsibility assertion | "I decided", "We agreed", "I approve" |
+| Execution trigger | Follow-up tasks, code changes, calendar events |
+
+Each signal contributes partial evidence, never binary truth.
+
+---
+
+## 4. Confidence Scoring Model
+
+DBB assigns a Decision Confidence Score (DCS) in [0.0 - 1.0].
+
+### 4.1 Scoring Formula (Conceptual)
+
+DCS = sum(weight_i * signal_i) - ambiguity_penalty
+
+Where:
+- signal_i in [0,1]
+- weights are user-calibrated over time
+- ambiguity penalty increases with:
+  - speculative language
+  - conditional phrasing
+  - hypothetical tense
+
+### 4.2 Confidence Bands
+
+| DCS range | Classification | Behavior |
+| --- | --- | --- |
+| >= 0.75 | Confirmed decision | Recorded immediately in DBB |
+| 0.45 - 0.75 | Tentative decision | Stored as provisional, surfaced softly |
+| < 0.45 | Exploration | Ignored for DS, kept only as context |
+
+DBB never blocks user actions regardless of confidence.
+
+---
+
+## 5. False Positive Handling (No-Friction Model)
+
+DBB assumes false positives are inevitable.
+
+### 5.1 Correction Loop
+
+Tentative decisions appear in DS as low-priority signals. User can:
+- Confirm
+- Mark as exploration
+- Ignore
+
+All actions are one-click, async, and avoid modal dialogs.
+
+### 5.2 Learning Rule
+
+Corrections:
+- Adjust user-specific weights
+- Improve future DCS calibration
+- Are never shared globally
+
+---
+
+## 6. DBB Output Schema (Abstract)
+
+Each recorded decision includes:
+- Decision ID
+- Timestamp
+- Confidence score
+- Reasoning trace (summarized, structured)
+- Source references (chat IDs, commit hashes, docs)
+- Assumptions detected
+- Initial prediction (if available)
+
+Decisions are append-only. No overwrites.
+
+---
+
+## 7. Relationship to Decision Surface (DS)
+
+- DS reads only DBB outputs
+- Raw chat history is never surfaced directly
+- DS reflects:
+  - Open decisions
+  - Drift
+  - Unresolved assumptions
+  - Outcome deltas
+
+DBB is the sole authority on what counts as a decision.
+
+---
+
+# Part II - LoRA Router Policy
+
+## 8. Purpose of LoRA Routing
+
+Membria does not rely on a single monolithic model. Instead:
+- A base SLM handles most interactions
+- LoRA adapters provide domain expertise
+- Escalation occurs only when confidence is insufficient
+
+Goal: maximize speed and personalization without hallucination.
+
+---
+
+## 9. LoRA Types
+
+| LoRA type | Scope |
+| --- | --- |
+| Personal LoRA | Single user |
+| Domain LoRA | Workspace / project |
+| Task LoRA | Narrow function (e.g. legal review) |
+| Council-derived LoRA | Sanitized expert synthesis |
+
+All LoRAs are versioned, immutable, and explicitly activated.
+
+---
+
+## 10. Router Inputs
+
+The LoRA Router evaluates:
+- Query intent
+- Required domain expertise
+- Base model confidence estimate
+- Historical success rate of LoRAs
+- Cost / latency budget
+
+---
+
+## 11. Routing Policy (Default)
+
+### 11.1 Normal Path (approx 80-90%)
+
+Base SLM + Personal LoRA (if exists) + Local GraphRAG
+
+Used when:
+- Confidence >= threshold
+- Query within known domain
+- No conflicting signals
+
+### 11.2 Expert Path
+
+Base SLM + Personal LoRA + Domain LoRA + Local GraphRAG
+
+Triggered when:
+- Domain match is strong
+- Past evaluations show LoRA benefit
+- Confidence borderline but acceptable
+
+### 11.3 Escalation Path
+
+Triggered when:
+- Confidence < minimum threshold
+- Conflicting reasoning detected
+- High-risk decision context
+
+Escalation order:
+1. Global Knowledge Cache (if answer exists)
+2. Council of LLMs (parallel inference)
+3. Result distilled and cached
+
+Escalated outputs may generate new LoRA candidates.
+
+---
+
+## 12. LoRA Evaluation & Promotion
+
+### 12.1 Evaluation Dataset
+
+Each LoRA maintains:
+- Fixed test prompts
+- Known failure cases
+- Drift detection metrics
+
+### 12.2 Promotion Rules
+
+A LoRA may become default only if:
+- Improves accuracy
+- Does not increase hallucinations
+- Reduces escalation frequency
+
+Otherwise it remains optional or is deprecated.
+
+---
+
+## 13. Rollback Policy
+
+Rollback is instantaneous:
+- Disable LoRA
+- Revert routing decision
+
+Rollback does not affect DBB history and does not modify past decisions.
+
+---
+
+## 14. Key Design Principles
+
+- Decisions > conversations
+- Silence > interruption
+- Personal calibration > global optimization
+- Escalate only when needed
+- Never hide uncertainty
+
+---
+
+## 15. Summary
+
+DBB ensures that important moments are captured without user effort. LoRA routing ensures that expertise compounds without degrading trust. Together, they form the reasoning backbone of Membria CE.
