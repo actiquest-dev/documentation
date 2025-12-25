@@ -653,10 +653,10 @@ pub struct BatchCommit {
 
 Extrinsics:
 
-- propose_event(header: EventHeader, adj: Adjacency, sig: Signature)
-- finalize_event(event_id: H256) or finalize_batch(commit: BatchCommit)
-- dispute(event_id: H256, evidence_ref: Vec<u8>)
-- checkpoint(root: H256, height: u64)
+- `propose_event(header: EventHeader, adj: Adjacency, sig: Signature)`
+- `finalize_event(event_id: H256) or finalize_batch(commit: BatchCommit)`
+- `dispute(event_id: H256, evidence_ref: Vec<u8>)`
+- `checkpoint(root: H256, height: u64)`
 
 Runtime events:
 
