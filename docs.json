@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Membria CE Knowledge Base",
+  "name": "Membria Knowledge Base",
   "colors": {
     "primary": "#0F172A",
     "light": "#2563EB",
@@ -58,7 +58,7 @@
         ]
       },
       {
-        "tab": "Membria CE (Personal)",
+        "tab": "Membria CE (Community Edition)",
         "groups": [
           {
             "group": "Overview",
@@ -156,8 +156,8 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Membria Community Edition",
-          "href": "https://membria.xyz",
+          "anchor": "Membria - Persistence Layer between you and AI",
+          "href": "https://membria.ai",
           "icon": "book-open-cover"
         },
         {
@@ -176,13 +176,13 @@
     "links": [
       {
         "label": "Contact",
-        "href": "mailto:hello@membria.xyx"
+        "href": "mailto:hello@membria.ai"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Join waitlist",
-      "href": "https://membria.xyz/whitelist"
+      "label": "Join us",
+      "href": "https://membria.ai/"
     }
   },
   "contextual": {
