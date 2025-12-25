@@ -1,12 +1,182 @@
 ---
 title: "Security and privacy"
-description: "Security and compliance posture for Membria EE"
+description: "Security controls, data isolation, and compliance posture for Membria Enterprise Edition."
 ---
 
 # Security and privacy
 
-## Controls
-- SSO and SCIM provisioning
-- Encryption at rest and in transit
-- Data residency and retention policies
-- Full audit logs for escalations and access
+This page describes the security architecture, privacy guarantees, and compliance controls of **Membria EE (Enterprise Edition)**.
+
+Membria EE is designed for organizations operating in regulated environments where data integrity, auditability, and residency are mandatory.
+
+---
+
+## Security model overview
+
+Membria EE follows a **defense-in-depth** model across infrastructure, data, identity, and runtime layers.
+
+Core principles:
+- Customer data is isolated by default
+- Access is explicit, logged, and auditable
+- No silent learning or cross-tenant reuse
+- Security controls are enforceable, not advisory
+
+Membria does not rely on implicit trust in AI models or operators.
+
+---
+
+## Identity and access controls
+
+### Single Sign-On (SSO)
+
+Membria EE supports enterprise identity providers via:
+- SAML 2.0
+- OpenID Connect (OIDC)
+
+This enables centralized authentication aligned with corporate IAM policies.
+
+### SCIM provisioning
+
+Automated user lifecycle management via SCIM:
+- User creation and deactivation
+- Role assignment
+- Group synchronization
+
+This ensures access is always aligned with HR and identity systems.
+
+### Role-based access control (RBAC)
+
+Access is governed by fine-grained roles, including:
+- Workspace administrators
+- Knowledge contributors
+- Read-only and audit roles
+- System and compliance officers
+
+Privileges are enforced at query, ingestion, and escalation levels.
+
+---
+
+## Data encryption
+
+### Encryption at rest
+
+All stored data is encrypted at rest using industry-standard algorithms:
+- AES-256 for storage volumes
+- Encrypted vector indices
+- Encrypted knowledge graph stores
+
+Encryption keys are managed via enterprise-grade key management systems (KMS).
+
+### Encryption in transit
+
+All data in transit is protected using:
+- TLS 1.2+ for all internal and external communication
+- Mutual TLS (mTLS) for internal service-to-service traffic (where applicable)
+
+No plaintext data is transmitted between components.
+
+---
+
+## Data isolation and tenancy
+
+### Tenant isolation
+
+Each Membria EE deployment operates in a **fully isolated environment**:
+- Dedicated compute
+- Dedicated storage
+- Dedicated vector and graph databases
+
+No multi-tenant inference or shared memory is used.
+
+### Knowledge isolation
+
+- Knowledge graphs are private by default
+- No cross-organization knowledge sharing
+- No training or fine-tuning on customer data without explicit approval
+
+This applies to:
+- local models
+- escalation paths
+- knowledge caches
+
+---
+
+## Data residency and retention
+
+### Data residency
+
+Membria EE supports region-specific deployments to meet regulatory requirements:
+- On-premise
+- Private cloud
+- Approved geographic regions
+
+All data, including backups and logs, remains within the configured region.
+
+### Retention policies
+
+Organizations can configure:
+- Data retention periods
+- Log retention durations
+- Deletion and archival rules
+
+Retention policies are enforced automatically and auditable.
+
+---
+
+## Auditability and logging
+
+### Full audit logs
+
+Membria EE maintains immutable audit logs for:
+- User access
+- Query execution
+- Decision capture
+- Escalations to external models
+- Administrative actions
+
+Logs include:
+- Actor identity
+- Timestamp
+- Action type
+- Affected resources
+
+### Escalation transparency
+
+Any escalation beyond local models is:
+- Explicitly logged
+- Traceable to a specific request
+- Attributable to a user or system policy
+
+There are no silent escalations.
+
+---
+
+## Compliance posture
+
+Membria EE is designed to support compliance with frameworks such as:
+- GDPR
+- SOC 2 (Type I / II alignment)
+- ISO 27001 (control mapping)
+- Financial and banking regulations (AML, KYC, SOX-aligned workflows)
+
+Formal certifications depend on deployment scope and customer requirements.
+
+---
+
+## What Membria does not do
+
+For clarity, Membria EE does **not**:
+- Train global models on customer data
+- Share embeddings or graphs across tenants
+- Perform background learning without consent
+- Hide model behavior or decision provenance
+
+Security behavior is explicit and inspectable.
+
+---
+
+## Key takeaway
+
+Membria EE treats AI as a regulated system component, not a black box.
+
+Security, privacy, and compliance are enforced through architecture, not policy documents.
