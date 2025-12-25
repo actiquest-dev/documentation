@@ -1,68 +1,86 @@
 ---
 title: "Membria Docs"
-description: "Persistent intelligence across AI tools, decisions, and time."
+description: "Smart Persistence Layer (SPL) for AI across people, teams, and models."
 ---
 
-## Membria Docs
+# Welcome to Membria
 
-**Membria is a persistent intelligence layer that preserves reasoning, decisions, and knowledge across AI tools and time.**
-It runs as a personal system, a team SaaS, or an enterprise platform -- with the same core architecture.
+## Introduction
 
-Membria is not built to generate better answers.
-It is built to make intelligence compound instead of resetting.
+Membria is a **Smart Persistence Layer (SPL) for AI**.
 
----
+It sits between people, teams, and AI models so that knowledge, reasoning, and decisions do not reset every time a conversation ends.
 
-## Choose your product
+Most AI systems are stateless by design.
+They respond, forget, and start over.
 
-<Columns cols={3}>
-  <Card title="Membria CE (Community Edition)" icon="sparkles" href="/membria-ce/overview">
-    Local-first personal runtime that captures decisions and compounds knowledge across tools.
-    **Best for:** founders, engineers, researchers, independent creators.
-  </Card>
-  <Card title="Membria for SMBs (SaaS)" icon="building" href="/membria-smb/overview">
-    Managed SaaS for teams that need shared reasoning and decision continuity.
-    **Best for:** startups, product teams, research groups.
-  </Card>
-  <Card title="Membria EE (Enterprise Edition)" icon="shield" href="/membria-ee/overview">
-    Enterprise deployment with governance, compliance, and institutional memory.
-    **Best for:** regulated enterprises, financial institutions, large organizations.
-  </Card>
-</Columns>
+Membria adds the missing layer: **persistent intelligence**.
 
 ---
 
-## Core concepts
+## What a Smart Persistence Layer is
 
-All Membria products are built on the same core architecture:
+A Smart Persistence Layer does not replace chat, documents, or AI models.
 
-- **Decision Surface** -- a live view of open, unresolved, drifting, or risky decisions.
-- **Decision Black Box (DBB)** -- an agent that detects and records decisions as they happen.
-- **Persistent Memory** -- a combination of long-context, GraphRAG, and decision records.
-- **LoRA Expertise Routing** -- domain-specific skill amplification without global model drift.
-- **Council Escalation** -- controlled use of stronger models when local intelligence is insufficient.
+It does one thing deliberately and well:
+it preserves what matters over time.
 
-The difference between products is not *what* Membria does --
-but *where it runs*, *who shares it*, and *how it is governed*.
+Membria's SPL captures:
+- Decisions and their outcomes
+- The reasoning behind those decisions
+- Assumptions, constraints, and context
+- Links between people, sources, and events
 
--> [Explore core architecture](/membria-ce/concepts)
-
----
-
-## How to use this documentation
-
-- Start with **Core Concepts** if you want to understand how Membria works.
-- Jump directly to your product section if you already know what you are deploying.
-- Enterprise readers should review governance and compliance sections early.
-
-This documentation is designed for technical users and decision-makers.
-If something feels underspecified, it probably is -- and should be made explicit.
+This information is stored in a structured, explainable form that AI can reuse later.
 
 ---
 
-## Where to go next
+## Why this layer is needed
 
-- New user? -> [Getting Started](/membria-ce/getting-started)
-- Evaluating architecture? -> [Core Concepts](/membria-ce/concepts)
-- Deploying at scale? -> [Enterprise Edition](/membria-ee/overview)
-- Running self-hosted? -> [Membria CE](/membria-ce/overview)
+Chats are noisy.
+Documents are static.
+Models are powerful but forgetful.
+
+Without persistence:
+- Teams repeat the same discussions
+- Old decisions get reopened
+- AI answers lack context
+- Knowledge disappears when people leave
+
+The Smart Persistence Layer ensures that intelligence **compounds instead of dissolving**.
+
+---
+
+## How Membria implements SPL
+
+Membria's SPL is built through a set of coordinated systems:
+
+- **Decision Black Box (DBB)** -- automatically captures decisions from conversations and work
+- **Decision Surface (DS)** -- makes decisions visible, trackable, and governable
+- **Graph-based memory** -- preserves causality, provenance, and timelines
+- **Local and shared knowledge caches** -- reuse past reasoning instead of re-generating it
+- **Controlled escalation** -- consults stronger models only when necessary
+
+Together, these systems form a persistent reasoning backbone.
+
+---
+
+## One architecture, three products
+
+All Membria products share the same Smart Persistence Layer, adapted to different environments:
+
+- **Membria CE (Personal)** -- SPL for individual power users
+- **Membria for SMBs (SaaS)** -- SPL for teams and shared workspaces
+- **Membria EE (Enterprise)** -- SPL for regulated, on-prem environments
+
+The difference is not what is remembered, but **who owns it, how it is governed, and where it runs**.
+
+---
+
+## The core idea
+
+AI should not only answer questions.
+
+It should remember **how and why decisions were made**.
+
+Membria's Smart Persistence Layer makes that possible.
