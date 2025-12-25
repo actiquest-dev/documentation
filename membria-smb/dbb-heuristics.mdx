@@ -1,0 +1,129 @@
+---
+title: "DBB heuristics"
+description: "How Decision Black Box decides what to persist in SMB workspaces."
+---
+
+# Decision Black Box Heuristics (SMB Edition)
+
+## Purpose
+
+DBB heuristics determine **when something is a decision worth recording**.
+
+For SMBs, heuristics are intentionally:
+- Conservative
+- Explainable
+- Low-noise
+
+The goal is trust, not completeness.
+
+---
+
+## Confidence-based capture model
+
+Every potential decision signal receives a confidence score.
+
+Only signals above the persistence threshold are recorded.
+
+Confidence is derived from multiple lightweight features.
+
+---
+
+## Core heuristic signals
+
+### 1. Explicit resolution language
+
+Phrases indicating closure or commitment:
+- "We will..."
+- "Let's proceed with..."
+- "Approved"
+- "Final decision"
+
+Strong positive signal.
+
+---
+
+### 2. Convergence after discussion
+
+Signals increase when:
+- Multiple viewpoints collapse into one
+- Alternatives stop appearing
+- Follow-up actions align
+
+Medium to strong signal depending on clarity.
+
+---
+
+### 3. Approval or status change
+
+Examples:
+- Document approval
+- Merge or publish action
+- Formal sign-off
+
+High-confidence signal.
+
+---
+
+### 4. Rejection of alternatives
+
+Explicitly rejected options strengthen confidence:
+- "We won't do X"
+- "Option A is not viable"
+
+Adds context, not a standalone decision.
+
+---
+
+### 5. Temporal persistence
+
+If a topic:
+- Reappears across days or weeks
+- Retains similar framing
+
+Confidence increases that a real decision context exists.
+
+---
+
+## Negative signals (noise reduction)
+
+DBB suppresses capture when:
+- Discussions are exploratory
+- Language remains hypothetical
+- No convergence is detected
+- The same topic oscillates without closure
+
+Long discussions without resolution are flagged but not recorded.
+
+---
+
+## False positives handling
+
+When a captured decision is marked incorrect:
+- DBB records the correction as an event
+- Original capture is preserved
+- Confidence weighting is adjusted
+
+No history is erased.
+
+---
+
+## SMB-specific constraints
+
+Compared to Enterprise:
+- Fewer policy layers
+- No manual approval workflows
+- Faster decay of low-confidence signals
+- Smaller evaluation windows
+
+This keeps DBB lightweight and unobtrusive.
+
+---
+
+## Summary
+
+DBB heuristics for SMBs prioritize:
+- Precision over recall
+- Trust over automation
+- Persistence over activity tracking
+
+Only decisions that matter survive.
