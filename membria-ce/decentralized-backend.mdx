@@ -30,71 +30,105 @@ Arweave stores the heavy payloads (validated answers, knowledge artifacts). Peaq
 
 ```mermaid
 graph TB
-  subgraph Client["Client layer"]
-    SLM["User or SLM"]
-    DoDAgent["DoD agent (lightweight client)"]
-    SLM <--> DoDAgent
-  end
-
-  subgraph Gateway["Gateway layer - knowledge lifecycle engine"]
-    subgraph Input["Input"]
-      Router["API router"]
+    %% Client Layer
+    subgraph Client["🔵 CLIENT LAYER"]
+        direction LR
+        SLM["👤 User/SLM"]
+        DoDAgent["📱 DoD Agent<br/>Lightweight Client"]
+        SLM <--> DoDAgent
     end
 
-    subgraph FastPath["Fast path"]
-      Cache["State graph cache"]
-      SemanticSearch["Semantic search (graph transformer, cuGraph)"]
+    %% Processing Layer - Main Gateway Logic
+    subgraph Gateway["🟢 GATEWAY LAYER - Knowledge Lifecycle Engine"]
+        direction LR
+
+        subgraph Input["INPUT"]
+            Router["🚪 API Router"]
+        end
+
+        subgraph FastPath["⚡ FAST PATH"]
+            Cache["💾 State Graph Cache"]
+            SemanticSearch["🧠 Semantic Search<br/>Graph Transformer + cuGraph"]
+        end
+
+        subgraph SlowPath["🔄 SLOW PATH"]
+            LLMEscalator["🚀 LLM Escalator"]
+            KnowledgeCreator["✨ Knowledge Creator<br/>Payload + Arweave + Consensus"]
+        end
+
+        subgraph Background["📦 BACKGROUND"]
+            EventProcessor["🔄 Event Processor"]
+            ArchiveEngine["📚 Archive Engine<br/>Batching + DuckDB + Parquet"]
+        end
     end
 
-    subgraph SlowPath["Slow path"]
-      LLMEscalator["LLM escalator"]
-      KnowledgeCreator["Knowledge creator (payload, Arweave, consensus)"]
+    %% Teacher Services Layer
+    subgraph Teacher["🤖 TEACHER SERVICES"]
+        LLMX["🧠 LLM-X<br/>OpenRouter"]
     end
 
-    subgraph Background["Background"]
-      EventProcessor["Event processor"]
-      ArchiveEngine["Archive engine (batching, DuckDB, Parquet)"]
+    %% Blockchain Layer
+    subgraph Blockchain["⛓️ PEAQ BLOCKCHAIN"]
+        direction LR
+        PeaqSubgraph["📊 Peaq Subgraph<br/>pallet-kcg"]
+        PeaqConsensus["🔐 Consensus Engine<br/>Verification Logic"]
     end
-  end
 
-  subgraph Teacher["Teacher services"]
-    LLMX["Teacher LLM (OpenRouter)"]
-  end
+    %% Storage Layer
+    subgraph Storage["🟣 PERMANENT STORAGE - Arweave Permaweb"]
+        direction LR
+        JSONFiles["📄 JSON Answers<br/>answers/{id}.json"]
+        ParquetArchives["📊 Parquet Archives<br/>batches/{ts}.parquet"]
+        ManifestIndex["📋 Manifest Index<br/>archive metadata"]
+    end
 
-  subgraph Blockchain["Peaq blockchain"]
-    PeaqSubgraph["Peaq subgraph (pallet-kcg)"]
-    PeaqConsensus["Consensus engine (verification logic)"]
-  end
+    %% Main Flow - Client Request
+    DoDAgent -->|"API Request"| Router
 
-  subgraph Storage["Permanent storage (Arweave)"]
-    JSONFiles["JSON answers (answers/{id}.json)"]
-    ParquetArchives["Parquet archives (batches/{ts}.parquet)"]
-    ManifestIndex["Manifest index (archive metadata)"]
-  end
+    %% Fast Path Flow
+    Router --> Cache
+    Router --> SemanticSearch
+    Cache --> SemanticSearch
+    SemanticSearch -->|"Cache Hit"| Router
+    Router -->|"Fast Response"| DoDAgent
 
-  DoDAgent -->|"API request"| Router
+    %% Slow Path Flow
+    Router -->|"Cache Miss"| LLMEscalator
+    LLMEscalator <--> LLMX
+    LLMEscalator --> KnowledgeCreator
+    KnowledgeCreator <--> JSONFiles
+    KnowledgeCreator <--> PeaqSubgraph
+    PeaqSubgraph --> PeaqConsensus
+    KnowledgeCreator -->|"New Answer"| Router
 
-  Router --> Cache
-  Router --> SemanticSearch
-  Cache --> SemanticSearch
-  SemanticSearch -->|"Cache hit"| Router
-  Router -->|"Fast response"| DoDAgent
+    %% Background Processing
+    PeaqSubgraph --> EventProcessor
+    EventProcessor --> Cache
+    EventProcessor --> ArchiveEngine
+    ArchiveEngine <--> ParquetArchives
+    ArchiveEngine --> ManifestIndex
 
-  Router -->|"Cache miss"| LLMEscalator
-  LLMEscalator <--> LLMX
-  LLMEscalator --> KnowledgeCreator
-  KnowledgeCreator <--> JSONFiles
-  KnowledgeCreator <--> PeaqSubgraph
-  PeaqSubgraph --> PeaqConsensus
-  KnowledgeCreator -->|"New answer"| Router
+    %% State Sync
+    PeaqSubgraph -.->|"State Sync"| Cache
 
-  PeaqSubgraph --> EventProcessor
-  EventProcessor --> Cache
-  EventProcessor --> ArchiveEngine
-  ArchiveEngine <--> ParquetArchives
-  ArchiveEngine --> ManifestIndex
+    %% Styling by Layer
+    classDef clientStyle fill:#3498db,stroke:#2980b9,color:#fff,stroke-width:2px
+    classDef gatewayStyle fill:#2ecc71,stroke:#27ae60,color:#fff,stroke-width:2px
+    classDef teacherStyle fill:#e67e22,stroke:#d35400,color:#fff,stroke-width:2px
+    classDef blockchainStyle fill:#e74c3c,stroke:#c0392b,color:#fff,stroke-width:2px
+    classDef storageStyle fill:#9b59b6,stroke:#8e44ad,color:#fff,stroke-width:2px
+    classDef fastStyle fill:#27ae60,stroke:#2ecc71,color:#fff
+    classDef slowStyle fill:#e67e22,stroke:#d35400,color:#fff
+    classDef backgroundStyle fill:#16a085,stroke:#1abc9c,color:#fff
 
-  PeaqSubgraph -.->|"State sync"| Cache
+    class SLM,DoDAgent clientStyle
+    class Router gatewayStyle
+    class Cache,SemanticSearch fastStyle
+    class LLMEscalator,KnowledgeCreator slowStyle
+    class EventProcessor,ArchiveEngine backgroundStyle
+    class LLMX teacherStyle
+    class PeaqSubgraph,PeaqConsensus blockchainStyle
+    class JSONFiles,ParquetArchives,ManifestIndex storageStyle
 ```
 
 ## 2: Decentralized Knowledge Graph (DKG) - layers and components
