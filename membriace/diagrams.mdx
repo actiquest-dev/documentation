@@ -65,12 +65,12 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-  A[Connected sources\nDrive - Email - Slack - Chat logs] --> B[Structural parsing\n(no heavy reasoning)]
-  B --> C[ThoughtUnits\n(ts, author, thread, uri, type)]
+  A["Connected sources (Drive - Email - Slack - Chat logs)"] --> B["Structural parsing (no heavy reasoning)"]
+  B --> C["ThoughtUnits (ts, author, thread, uri, type)"]
   C --> D[Cheap embeddings]
   D --> E[Semantic clustering]
-  E --> F[Reasoning skeleton\n(form only)]
-  F --> G[Conservative heuristics\nstability/drift flags]
+  E --> F["Reasoning skeleton (form only)"]
+  F --> G["Conservative heuristics (stability/drift flags)"]
   G --> H[DBB candidates + Graph updates]
   H --> I[Decision Surface can render]
 ```
