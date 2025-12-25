@@ -121,14 +121,39 @@
             "pages": [
               "membria-smb/overview",
               "membria-smb/getting-started",
-              "membria-smb/concepts"
+              "membria-smb/concepts",
+              "membria-smb/positioning",
+              "membria-smb/target-market"
             ]
           },
           {
-            "group": "Deployment & security",
+            "group": "Product",
             "pages": [
-              "membria-smb/deployment-hosting",
+              "membria-smb/decision-surface",
+              "membria-smb/decision-brief-builder"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "membria-smb/architecture",
+              "membria-smb/deployment-hosting"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              "membria-smb/roles-workflows",
+              "membria-smb/implementation",
               "membria-smb/security-privacy"
+            ]
+          },
+          {
+            "group": "Business",
+            "pages": [
+              "membria-smb/pricing",
+              "membria-smb/roadmap",
+              "membria-smb/sales-positioning"
             ]
           }
         ]

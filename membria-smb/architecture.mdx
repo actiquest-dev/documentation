@@ -1,0 +1,48 @@
+---
+title: "Architecture"
+description: "GraphRAG core, event schema, integrations, and deployment options."
+---
+
+# Architecture
+
+## Core: FalkorDB GraphRAG
+
+Membria uses a hybrid GraphRAG approach where graph and vector retrieval are executed in a single system. Embeddings live inside graph nodes to avoid sync issues between separate stores.
+
+## Event schema (Wikontic-inspired)
+
+Every decision is stored as a structured event:
+
+```
+DECISION EVENT:
+- WHO: Partner | Associate | Committee
+- WHAT: Decision | Precedent | Matter | Document
+- WHEN: Timestamp (immutable)
+- WHY: Reasoning text (embedded as vector)
+- CONTEXT: Client, matter, practice area
+- RELATIONS:
+  - approved_by -> Person
+  - references -> Precedent
+  - deviates_from -> Standard
+  - resulted_in -> Outcome
+  - linked_to -> Document
+- QUALIFIERS: confidence, status, review_required
+```
+
+## Integration architecture
+
+Membria connects to the systems you already use:
+
+- Document watcher (extracts decisions from docs)
+- Email analyzer (detects decision discussions)
+- Meeting summarizer (captures verbal decisions)
+
+These connectors feed the Membria core (GraphRAG, Decision Surface, DBB).
+
+## Deployment options
+
+| Option | Description | Target |
+| --- | --- | --- |
+| Cloud SaaS | Multi-tenant, Membria-hosted | SMB, quick start |
+| Private cloud | Single-tenant, customer cloud | Mid-market, compliance |
+| On-premise | Customer infrastructure | Enterprise, banks |

@@ -1,11 +1,32 @@
 ---
 title: "Security and privacy"
-description: "Security posture for Membria SMB"
+description: "Data security, compliance posture, and AI governance for Membria SaaS."
 ---
 
 # Security and privacy
 
-## Controls
-- Workspace access controls and role-based permissions
-- Audit logs for escalations and policy changes
-- Data retention policies per workspace
+## Data security
+
+| Control | Implementation |
+| --- | --- |
+| Encryption at rest | AES-256 |
+| Encryption in transit | TLS 1.3 |
+| Access control | RBAC plus matter-level permissions |
+| Audit trail | Full activity logging |
+| Data residency | Customer choice (US, EU, local) |
+
+## Compliance
+
+| Standard | Status |
+| --- | --- |
+| SOC 2 Type II | Architecture ready |
+| GDPR | Compliant |
+| CCPA | Compliant |
+| ISO 27001 | Roadmap |
+
+## AI governance
+
+- LLM calls do not train external models
+- Customer data never leaves the environment (on-prem option)
+- All AI outputs are auditable
+- Human-in-the-loop for all decisions
