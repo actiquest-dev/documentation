@@ -1,8 +1,175 @@
 ---
 title: "Deployment and hosting"
-description: "Hosting model for Membria SMB"
+description: "Hosting model, storage limits, and acceleration options for Membria for SMBs."
 ---
 
 # Deployment and hosting
 
-Membria for SMBs is delivered as a managed SaaS. Dedicated deployments may be offered for regulated teams.
+This page explains how Membria for SMBs is hosted, what infrastructure is included by default, and how teams can scale storage and performance as usage grows.
+
+---
+
+## Hosting model
+
+Membria for SMBs is delivered as a **managed SaaS**.
+
+By default:
+- Infrastructure is fully managed by Membria
+- No customer-side deployment or ML operations are required
+- Data is isolated per workspace
+
+For regulated teams, **dedicated deployments** may be offered with stricter isolation and custom residency options.
+
+---
+
+## Data model overview
+
+Each SMB workspace operates on three tightly coupled layers:
+
+1. **Vector index**  
+   For semantic retrieval across documents, notes, and extracted facts.
+
+2. **Event-based knowledge graph**  
+   For decision tracking, causality, timelines, and provenance.
+
+3. **Knowledge cache**  
+   For validated answers, decisions, and reusable reasoning.
+
+These layers grow together and are optimized as a single system, not as independent databases.
+
+---
+
+## Typical workspace size (SMB baseline)
+
+Membria SMB is designed for **document-heavy teams of 5-100 people**.
+
+A typical workspace includes:
+
+### Documents and sources
+- 5,000-100,000 documents
+- PDFs, Word files, spreadsheets, emails, notes
+- Multiple connected sources (Drive, SharePoint, CRM exports, etc.)
+
+### Vector storage
+- ~1-5 million embeddings per workspace
+- Average embedding size: 768-1,536 dimensions
+- Approximate storage footprint:
+  - 5-30 GB per workspace (compressed)
+
+### Knowledge graph
+- 100,000-2 million graph nodes
+- Nodes represent:
+  - decisions
+  - events
+  - entities
+  - rules
+  - outcomes
+- Graph edges encode causality, references, and temporal relations
+
+This scale comfortably supports daily usage for most SMB teams without performance degradation.
+
+---
+
+## Performance characteristics (CPU baseline)
+
+By default, Membria SMB runs on **CPU-optimized infrastructure**.
+
+Typical performance:
+- Semantic search latency: < 500 ms
+- Graph traversal queries: < 1-2 seconds
+- Decision Surface refresh: near real-time
+- Concurrent users per workspace: 20-50 active users
+
+This baseline is sufficient for:
+- research queries
+- precedent lookup
+- compliance checks
+- proposal and memo generation
+
+---
+
+## GPU acceleration option (advanced workspaces)
+
+For teams with **very large datasets or high query intensity**, GPU acceleration can be enabled.
+
+### What GPU acceleration is used for
+- Large-scale vector similarity search
+- Graph-assisted retrieval (vector + graph fusion)
+- Batch reasoning and analysis jobs
+- High-frequency concurrent queries
+
+Membria uses **GPU-accelerated graph and vector computation** (cuGraph-style primitives) to speed up:
+- multi-hop graph traversal
+- temporal queries
+- similarity ranking at scale
+
+### When GPU makes sense
+GPU acceleration is recommended if:
+- workspace exceeds ~3 million embeddings
+- graph size exceeds ~1 million nodes
+- frequent multi-hop analytical queries are used
+- team relies on dashboards and alerts continuously
+
+### GPU mode characteristics
+- 3-10x faster retrieval on large workspaces
+- Lower latency under load
+- Predictable performance for power users
+
+GPU acceleration is an **optional add-on**, not required for most SMB teams.
+
+---
+
+## Scaling model
+
+Membria SMB scales along three axes:
+
+1. **Data volume**
+   - Additional storage tiers for vectors and graphs
+   - Automatic sharding by workspace
+
+2. **Computation**
+   - CPU to GPU upgrade path
+   - Burst capacity for heavy analysis
+
+3. **Concurrency**
+   - Increased query throughput
+   - Higher parallel reasoning limits
+
+Scaling does not require reindexing or downtime.
+
+---
+
+## Dedicated deployments (SMB+)
+
+For regulated or high-sensitivity teams, Membria may offer **dedicated SMB deployments**:
+
+- Isolated compute and storage
+- Dedicated vector and graph clusters
+- Custom retention and logging policies
+- Optional regional data residency
+
+These deployments retain the SMB product model while offering stronger isolation.
+
+---
+
+## What Membria does not require
+
+Membria SMB does **not** require:
+- customer-managed GPUs
+- ML engineers
+- manual index tuning
+- separate graph database operations
+- prompt engineering to maintain accuracy
+
+The system adapts automatically as the workspace grows.
+
+---
+
+## Key takeaway
+
+Membria for SMBs is designed to handle **millions of embeddings and large decision graphs** without complexity.
+
+Most teams run comfortably on CPU-based infrastructure.
+GPU acceleration is available when scale or workload demands it.
+
+The goal is predictable performance and compounding knowledge, not infrastructure management.
