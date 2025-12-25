@@ -9,6 +9,15 @@ Membria CE is built around a small set of runtime primitives. This page summariz
 
 ## Core concepts
 
+### Smart Persistence Layer (SPL)
+Membria CE is built around a **personal Smart Persistence Layer for AI**. Instead of storing full chat logs, SPL selectively captures:
+- Decisions you make
+- Reasoning paths you follow
+- Assumptions you rely on
+- Outcomes that confirm or invalidate those decisions
+
+This allows Membria CE to act as a **second memory**, preserving how you think across time.
+
 ### Decision Surface (DS)
 The Decision Surface is the user-facing layer that shows open loops, drift, and outcomes. It is derived from DBB records, not raw chat.
 See [Client overview](/membria-ce/client) and [Runtime diagrams](/membria-ce/diagrams).
@@ -32,6 +41,12 @@ See [Decentralized backend](/membria-ce/decentralized-backend), [KCG and gateway
 ### LoRA adapters and SkillForge
 LoRA adapters provide scoped expertise without changing the base model or rewriting history.
 See [DBB and LoRA runtime](/membria-ce/dbb-and-lora-runtime).
+
+### Local-first reasoning
+Membria CE runs local models by default. Local reasoning is enhanced through personal GraphRAG, user-specific LoRA patches, and continuous context across sessions. Escalation to stronger external models happens only when confidence thresholds are not met.
+
+### Memory scope
+In CE, all memory is private by default. Nothing is shared unless explicitly exported or synchronized by the user.
 
 ## Where to go next
 
