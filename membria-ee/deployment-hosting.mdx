@@ -288,25 +288,10 @@ A: Operators: 1 day. IT: 2 days. Architects: 3 days plus 4 weeks hands-on.
 
 ---
 
-## Membria Enterprise AI Hub - presentation outline
 
-## Slide 1: Title
+## Problem context
 
-Membria Enterprise AI Hub
-
-Closed AI platform for banks
-
-On-premise. No data in the cloud.
-
-On-prem AI, graph analytics, agents, and LLM orchestration. Runs anywhere: Russia, Kazakhstan, Europe, Asia.
-
-Audience: IT architects
-
-November 2025
-
-## Slide 2: Problem context
-
-What is changing in banks? The perfect storm:
+What is changing in regulated enterprises? The perfect storm:
 
 | Challenge | Details |
 | --- | --- |
@@ -315,11 +300,9 @@ What is changing in banks? The perfect storm:
 | Technology is restricted | ChatGPT sends data abroad, public cloud is restricted, must be on-premise |
 | Budgets are limited | Cost pressure but regulation cost is higher than AI |
 
-Bottom line: banks need AI inside their data center.
+## Solution
 
-## Slide 3: Solution
-
-Membria: AI hub inside your data center.
+Membria: Smart Persistant Layer for Enterprise AI.
 
 | Benefit | Result |
 | --- | --- |
@@ -329,14 +312,7 @@ Membria: AI hub inside your data center.
 | Works above 99 percent | HA, K8s, failover |
 | Saves 5 FTE (AML, Fraud, Support) | 550K USD per year |
 
-Cost: 250K USD equipment plus 180K USD per year operations
-Payback: 1 year (staff savings)
-
-## Slide 4: Architecture (high level)
-
-_Diagram placeholder_
-
-## Slide 5: Key features
+## Key features
 
 | Feature | Why it matters | Business result |
 | --- | --- | --- |
@@ -347,18 +323,15 @@ _Diagram placeholder_
 | Voice AI | Call center copilot | 50 percent calls automated |
 | Immutable audit | Every decision logged | Compliance in days |
 
-## Slide 6: Request flow (AML UBO tracing)
 
-_Diagram placeholder_
-
-## Slide 7: Component 1 - Router + Planner
+## Component 1 - Router + Planner
 
 | Component | Functions | SLA |
 | --- | --- | --- |
 | Router | Classifies task (FAQ, analysis, action), selects domain (AML, Fraud, Legal), checks security (DLP, RBAC), chooses XLAM or Qwen | &le; 50 ms |
 | Planner | Breaks into steps, selects tools (graph, vector, API), builds context, controls XLAM or Qwen, checks compliance | &le; 200 ms |
 
-## Slide 8: Component 2 - XLAM Large
+## Component 2 - XLAM Large
 
 XLAM Large is the fast action model for orchestration.
 
@@ -380,7 +353,7 @@ XLAM Large is the fast action model for orchestration.
 
 **When XLAM is enough:** FAQ, documents, simple decisions, 90 percent of call center requests
 
-## Slide 9: Component 3 - Qwen 235B
+## Component 3 - Qwen Max
 
 When deep reasoning is required.
 
