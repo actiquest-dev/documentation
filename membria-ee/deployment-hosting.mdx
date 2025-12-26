@@ -1,371 +1,267 @@
 ---
 title: "Deployment and hosting"
-description: "On-premise deployment architecture, performance, and compliance model for Membria EE."
+description: "On-premise deployment architecture, infrastructure requirements, and operational model for Membria EE."
 ---
 
-> Membria is a Enterprise Reasoning AI platform deployed on-prem. It does not send data to the public cloud and automates up to 80 percent > of operational workload (AML, fraud, documents, support). It runs a fast XLAM model (under 1 second) for 95 percent of tasks and 
-> escalates to Qwen 235B for complex cases.
-
----
-
-## Components
-
-### Router + Planner
-
-| Function | Description | SLA |
-| --- | --- | --- |
-| Router | Classifies the request (FAQ, analysis, action), selects the domain (AML, Fraud, Legal), checks security (DLP, RBAC, PII) | &le; 50 ms |
-| Planner | Breaks tasks into steps, selects tools (graph query, vector search, API), controls XLAM or Qwen routing, validates policy | &le; 200 ms |
-
-### XLAM Large (action model for orchestration)
-
-| Parameter | Value |
-| --- | --- |
-| Type | Action model optimized for speed |
-| Latency p95 | 0.6-0.9 sec |
-| Throughput | 2,000 req/sec per cluster |
-| Hardware | CPU optimized (1x H100 or 2x A100 if inference boost required) |
-| Context window | 32K tokens |
-| Usage | 95 percent of requests (FAQ, documents, simple decisions) |
-
-**LoRA specializations (domain models):**
-
-| Domain | Example usage |
-| --- | --- |
-| Legal | Contract analysis, clause extraction, risk scoring |
-| AML | Counterparty screening, UBO tracing, SAR or STR generation |
-| Fraud | Anomaly detection, transaction scoring, velocity checks |
-| Risk | Credit scoring, exposure calculation |
-| Support | FAQ matching, IT helpdesk, troubleshooting |
-
-### Qwen 235B (deep reasoning engine)
-
-| Parameter | Value |
-| --- | --- |
-| Type | 235B parameters, deep reasoning model |
-| Latency p95 | 2-4 sec |
-| Throughput | 100 req/sec (GPU bound) |
-| Hardware | 4x H100 80GB (INT8 quantization: 80-100GB VRAM used) |
-| Real VRAM | about 80-100GB with quantization, not 1.8TB |
-| Cost | 150K USD GPU hardware (4x H100), not 2.5M USD |
-| Usage | about 5 percent of requests (complex cases) |
-
-**Escalate XLAM to Qwen when:**
-
-- Multi-level UBO tracing (6+ levels)
-- Complex legal interpretations
-- Fraud ring detection (graph patterns)
-- M&A risk assessment
-- Regulatory ambiguity resolution
+> Membria EE is deployed **entirely within customer-controlled infrastructure**.
+> It is designed for regulated enterprise environments where data residency, security boundaries, and operational control are mandatory.  
+> No data is sent to public cloud services or external APIs unless explicitly configured by the customer.
+> This document describes **how Membria EE is deployed, scaled, and operated**, independent of specific business use cases.
 
 ---
 
-## SuperGraphRAG: Temporal event graph plus embedded vectors plus TuGraph
+## Deployment model
 
-SuperGraphRAG uses a temporal event graph with embedded vectors. This reduces hallucinations and yields 95 percent or higher answer accuracy.
+Membria EE supports the following deployment modes:
 
-### Event graph
+- **On-premise (primary)**  
+  Deployed inside the customer’s data center.
 
-Each event is a fact with history:
+- **Private cloud**  
+  Deployed in a customer-owned private cloud (VMware, OpenStack, bare metal Kubernetes).
 
-```
-Event 1: KYC_Check_Started (2025-11-20 09:00)
-  - cause: new_customer_registered
+Public multi-tenant SaaS deployment is **not supported** for Membria EE.
 
-Event 2: Document_Uploaded (2025-11-20 10:30)
-  - cause: Event 1
-  - value: "Certificate of incorporation"
+### Trust boundary
 
-Event 3: UBO_Found (2025-11-20 14:00)
-  - cause: Event 2 (extracted)
-  - value: "John Smith, 75 percent ownership"
-  - confidence: 0.94
+All components operate within a single, clearly defined trust boundary:
 
-Event 4: AML_Decision (2025-11-20 14:10)
-  - cause: Event 3, sanction_check_passed
-  - decision: "APPROVED"
-  - audit_trail: "Full UBO chain verified"
-```
+- Models
+- Data
+- Graph storage
+- Logs
+- Audit trails
 
-**Advantage:** the model sees the full causal chain, leading to far fewer hallucinations.
-
-### Vector index embedded in the graph
-
-| Aspect | Details |
-| --- | --- |
-| What it is | Embeddings live inside graph nodes, not in a separate database |
-| Retrieval | 1) Graph filter (RBAC) -> 2) Subgraph select -> 3) Vector similarity inside subgraph -> 4) Temporal filter -> 5) Full context to the model |
-| Latency | Total retrieval &le; 300 ms p95 |
-| Advantage | Context, security, and versioning are built in |
-
-### TuGraph vs Neo4j
-
-| Metric | Neo4j | TuGraph | Membria choice |
-| --- | --- | --- | --- |
-| Speed (10M nodes) | 50 ms | 5 ms | TuGraph |
-| Throughput | 1K q/s | 50K q/s | TuGraph |
-| Built-in vectors | No | Yes | TuGraph |
-| Multi-tenant | Hard | Native | TuGraph |
-| Open source | No | Yes (MIT) | TuGraph |
-
-### Real production stats (large bank, Nov 2025)
-
-| Metric | Value |
-| --- | --- |
-| Nodes | 353M (50K organizations, 500K customers, 250M events) |
-| Edges | 2B relationships |
-| Storage | 52GB compressed plus 85GB vectors |
-| Query latency p95 | &le; 1000 ms (all types) |
-| Throughput | 8,500 parallel queries/sec |
-| Uptime | 99.95 percent (3 replicas) |
-| Cache hit rate | 30-40 percent (Redis semantic cache) |
+No external calls are required for normal operation.
 
 ---
 
-## Security (six layers of defense)
+## Runtime architecture overview
 
-### DLP (data loss prevention)
+Membria EE is deployed as a **modular Kubernetes-based system** with clear separation between:
 
-| Stage | Action |
-| --- | --- |
-| Input | "Kurban Aliev (Passport: 123-45-6789) defaulted" |
-| DLP Scan | Detect PassID -> CRITICAL |
-| Masking | Replace -> PASSID_REDACTED |
-| LLM Input | "Customer [NAME] ([PASSID_REDACTED]) defaulted" |
-| Output | Clean, no PII |
+- Stateless orchestration components
+- Stateful persistence layers
+- Optional deep-reasoning engines
 
----
+### Core runtime components
 
-## Integration with legacy systems
+| Component | Type | Scaling model | Notes |
+|---------|-----|---------------|------|
+| Router | Stateless | Horizontal | Request classification, policy checks |
+| Planner | Stateless | Horizontal | Task planning and tool selection |
+| Fast reasoning runtime | Semi-stateless | Horizontal | Primary execution tier |
+| Deep reasoning engine (optional) | Isolated | Vertical | Gated, low-volume |
+| Graph store | Stateful | Sharded | Persistent memory and causality |
+| Vector index | Stateful | Sharded | Embedded within graph |
+| Cache | Stateful | Replicated | Semantic and result caching |
+| Policy engine | Stateless | Horizontal | RBAC, DLP, escalation control |
 
-### Typical AML flow
-
-_Diagram placeholder_
-
-### Integration methods
-
-| Scenario | Method | Latency |
-| --- | --- | --- |
-| Real-time copilot | REST sync | &le; 1.2 sec |
-| Batch scoring | ETL nightly | 1-2 hours |
-| Streaming fraud | Kafka or event stream | &le; 100 ms |
-| Legacy query | REST or SOAP via ESB | &le; 2 sec |
+Each component can be independently scaled or disabled depending on operational needs.
 
 ---
 
-## Deployment (Kubernetes on-premise)
+## Model execution tiers
 
-### Components
+Membria EE separates model execution into **explicit tiers** to control cost, latency, and risk.
 
-| Component | Count | Purpose |
-| --- | --- | --- |
-| Master nodes | 3 | etcd, API server, scheduler (HA) |
-| CPU worker nodes | 4-8 | Router, Planner, XLAM Large, RPA |
-| GPU worker nodes | 2-4 | Qwen 235B (4x H100 per node) |
-| Storage nodes | 3 | TuGraph, vector DB, PostgreSQL, Redis |
-| SAN or NAS | 1 | 10TB data plus 10TB backup |
+### Tier 1: Fast local reasoning (default)
 
-### Sizing for a medium bank
+- Handles the majority of requests
+- Optimized for low latency
+- Can run on CPU or GPU
+- Supports domain-specific LoRA adapters
 
-| Parameter | Value |
-| --- | --- |
-| Total servers | 18 |
-| CPU cores | about 200 |
-| RAM | about 450GB |
-| GPU | 4x H100 (320GB VRAM total) |
-| Storage | 52GB compressed (graph plus vectors) |
-| Hardware cost | about 900K USD |
-| Annual OpEx | 180K USD (power, cooling, staff, support) |
-| Concurrent users | 2,000 |
-| Throughput | 50K req/sec |
+This tier is sufficient for most enterprise workloads.
 
----
+### Tier 2: Deep reasoning (optional)
 
-## Performance SLA
+- Used only for complex cases
+- Explicitly gated by policy
+- Deployed as a separate isolated runtime
+- Can be fully disabled
 
-| Scenario | Model | p95 latency |
-| --- | --- | --- |
-| Simple FAQ | XLAM | 0.45 sec |
-| Summarization with citations | XLAM | 0.8 sec |
-| Graph query | TuGraph | 0.15 sec |
-| Vector search | TuGraph vectors | 0.2 sec |
-| Complex AML | Qwen 235B | 3.0 sec |
-| End-to-end | XLAM | 1.2 sec |
+Enterprises may operate Membria EE **without Tier 2 enabled**.
 
-**Throughput:**
+### Tier 3: External escalation (disabled by default)
 
-- XLAM: 2,000 req/sec
-- Qwen: 100 req/sec
-- Graph: 5,000 queries/sec
-- Vector: 10,000 searches/sec
+- Optional integration point
+- Requires explicit approval
+- Fully auditable
+- Off by default in regulated environments
 
 ---
 
-## Compliance coverage
+## Persistence and data plane
 
-| Requirement | Status | How |
-| --- | --- | --- |
-| On-premise | Yes | 100 percent inside bank data center |
-| Zero data leakage | Yes | No external APIs |
-| Data residency (central bank) | Yes | Everything internal |
-| GDPR | Yes | Field encryption, DPIA |
-| AML or CFT | Yes | Native agents, STR or SAR workflows |
-| ISO 27001 | Yes | Zero-trust, audit controls |
-| Basel III | Yes | Model governance |
-| PCI-DSS | Yes | Tokenization |
+### Smart Persistence Layer (SPL)
 
----
+At the core of Membria EE is the Smart Persistence Layer, responsible for:
 
-## ROI and economics
+- Storing decisions and outcomes
+- Preserving causality and timelines
+- Linking reasoning to sources and actors
 
-### Capex and inference
+This layer is **stateful and persistent**.
 
-| Item | Cost |
-| --- | --- |
-| Hardware (K8s cluster) | 300K USD |
-| Setup (4 months) | 200K USD |
-| Training | 50K USD |
-| Total | 1.15M USD |
+### Graph-based memory
 
-### Annual costs
+Membria EE uses a **temporal event graph** as its primary persistence model.
 
-| Item | Cost |
-| --- | --- |
-| Power and cooling | 80K USD |
-| Maintenance | 50K USD |
-| Staff (0.5 FTE) | 30K USD |
-| Support and updates | 20K USD |
-| Total | 180K USD per year |
+Key properties:
 
-### Annual benefit
+- Events are immutable
+- History is preserved
+- Causality is explicit
+- Versioning is native
 
-| Process | Improvement | Savings |
-| --- | --- | --- |
-| AML analyst | 2.5x productivity | 200K USD |
-| Call center | 4x faster | 100K USD |
-| Legal | 30 min vs 2 hours | 150K USD |
-| Fraud resolution | 70 percent faster | 100K USD |
-| Total |  | at least 550K USD per year |
+### Embedded vector indexing
 
-**Payback period: 1.2 years**
+Vector embeddings are stored **inside graph nodes**, not in a separate external database.
+
+Benefits:
+
+- RBAC and security apply automatically
+- Versioning and provenance are preserved
+- Retrieval is constrained to authorized subgraphs
+- No synchronization drift between graph and vectors
 
 ---
 
-## Implementation (16 weeks)
+## Infrastructure requirements (reference)
 
-| Phase | Weeks | Work | Deliverable |
-| --- | --- | --- | --- |
-| Foundation | 1-4 | K8s cluster, security setup, XLAM deploy | Core system operational |
-| Integration | 5-8 | REST or SOAP connectors, knowledge base, DLP | First use case working |
-| Features | 9-12 | AML, Fraud, Legal, Qwen deploy, templates | Production-ready use case |
-| Production | 13-16 | Monitoring, audit log, pilot, SLA validation | System live with metrics |
+The following configuration is a **non-binding reference example** for a medium-scale enterprise deployment.
+
+Actual sizing depends on:
+- Data volume
+- Concurrency
+- Enabled components
+- Retention policies
+
+### Reference cluster layout
+
+| Layer | Purpose |
+|-----|--------|
+| Control plane | Kubernetes management |
+| CPU workers | Router, Planner, fast reasoning |
+| GPU workers | Optional deep reasoning |
+| Storage nodes | Graph, vectors, metadata |
+| Cache layer | Semantic and result caching |
+
+### Example reference sizing
+
+| Resource | Example value |
+|-------|---------------|
+| Total nodes | 12–18 |
+| CPU cores | ~200 |
+| RAM | ~450 GB |
+| GPU | Optional (4× H100 or equivalent) |
+| Persistent storage | 10–20 TB |
+| Concurrent users | ~2,000 |
+
+These figures are provided for planning purposes only.
 
 ---
 
-## FAQ
+## High availability and resilience
 
-**Q: Is GPU inference expensive?**
-A: XLAM runs on CPU for 95 percent of load. Qwen is used only for about 5 percent of requests (often in batch). ROI is under 1 year.
+Membria EE supports standard enterprise HA patterns:
 
-**Q: Why is this better than ChatGPT?**
-A: On-premise deployment, domain-specific models (AML-focused), deep legacy integration, and no per-query cost.
+- Stateless components run with multiple replicas
+- Stateful services support replication
+- Leader election is automatic
+- No single point of failure
 
-**Q: What if Membria shuts down?**
-A: The stack is open source (K8s, PostgreSQL, TuGraph). Models can be replaced with Llama or Mistral. No lock-in.
+### Failure handling
 
-**Q: Is it secure?**
-A: Six layers of defense, zero-trust, immutable audit, regular pen-testing, HSM keys.
-
-**Q: Can we update without downtime?**
-A: Blue-green deployment with sub-100 ms traffic switch and instant rollback.
-
-**Q: Mainframe compatibility?**
-A: REST or SOAP via ESB, batch ETL for data, real-time API for queries.
-
-**Q: Training effort?**
-A: Operators: 1 day. IT: 2 days. Architects: 3 days plus 4 weeks hands-on.
+- Component-level restart
+- Rolling upgrades
+- Blue-green deployment
+- Instant rollback for stateless layers
 
 ---
 
+## Security boundary
 
-## Problem context
+Security is enforced at multiple layers:
 
-What is changing in regulated enterprises? The perfect storm:
+- Network isolation
+- RBAC enforcement
+- Policy-driven execution
+- Data masking and DLP
+- Immutable audit logging
 
-| Challenge | Details |
-| --- | --- |
-| Load is growing | 2x more customers (mobile), stricter AML or KYC, fraud waves grow exponentially |
-| People do not scale | Shortage of risk analysts, legal is expensive and slow, call center turnover 40 percent plus |
-| Technology is restricted | ChatGPT sends data abroad, public cloud is restricted, must be on-premise |
-| Budgets are limited | Cost pressure but regulation cost is higher than AI |
+### Data protection
 
-## Solution
+- Encryption at rest
+- Encryption in transit
+- Customer-managed keys (optional HSM)
+- Configurable retention policies
 
-Membria: Smart Persistant Layer for Enterprise AI.
+### Auditability
 
-| Benefit | Result |
-| --- | --- |
-| No data leaves | Zero regulatory risk |
-| Domain-specific (AML, Fraud, Legal) | 40 percent higher accuracy vs generic |
-| Integration in 6 weeks | Fast start |
-| Works above 99 percent | HA, K8s, failover |
-| Saves 5 FTE (AML, Fraud, Support) | 550K USD per year |
+All access, escalation, and decision capture events are logged:
 
-## Key features
+- Who accessed what
+- When
+- Under which policy
+- With which outcome
 
-| Feature | Why it matters | Business result |
-| --- | --- | --- |
-| On-premise | Required by regulators and GDPR | Zero regulatory risk |
-| Zero data leakage | No external APIs | Reduced compliance risk |
-| Domain-specific | AML differs from legal and fraud | 40 percent higher accuracy |
-| SuperGraphRAG | Graph context leads to correct answers | Reduced hallucination |
-| Voice AI | Call center copilot | 50 percent calls automated |
-| Immutable audit | Every decision logged | Compliance in days |
+Audit logs are immutable and exportable.
 
+---
 
-## Component 1 - Router + Planner
+## Integration with enterprise systems
 
-| Component | Functions | SLA |
-| --- | --- | --- |
-| Router | Classifies task (FAQ, analysis, action), selects domain (AML, Fraud, Legal), checks security (DLP, RBAC), chooses XLAM or Qwen | &le; 50 ms |
-| Planner | Breaks into steps, selects tools (graph, vector, API), builds context, controls XLAM or Qwen, checks compliance | &le; 200 ms |
+Membria EE integrates with existing systems through controlled interfaces:
 
-## Component 2 - XLAM Large
+| Integration type | Method |
+|------------------|-------|
+| Real-time queries | REST |
+| Batch ingestion | ETL |
+| Streaming events | Kafka / message bus |
+| Legacy systems | REST or SOAP via ESB |
 
-XLAM Large is the fast action model for orchestration.
+No direct database access is required.
 
-| Parameter | Value |
-| --- | --- |
-| Latency p95 | 0.6-0.9 sec |
-| Batch | 32 parallel requests |
-| Throughput | 2,000 req/sec per cluster |
-| Uptime | 99.95 percent |
-| Cost | Low |
+---
 
-**LoRA specializations (domain fine-tuning):**
+## Operations and lifecycle
 
-- Legal: clause extraction, risk scoring
-- AML: screening, network analysis
-- Fraud: anomaly detection, pattern match
-- Risk: credit scoring, exposure calculation
-- Support: FAQ, IT helpdesk
+### Deployment lifecycle
 
-**When XLAM is enough:** FAQ, documents, simple decisions, 90 percent of call center requests
+1. Infrastructure provisioning
+2. Core runtime deployment
+3. Policy configuration
+4. Source integration
+5. Validation and acceptance
 
-## Component 3 - Qwen Max
+### Upgrades
 
-When deep reasoning is required.
+- Rolling upgrades supported
+- No downtime for stateless components
+- Stateful upgrades follow controlled migration paths
 
-| Parameter | Value |
-| --- | --- |
-| Latency p95 | 2-4 sec |
-| Capacity | 235B parameters |
-| Hardware | 4x H100 (INT8 quantization: 80-100GB VRAM) |
-| Cost | about 150K USD (GPU hardware) |
-| Usage | about 5 percent of requests |
+### Monitoring
 
-**Escalate XLAM to Qwen when:**
+Standard enterprise observability tools are supported:
 
-- AML: beneficiary tracing (6 levels)
-- Legal: interpretation of new law
-- Fraud: ring fraud detection (graph &gt; 10 nodes)
+- Metrics
+- Logs
+- Traces
+- Health probes
+
+---
+
+## Summary
+
+Membria EE is deployed as a **self-contained, on-premise reasoning platform**.
+
+It provides:
+- Full data residency
+- Explicit trust boundaries
+- Modular execution tiers
+- Persistent institutional memory
+- Enterprise-grade operational control
+
+The deployment model is designed to integrate cleanly into existing regulated environments without introducing external dependencies.
