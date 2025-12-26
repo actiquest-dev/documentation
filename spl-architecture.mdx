@@ -288,9 +288,9 @@ Anti-noise:
 - Contradictions between messages
 
 Result:
-- confidence >= T_high -> decision written as captured
-- T_low <= confidence < T_high -> candidate, requests light validation
-- < T_low -> not written as decision, only as event or ignored
+- confidence &ge; T_high -> decision written as captured
+- T_low &le; confidence &lt; T_high -> candidate, requests light validation
+- &lt; T_low -> not written as decision, only as event or ignored
 
 ### 4.9 Correcting false positives without friction
 
