@@ -1,11 +1,17 @@
 ---
 title: "Membria Docs"
-description: "Smart Persistence Layer (SPL) for AI across people, teams, and models."
+description: "Smart Persistence Layer (SPL) for AI across people, teams, and models"
+---
+
+# Membria Docs
+
+> **Smart Persistence Layer (SPL) for AI across people, teams, and models**
+
 ---
 
 ## Introduction
 
-Membria is a **Smart Persistence Layer (SPL) for AI**.
+Membria is a **Smart Persistence Layer (SPL) for AI systems**.
 
 It sits between people, teams, and AI models so that knowledge, reasoning, and decisions do not reset every time a conversation ends.
 
@@ -20,16 +26,18 @@ Membria adds the missing layer: **persistent intelligence**.
 
 A Smart Persistence Layer does not replace chat, documents, or AI models.
 
-It does one thing deliberately and well:
-it preserves what matters over time.
+It focuses on one core function:
 
-Membria's SPL captures:
+**preserving what matters over time for reasoning and decision-making.**
+
+Membria's SPL captures and structures:
+
 - Decisions and their outcomes
 - The reasoning behind those decisions
 - Assumptions, constraints, and context
 - Links between people, sources, and events
 
-This information is stored in a structured, explainable form that AI can reuse later.
+This information is stored in an explainable, queryable form that AI can reuse later instead of regenerating guesses.
 
 ---
 
@@ -40,9 +48,10 @@ Documents are static.
 Models are powerful but forgetful.
 
 Without persistence:
+
 - Teams repeat the same discussions
 - Old decisions get reopened
-- AI answers lack context
+- AI answers lack historical context
 - Knowledge disappears when people leave
 
 The Smart Persistence Layer ensures that intelligence **compounds instead of dissolving**.
@@ -53,25 +62,68 @@ The Smart Persistence Layer ensures that intelligence **compounds instead of dis
 
 Membria's SPL is built through a set of coordinated systems:
 
-- **Decision Black Box (DBB)** -- automatically captures decisions from conversations and work
-- **Decision Surface (DS)** -- makes decisions visible, trackable, and governable
-- **Graph-based memory** -- preserves causality, provenance, and timelines
-- **Local and shared knowledge caches** -- reuse past reasoning instead of re-generating it
-- **Controlled escalation** -- consults stronger models only when necessary
+- **Decision Black Box (DBB)**
+  Automatically captures decisions from conversations, documents, and AI interactions.
 
-Together, these systems form a persistent reasoning backbone.
+- **Decision Surface (DS)**
+  Makes decisions visible, trackable, and governable over time.
+
+- **Graph-based memory**
+  Preserves causality, provenance, timelines, and ownership.
+
+- **Local and shared knowledge caches**
+  Reuses past reasoning instead of regenerating answers.
+
+- **Controlled escalation**
+  Consults stronger models only when confidence or risk requires it.
+
+- **Decentralized knowledge backends**
+  Enable persistence across environments without centralizing raw data.
+
+Together, these components form a **persistent reasoning backbone**.
 
 ---
 
 ## One architecture, three products
 
-All Membria products share the same Smart Persistence Layer, adapted to different environments:
+All Membria products share the same Smart Persistence Layer, adapted to different trust boundaries and environments.
 
-- **Membria CE (Personal)** -- SPL for individual power users
-- **Membria for SMBs (SaaS)** -- SPL for teams and shared workspaces
-- **Membria EE (Enterprise)** -- SPL for regulated, on-prem environments
+The difference is not what is remembered,
+but **who owns it, how it is governed, and where it runs**.
 
-The difference is not what is remembered, but **who owns it, how it is governed, and where it runs**.
+---
+
+## Membria Editions at a Glance
+
+> Visual markers are used instead of colors to ensure compatibility across Markdown renderers.
+
+| Feature | Membria CE (Personal) | Membria for SMBs (SaaS) | Membria EE (Enterprise) |
+| --- | --- | --- | --- |
+| **Primary user** | Individual power users | Small and mid-sized teams | Enterprises, banks, telecoms |
+| **Primary goal** | Personal reasoning continuity | Shared team context | Institutional memory |
+| **Deployment model** | Local-first and self-hosted | Managed SaaS | On-premise or private cloud |
+| **Data ownership** | User-owned | Organization-owned | Enterprise-owned |
+| **Default data location** | Local environment | Managed cloud workspace | Customer-controlled infrastructure |
+| **Smart Persistence Layer** | Personal reasoning graph | Shared workspace graph | Private institutional graph |
+| **Decision Black Box (DBB)** | Personal decision capture | Team-level capture | Enterprise-grade with governance |
+| **Decision Surface (DS)** | Personal signals and drift | Team-wide visibility | Org-wide governance view |
+| **Knowledge graph scope** | Single-user | Workspace or team | Multi-domain, policy-isolated |
+| **LoRA usage** | Personal skill LoRAs | Team-scoped LoRAs | Approved expert LoRAs |
+| **LoRA governance** | User-controlled | Workspace policies | Review, approval, rollback workflows |
+| **Model execution** | Local models first | Managed models | Customer-approved model stack |
+| **Escalation behavior** | Optional, user-visible | Budgeted per workspace | Policy-driven and auditable |
+| **Decentralized backend** | Optional | Managed | Private or federated |
+| **Audit logs** | Local, user-visible | Workspace-level | Compliance-grade, immutable |
+| **Compliance posture** | Personal privacy | Lightweight governance | Regulatory (AML, SOX, GDPR) |
+| **Typical use cases** | Personal reasoning, AI experiments | Shared decisions, onboarding | Risk, compliance, governance |
+
+---
+
+## How to choose
+
+- Choose **Membria CE** if you want a personal AI that remembers how *you* think.
+- Choose **Membria for SMBs** if your team needs shared context without enterprise overhead.
+- Choose **Membria EE** if you operate in regulated environments and require full control, auditability, and governance.
 
 ---
 
