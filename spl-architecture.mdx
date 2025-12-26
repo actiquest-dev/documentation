@@ -1,32 +1,32 @@
 ---
-title: "SPL architecture"
+title: "Reasoning Graph architecture"
 description: "Smart Persistence Layer architecture across GraphRAG, DBB/DS, cache, and LoRA lifecycle."
 ---
 
 ## Overview
 
-This document provides a production-grade description of the Smart Persistence Layer (SPL) in Membria: how GraphRAG, memory, DBB/DS, knowledge cache, and the LoRA lifecycle work together.
+This document provides a production-grade description of the Smart Persistence Layer (Reasoning Graph) in Membria: how GraphRAG, memory, DBB/DS, knowledge cache, and the LoRA lifecycle work together.
 
 ---
 
-## 1. What is SPL in Membria
+## 1. What is Reasoning Graph in Membria
 
-**SPL (Smart Persistence Layer)** is the layer between the user (or team) and any AI models that makes intelligence **cumulative** rather than disposable.
+**Reasoning Graph (Smart Persistence Layer)** is the layer between the user (or team) and any AI models that makes intelligence **cumulative** rather than disposable.
 
 It solves one fundamental problem:
 
-> In conventional AI, intelligence "dissolves" in chats - many conversations, little persistent structure. SPL transforms the stream of interactions into stable, reusable memory with causal relationships, provable provenance, and governance capability.
+> In conventional AI, intelligence "dissolves" in chats - many conversations, little persistent structure. Reasoning Graph transforms the stream of interactions into stable, reusable memory with causal relationships, provable provenance, and governance capability.
 
-SPL implements:
+Reasoning Graph implements:
 - **Decision-centric temporal knowledge graph**
 - **Budget-aware GraphRAG**
 - **Governed learning loop**
 
 ---
 
-## 2. Core SPL Subsystems
+## 2. Core Reasoning Graph Subsystems
 
-SPL is implemented as a set of interconnected subsystems:
+Reasoning Graph is implemented as a set of interconnected subsystems:
 
 | # | Subsystem | Function |
 | --- | --- | --- |
@@ -42,7 +42,7 @@ SPL is implemented as a set of interconnected subsystems:
 
 ---
 
-## 3. Data Objects in SPL
+## 3. Data Objects in Reasoning Graph
 
 ### 3.1 Canonical Unit - Evidence
 
@@ -92,7 +92,7 @@ Decision:
 
 ### 3.3 Memory is not a chat log
 
-Core SPL principle: store structure, not all words:
+Core Reasoning Graph principle: store structure, not all words:
 - Decisions and their context
 - Causal relationships
 - Fact provenance
@@ -107,7 +107,7 @@ DBB is not a UI - it is a backend agent/process. Its task: detect decision momen
 
 ### 4.1 Event ingestion and normalization
 
-SPL relies on a normalized event stream from external systems (email, DMS, billing, identity, etc.).
+Reasoning Graph relies on a normalized event stream from external systems (email, DMS, billing, identity, etc.).
 
 This layer is responsible for:
 - Receiving events from external sources
@@ -120,9 +120,9 @@ The event ingestion layer does not interpret event meaning and does not make dec
 
 ### 4.2 Irreversibility layer and Commitment Events
 
-In SPL, decision irreversibility is not determined by LLM and not derived from text. It is established through external Commitment Events - facts of real-world change that cannot or should not be undone without trace.
+In Reasoning Graph, decision irreversibility is not determined by LLM and not derived from text. It is established through external Commitment Events - facts of real-world change that cannot or should not be undone without trace.
 
-SPL fundamentally distinguishes:
+Reasoning Graph fundamentally distinguishes:
 - Discussion
 - Intent
 - Decision
@@ -146,11 +146,11 @@ Examples of Commitment Events:
 - Access or role granted
 - Policy or permissions changed
 
-Commitment Events enter SPL through the event logger and are treated as facts, not interpretations.
+Commitment Events enter Reasoning Graph through the event logger and are treated as facts, not interpretations.
 
 #### Decision Window
 
-A decision in SPL is not treated as a message, but as a Decision Window - a temporal window of events within which an irreversible action occurred.
+A decision in Reasoning Graph is not treated as a message, but as a Decision Window - a temporal window of events within which an irreversible action occurred.
 
 Decision Window includes:
 - pre-context: discussions, alternatives, approvals
@@ -196,14 +196,14 @@ In this case:
 - Content and PII are stored off-chain
 - Only hashes, references, and metadata are recorded on-chain
 
-Irreversibility in SPL is achieved not through LLM, but through:
+Irreversibility in Reasoning Graph is achieved not through LLM, but through:
 ```
 Commitment Event -> Decision Window -> Policy -> Immutable Record
 ```
 
 ### 4.3 Decision identity
 
-Every decision in SPL has a stable decision_id that persists throughout the decision's lifecycle.
+Every decision in Reasoning Graph has a stable decision_id that persists throughout the decision's lifecycle.
 
 Confirmation, revision, supersession, or cancellation of a decision does not create a new decision - it changes the state of the existing decision_id.
 
@@ -214,7 +214,7 @@ This enables:
 
 ### 4.4 Decision scope
 
-Every decision in SPL has an explicitly defined scope - the boundaries of decision applicability.
+Every decision in Reasoning Graph has an explicitly defined scope - the boundaries of decision applicability.
 
 Scope may include:
 - Organizational level (org, team, project)
@@ -226,7 +226,7 @@ Decisions outside their scope are not considered conflicting by default.
 
 ### 4.5 Validity and expiry
 
-A decision in SPL may have:
+A decision in Reasoning Graph may have:
 - Validity period
 - Validity conditions
 - Contextual applicability
@@ -237,25 +237,25 @@ Historical decisions remain part of memory and can be used for analysis and lear
 
 ### 4.6 Conflicts and supersession
 
-SPL allows existence of conflicting decisions.
+Reasoning Graph allows existence of conflicting decisions.
 
-When a conflict is detected, SPL:
+When a conflict is detected, Reasoning Graph:
 - Records the conflict fact
 - Indicates affected decision_ids
 - Links conflict to policy or responsible person
 
-SPL does not automatically choose the correct decision. Conflict resolution is always a political or human action, recorded as an event.
+Reasoning Graph does not automatically choose the correct decision. Conflict resolution is always a political or human action, recorded as an event.
 
 ### 4.7 Human override and automation boundaries
 
-SPL allows manual intervention by authorized users.
+Reasoning Graph allows manual intervention by authorized users.
 
 Any override action:
 - Is recorded as an event
 - Does not delete history
 - Becomes part of the Decision Window
 
-SPL fundamentally does not:
+Reasoning Graph fundamentally does not:
 - Determine decision correctness
 - Optimize business outcomes
 - Replace governance
@@ -306,7 +306,7 @@ Correct UX pattern: not a modal, but quiet correction:
 
 Standard RAG: "Find similar text chunks -> feed to model"
 
-GraphRAG in SPL: first filter permitted graph area, then retrieve relevant subgraphs, then apply semantics.
+GraphRAG in Reasoning Graph: first filter permitted graph area, then retrieve relevant subgraphs, then apply semantics.
 
 ### 5.1 What the graph stores
 
@@ -364,7 +364,7 @@ Iterative cycle properties:
 - Final result formalized as Decision or Knowledge Artifact
 - Budget exhaustion leads to stop or escalation, not context expansion
 
-### 5.4 Retrieval Orchestrator as SPL core (budget-aware GraphRAG)
+### 5.4 Retrieval Orchestrator as Reasoning Graph core (budget-aware GraphRAG)
 
 Retrieval Orchestrator is implemented as a policy engine that manages context assembly under explicit constraints, rather than expanding it to maximum possible volume.
 
@@ -418,9 +418,9 @@ Context Assembly Trace is used for:
 
 ---
 
-## 6. SPL Memory: What Membria Remembers
+## 6. Reasoning Graph Memory: What Membria Remembers
 
-SPL memory is multi-layered:
+Reasoning Graph memory is multi-layered:
 
 ### 6.1 Working context (operational)
 - Current tasks, active decisions, open loops
@@ -482,7 +482,7 @@ It is needed not to leak private data, but to:
 
 ### 7.1 Why local
 
-Because SPL holds long-term memory, meaning:
+Because Reasoning Graph holds long-term memory, meaning:
 - Lots of data
 - Personal context
 - Privacy is critical
@@ -520,12 +520,12 @@ Three main categories:
 1. Decision -> Outcome feedback
 - DBB captured decision
 - Later, outcome appeared
-- SPL understands: decision was successful or failed
+- Reasoning Graph understands: decision was successful or failed
 - Training example forms: which reasoning was correct under these conditions
 
 2. Council distillation
 - Council gave strong answer or plan
-- SPL compared: where did local model err? why?
+- Reasoning Graph compared: where did local model err? why?
 - Pairs form: question -> correct answer pattern
 - This closes knowledge gap
 
@@ -579,7 +579,7 @@ The complete accumulation cycle:
 2. DBB extracts events and decisions, links them to sources
 3. Decisions are written to graph (with causality and time)
 4. DS shows signals: what's open, drifting, needs confirmation
-5. On new query, SPL first searches graph and cache, then provides context to local model
+5. On new query, Reasoning Graph first searches graph and cache, then provides context to local model
 6. If local is insufficient -> escalation to Council
 7. Council result is synthesized, checked for graph conflicts, cached
 8. Recurring gaps become LoRA candidates
@@ -590,7 +590,7 @@ This is intelligence compounds instead of resetting.
 
 ---
 
-## 10. How SPL Protects Against Input Garbage
+## 10. How Reasoning Graph Protects Against Input Garbage
 
 Minimal defense heuristics:
 
@@ -658,13 +658,13 @@ For SMB:
 
 ## Summary
 
-SPL is the layer that transforms disposable AI conversations into persistent institutional memory.
+Reasoning Graph is the layer that transforms disposable AI conversations into persistent institutional memory.
 
 Key principles:
 - Decisions, not documents - capture reasoning, not just files
 - Commitment Events, not LLM interpretation - irreversibility comes from external facts
 - Budget-aware retrieval - controlled context, not maximum dump
 - Governed learning - LoRA with eval, rollback, justification
-- Human-in-the-loop - SPL never decides, only supports decisions
+- Human-in-the-loop - Reasoning Graph never decides, only supports decisions
 
 Result: Intelligence compounds instead of resetting.
