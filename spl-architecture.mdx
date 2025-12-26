@@ -1,0 +1,677 @@
+---
+title: "SPL architecture"
+description: "Smart Persistence Layer architecture across GraphRAG, DBB/DS, cache, and LoRA lifecycle."
+---
+
+# Smart Persistence Layer (SPL) - Architecture Specification
+
+## Overview
+
+This document provides a production-grade description of the Smart Persistence Layer (SPL) in Membria: how GraphRAG, memory, DBB/DS, knowledge cache, and the LoRA lifecycle work together.
+
+---
+
+## 1. What is SPL in Membria
+
+**SPL (Smart Persistence Layer)** is the layer between the user (or team) and any AI models that makes intelligence **cumulative** rather than disposable.
+
+It solves one fundamental problem:
+
+> In conventional AI, intelligence "dissolves" in chats - many conversations, little persistent structure. SPL transforms the stream of interactions into stable, reusable memory with causal relationships, provable provenance, and governance capability.
+
+SPL implements:
+- **Decision-centric temporal knowledge graph**
+- **Budget-aware GraphRAG**
+- **Governed learning loop**
+
+---
+
+## 2. Core SPL Subsystems
+
+SPL is implemented as a set of interconnected subsystems:
+
+| # | Subsystem | Function |
+| --- | --- | --- |
+| 1 | **Ingestion + Normalization** | Connect sources, extract content, normalize to canonical form |
+| 2 | **Event / Decision Extraction (DBB)** | Background agent that transforms noise (chats/docs/comments) into events, decisions, assumptions, outcomes |
+| 3 | **Graph Memory (Temporal / Causal)** | Long-term memory as graph: people, documents, decisions, causes, effects, versions, time ranges |
+| 4 | **Vector Memory (Embeddings)** | Semantic memory: embeddings of fragments, nodes, events, case similarity |
+| 5 | **Knowledge Cache (Local + Shared)** | Reuse of verified answers, reasoning patterns, conclusions |
+| 6 | **Retrieval Orchestrator (GraphRAG Router)** | Router that decides: what to retrieve (graph, vectors, cache), context volume, escalation needs |
+| 7 | **Model Runtime (Local-first + Council)** | Fast local model handles 80-95 percent of work; complex cases escalate to Council |
+| 8 | **LoRA Lifecycle + Router Policy** | Mechanism for accumulating expertise: new LoRA adapters emerge from recurring gaps, are validated, deployed/rolled back |
+| 9 | **Decision Surface (DS)** | UI/signal system showing: what's open, what's drifting, what's risky, what needs approval |
+
+---
+
+## 3. Data Objects in SPL
+
+### 3.1 Canonical Unit - Evidence
+
+Every input data fragment is normalized to an **Evidence Record**:
+
+```
+Evidence Record:
+- source_type    (chat/doc/email/issue/voice/log/...)
+- source_id      (reference to original)
+- actor          (who wrote/said/approved)
+- timestamp
+- content        (text/extract)
+- hash           (content hash for immutability)
+- access_scope   (permissions/tenant/domain)
+- embedding      (optional)
+```
+
+### 3.2 Events and Decisions
+
+DBB produces structured objects:
+
+**Event:**
+```
+Event:
+- event_type       (proposal_updated, risk_flagged, decision_candidate, assumption_changed...)
+- entities         (what/who it relates to)
+- evidence_links[] (source references)
+- confidence       (interpretation correctness probability)
+- time_range       (if event spans time)
+```
+
+**Decision:**
+```
+Decision:
+- decision_id
+- statement        ("We choose X", "Release postponed 2 weeks", "UBO chain accepted")
+- alternatives[]   (if extracted)
+- rationale        (reasoning, preferably as structured points)
+- assumptions[]
+- constraints[]
+- owner            (who decides)
+- status           (draft / pending / approved / overturned)
+- outcomes[]       (results and metrics, when available)
+- evidence_links[]
+- confidence
+```
+
+### 3.3 Memory is not a chat log
+
+Core SPL principle: store structure, not all words:
+- Decisions and their context
+- Causal relationships
+- Fact provenance
+- Changes over time
+- Outcomes
+
+---
+
+## 4. How DBB Transforms Chaos into Memory
+
+DBB is not a UI - it is a backend agent/process. Its task: detect decision moments and record them, like an airplane's black box.
+
+### 4.1 Event ingestion and normalization
+
+SPL relies on a normalized event stream from external systems (email, DMS, billing, identity, etc.).
+
+This layer is responsible for:
+- Receiving events from external sources
+- Normalizing events to unified format
+- Deduplication
+- Temporal ordering within single objects
+- Preserving references to source systems
+
+The event ingestion layer does not interpret event meaning and does not make decisions. It provides DBB with a factual, verifiable foundation for building Decision Windows and identifying Commitment Events.
+
+### 4.2 Irreversibility layer and Commitment Events
+
+In SPL, decision irreversibility is not determined by LLM and not derived from text. It is established through external Commitment Events - facts of real-world change that cannot or should not be undone without trace.
+
+SPL fundamentally distinguishes:
+- Discussion
+- Intent
+- Decision
+- Irreversible action
+
+DBB does not create irreversibility. It only links decisions to already-occurred irreversible events.
+
+#### Commitment Event
+
+A Commitment Event is an event that:
+- Has external effect (technical, financial, legal, organizational)
+- Is recorded in an external system
+- Serves as a point of commitment (point of no return)
+
+Examples of Commitment Events:
+- PR merged or release published
+- Invoice issued
+- Payment executed
+- Contract signed
+- Email sent to external recipient
+- Access or role granted
+- Policy or permissions changed
+
+Commitment Events enter SPL through the event logger and are treated as facts, not interpretations.
+
+#### Decision Window
+
+A decision in SPL is not treated as a message, but as a Decision Window - a temporal window of events within which an irreversible action occurred.
+
+Decision Window includes:
+- pre-context: discussions, alternatives, approvals
+- trigger: commitment event
+- post-effects: consequences and downstream events
+- actors: participants and owners
+- linked systems: event sources
+
+The Decision Window is the primary object of DBB analysis and the foundation for decision capture.
+
+#### Role of DBB
+
+DBB operates on top of the event logger and:
+- Aggregates events into Decision Windows
+- Identifies presence of Commitment Events
+- Assesses risk and confidence
+- Forms decision candidates
+- Applies policy for capture or confirmation request
+
+DBB does not determine the fact of irreversibility. It uses irreversibility already recorded by external systems.
+
+#### Decision capture policy
+
+Decision capture in DBB is possible only when one of these conditions is met:
+1. A Commitment Event is present in the Decision Window
+2. User explicitly initiated decision capture (explicit capture)
+
+In all other cases, DBB can only:
+- Preserve context
+- Form candidates
+- Await confirmation
+
+This prevents false decisions and excludes automatic capture based on text alone.
+
+#### Connection to immutable storage
+
+Commitment Events and Decision Records can be:
+- Linked to append-only journal
+- Anchored in blockchain (Membria CE / peaq)
+- Signed for non-repudiation
+
+In this case:
+- Content and PII are stored off-chain
+- Only hashes, references, and metadata are recorded on-chain
+
+Irreversibility in SPL is achieved not through LLM, but through:
+```
+Commitment Event -> Decision Window -> Policy -> Immutable Record
+```
+
+### 4.3 Decision identity
+
+Every decision in SPL has a stable decision_id that persists throughout the decision's lifecycle.
+
+Confirmation, revision, supersession, or cancellation of a decision does not create a new decision - it changes the state of the existing decision_id.
+
+This enables:
+- Referencing decisions from external systems
+- Tracking decision evolution
+- Forming correct accountability chains
+
+### 4.4 Decision scope
+
+Every decision in SPL has an explicitly defined scope - the boundaries of decision applicability.
+
+Scope may include:
+- Organizational level (org, team, project)
+- System or product
+- Client or user group
+- Additional constraints (region, environment, period)
+
+Decisions outside their scope are not considered conflicting by default.
+
+### 4.5 Validity and expiry
+
+A decision in SPL may have:
+- Validity period
+- Validity conditions
+- Contextual applicability
+
+Expiration or loss of validity conditions does not delete the decision - it transitions it to expired state.
+
+Historical decisions remain part of memory and can be used for analysis and learning, but not for active reasoning.
+
+### 4.6 Conflicts and supersession
+
+SPL allows existence of conflicting decisions.
+
+When a conflict is detected, SPL:
+- Records the conflict fact
+- Indicates affected decision_ids
+- Links conflict to policy or responsible person
+
+SPL does not automatically choose the correct decision. Conflict resolution is always a political or human action, recorded as an event.
+
+### 4.7 Human override and automation boundaries
+
+SPL allows manual intervention by authorized users.
+
+Any override action:
+- Is recorded as an event
+- Does not delete history
+- Becomes part of the Decision Window
+
+SPL fundamentally does not:
+- Determine decision correctness
+- Optimize business outcomes
+- Replace governance
+- Make decisions without policy
+- Capture decisions without commitment event or explicit confirmation
+
+### 4.8 Confidence scoring
+
+How DBB decides "this is a decision or noise":
+
+Linguistic markers:
+- Presence of commitment language ("we will", "ship", "approve", "I'll do")
+- Presence of specifics (deadline, owner, change object)
+- Presence of alternatives or choice ("A vs B -> B")
+
+Contextual markers:
+- Thread had conflict or discussion then closure occurred
+- Decision accompanied by actions (ticket, PR, doc created)
+- Decision confirmed by second person ("+1", "confirmed")
+
+Source quality:
+- Messages from owner or approver roles are stronger
+- Documents and policies are stronger than chat opinions
+- Presence of cited primary sources increases confidence
+
+Anti-noise:
+- Too general formulation without object ("need to improve")
+- No evidence
+- Pattern repetition or spam behavior
+- Contradictions between messages
+
+Result:
+- confidence >= T_high -> decision written as captured
+- T_low <= confidence < T_high -> candidate, requests light validation
+- < T_low -> not written as decision, only as event or ignored
+
+### 4.9 Correcting false positives without friction
+
+Correct UX pattern: not a modal, but quiet correction:
+- Decision Surface shows "Captured decision (low confidence)"
+- User has 2 buttons: Confirm or Dismiss, plus "Edit statement"
+- If dismiss -> DBB learns (negative example), but record remains as raw event (not as decision)
+- If edit -> save link: original -> corrected (important for learning)
+
+---
+
+## 5. GraphRAG: Knowledge Retrieval with Causality
+
+Standard RAG: "Find similar text chunks -> feed to model"
+
+GraphRAG in SPL: first filter permitted graph area, then retrieve relevant subgraphs, then apply semantics.
+
+### 5.1 What the graph stores
+
+Typical nodes:
+- Person or Team or Role
+- Document or Policy or Spec or Ticket or PR or MessageThread
+- Decision or Assumption or Outcome
+- Entity (Customer, Project, System, Vendor, Regulation...)
+- Event (from DBB)
+
+Typical relationships:
+- DECIDED_BY
+- BASED_ON (decision -> evidence)
+- AFFECTS (decision -> entity)
+- DEPENDS_ON
+- CONFLICTS_WITH
+- SUPERSEDES (versioning)
+- HAS_OUTCOME
+- MENTIONED_IN or DERIVED_FROM
+- VALID_IN_TIME_RANGE
+
+### 5.2 Retrieval algorithm
+
+When a user query arrives:
+
+1. Intent determination: question, action, analysis, precedent search
+2. Domain or scope determination: personal, workspace, project, policy
+3. RBAC or tenant filter: only permitted graph area is selected
+4. Subgraph: take nodes around key entities
+5. Vector search within subgraph: find closest evidence or decisions
+6. Temporal filter: last 90 days or as-of date
+7. Context assembly: decisions + reasons + sources
+8. Response by local model with provenance
+
+This achieves audit-grade answers: not "I think so," but "I assert this because here is the source chain."
+
+### 5.3 Iterative context assembly cycle
+
+Complex queries are processed through an iterative context assembly cycle:
+
+```
+query ->
+  partial answer ->
+    conflict and confidence check ->
+      retrieve next fragment ->
+        refinement ->
+          stop or escalate
+```
+
+Each iteration is recorded, and intermediate conclusions are formalized as temporary hypotheses.
+
+Iterative cycle properties:
+- Each iteration recorded as event
+- Hypotheses represented as temporary graph nodes
+- Final result formalized as Decision or Knowledge Artifact
+- Budget exhaustion leads to stop or escalation, not context expansion
+
+### 5.4 Retrieval Orchestrator as SPL core (budget-aware GraphRAG)
+
+Retrieval Orchestrator is implemented as a policy engine that manages context assembly under explicit constraints, rather than expanding it to maximum possible volume.
+
+Context is sufficient not by completeness, but by adherence to defined budgets.
+
+#### Context Assembly Session (CAS)
+
+Every user request is processed within a Context Assembly Session (CAS).
+
+CAS serves as:
+- Unit of control
+- Unit of audit
+- Unit of explainability
+
+#### Explicit context budgets
+
+Every Context Assembly Session applies mandatory budgets:
+
+| Budget | Definition |
+| --- | --- |
+| **edge_budget** | Maximum graph edges that can be traversed in one session |
+| **step_budget** | Maximum reasoning steps and context assembly iterations |
+| **token_budget** | Maximum text volume passed to model |
+| **risk_budget** | Acceptable level of uncertainty, contradictions, and context incompleteness |
+
+Budgets are set by policies (tenant, project, scenario), logged, and saved as part of CAS.
+
+#### Behavior on budget exhaustion
+
+Budget exhaustion is not an error. It is a formal signal for one of these actions:
+- Stop assembly and generate response within current context
+- Escalate request
+- Request confirmation via Decision Surface
+
+Context expansion beyond budgets is not permitted.
+
+#### Context assembly trace
+
+Every CAS saves a context assembly trace including:
+- Which elements were expanded
+- Why
+- Which elements were discarded
+- At which step assembly stopped
+- Which budget was limiting
+
+Context Assembly Trace is used for:
+- Reproducibility
+- Explainability
+- Audit
+- Display in Decision Surface
+
+---
+
+## 6. SPL Memory: What Membria Remembers
+
+SPL memory is multi-layered:
+
+### 6.1 Working context (operational)
+- Current tasks, active decisions, open loops
+- Short horizon (days or weeks)
+- Used for continuity across chat series
+
+### 6.2 Graph memory (long-term)
+- Decisions, assumptions, outcomes, document versions
+- Causality, timeline, who approved
+
+#### Temporal validity
+
+Every graph edge has a temporal scope defined by valid_from and valid_to fields.
+
+Every decision has an explicit temporal applicability range.
+
+Context retrieval procedures always answer: "as of which date is the analysis performed?"
+
+### 6.3 Vector memory (semantic)
+- Similar cases, similar formulations, how we decided before
+
+### 6.4 Knowledge cache (answer reuse)
+
+If a question was already resolved and answer verified, return without regenerating.
+
+Cache types:
+- Local (personal or team)
+- Global or federated (decentralized knowledge backend)
+
+#### Cached artifact types
+
+Knowledge Cache stores reasoning results:
+
+1. Answer Artifact
+   - Question
+   - Answer
+   - Provenance
+   - Confidence
+
+2. Reasoning Pattern
+   - Typical conclusion: "in such conditions, usually X"
+
+3. Negative Knowledge
+   - Decision that proved wrong
+   - Conditions under which failure occurred
+
+Negative knowledge is an equal artifact type and is used to prevent repeated errors.
+
+### 6.5 Why decentralized backend matters
+
+It is needed not to leak private data, but to:
+- Store reusable, anonymized artifacts (patterns, decisions, corrections)
+- Support portability between devices
+- Provide common layer for council results (if policy permits)
+
+---
+
+## 7. Runtime: Local-first + Escalation (Council)
+
+### 7.1 Why local
+
+Because SPL holds long-term memory, meaning:
+- Lots of data
+- Personal context
+- Privacy is critical
+- Latency matters
+
+Local model plus local GraphRAG handle 80 to 95 percent of responses.
+
+### 7.2 When local model is insufficient
+
+Escalation triggers:
+- Confidence below threshold
+- Contradiction found in graph
+- High risk (finance, compliance, legal)
+- Request requires rare expertise not in LoRA or cache
+- New area with no historical decisions
+
+### 7.3 Escalation order
+
+1. Global or shared knowledge cache: do we already have a verified answer?
+2. Council: parallel request to multiple strong models
+3. Synthesis: consensus assembly plus contradiction check against graph
+4. Cache: result saved as verified knowledge artifact
+5. Gap detection: recurring escalations become LoRA candidates
+
+---
+
+## 8. LoRA Lifecycle: How Expertise Accumulates
+
+Important: LoRA does not make the model smarter overall. LoRA makes the model more precise in a narrow domain and reduces escalation count.
+
+### 8.1 Where LoRA data comes from
+
+Three main categories:
+
+1. Decision -> Outcome feedback
+- DBB captured decision
+- Later, outcome appeared
+- SPL understands: decision was successful or failed
+- Training example forms: which reasoning was correct under these conditions
+
+2. Council distillation
+- Council gave strong answer or plan
+- SPL compared: where did local model err? why?
+- Pairs form: question -> correct answer pattern
+- This closes knowledge gap
+
+3. Domain packs (optional)
+- Rules, policies, guides, playbooks
+- Especially useful in enterprise or SMB
+
+### 8.2 Governance: why uncontrolled self-learning is forbidden
+
+Because otherwise LoRA becomes a data poisoning channel:
+- User or employee can intentionally feed garbage
+- Drift can occur
+- Quality can degrade (hallucinations increase)
+
+Required cycle:
+1. Candidate generation (auto)
+2. Eval dataset (fixed test prompts + known failure cases)
+3. Offline eval (accuracy, hallucinations, escalations)
+4. Canary rollout (subset of requests)
+5. Promotion or rollback (instant rollback)
+6. Versioning (each LoRA has version and metrics)
+
+### 8.3 LoRA router policy
+
+Router evaluates:
+- Domain match
+- Historical LoRA benefit (on eval + in production)
+- Current risk policies
+- Confidence baseline without LoRA
+- No degradation guarantee (if LoRA increases hallucination probability -> forbidden)
+
+Safety rule: if LoRA is enabled but confidence is still low, escalate, do not fabricate.
+
+### 8.4 LoRA justification record
+
+Every LoRA adapter is accompanied by a LoRA Justification Record containing:
+- Reason for LoRA emergence
+- Identified gaps
+- Expected effect
+- Potential risks
+
+LoRA without documented justification is not permitted for use.
+
+---
+
+## 9. How It All Connects: The Compound Cycle
+
+The complete accumulation cycle:
+
+1. User interacts normally (chat, code, documents)
+2. DBB extracts events and decisions, links them to sources
+3. Decisions are written to graph (with causality and time)
+4. DS shows signals: what's open, drifting, needs confirmation
+5. On new query, SPL first searches graph and cache, then provides context to local model
+6. If local is insufficient -> escalation to Council
+7. Council result is synthesized, checked for graph conflicts, cached
+8. Recurring gaps become LoRA candidates
+9. LoRA passes evaluation, deploys, reduces future escalations
+10. System becomes more precise and personal without losing controllability
+
+This is intelligence compounds instead of resetting.
+
+---
+
+## 10. How SPL Protects Against Input Garbage
+
+Minimal defense heuristics:
+
+| Protection | Description |
+| --- | --- |
+| Source weighting | Documents, policies, signatures rank higher than chat words |
+| Role weighting | Owner or approver has greater weight |
+| Evidence requirement | Important decisions without sources do not get promoted |
+| Contradiction checks | If graph contains conflict, increase risk or request confirmation |
+| Temporal sanity | Decision cannot reference event from the future |
+| Spam or repetition detection | Identical formulations, strange patterns |
+| Canary and rollback for LoRA | Any degradation -> instant rollback |
+
+---
+
+## Appendix A: Commitment Events for SMB Audit Firms
+
+### Legal or Audit
+- Engagement letter signed
+- Audit opinion sent
+- Representation letter received
+- Matter closed in DMS
+
+### Financial
+- Invoice issued
+- Invoice sent
+- Write-off approved
+
+### Communications
+- Opinion email sent to client
+- Scope confirmation sent
+- Client approval received
+
+---
+
+## Appendix B: Required Integrations for SMB Audit
+
+### MVP (required)
+1. Outlook or Exchange - email events
+2. iManage or NetDocuments - DMS events
+3. Billing system - financial events
+
+### Phase 2
+4. Teams - additional context
+5. Practice management system
+
+Note: Slack can be excluded for audit SMB.
+
+---
+
+## Appendix C: Deployment Models
+
+| Segment | Deployment |
+| --- | --- |
+| Personal | Local-first |
+| SMB Audit | Cloud-first |
+| Enterprise | Hybrid or on-prem |
+
+For SMB:
+- IT does not want to support infrastructure
+- Cloud preferred
+- SOC2 and access control important
+
+---
+
+## Summary
+
+SPL is the layer that transforms disposable AI conversations into persistent institutional memory.
+
+Key principles:
+- Decisions, not documents - capture reasoning, not just files
+- Commitment Events, not LLM interpretation - irreversibility comes from external facts
+- Budget-aware retrieval - controlled context, not maximum dump
+- Governed learning - LoRA with eval, rollback, justification
+- Human-in-the-loop - SPL never decides, only supports decisions
+
+Result: Intelligence compounds instead of resetting.
+
+---
+
+Document version: 1.0
+Last updated: December 2024
