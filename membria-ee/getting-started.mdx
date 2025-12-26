@@ -1,13 +1,156 @@
 ---
 title: "Getting started"
-description: "Enterprise onboarding for Membria EE"
+description: "Enterprise onboarding and initial configuration for Membria EE"
 ---
 
-# Getting started
+# Getting started (Membria EE)
 
-This page will expand as enterprise onboarding is finalized.
+Membria EE is designed for regulated, high-trust environments where data ownership, auditability, and governance come first.
 
-## Steps
-1. Align on deployment model and data residency.
-2. Configure identity and access controls.
-3. Connect enterprise sources and validate policies.
+Enterprise onboarding focuses on **alignment, control, and validation** before any large-scale ingestion begins.
+
+This is intentional: Membria EE is not a plug-and-play chatbot, but an institutional intelligence system.
+
+---
+
+## 1) Align on deployment and trust boundaries
+
+Before installation, align on the operating model:
+
+- **Deployment**: on-prem, private cloud, or isolated VPC
+- **Data residency**: country, region, retention requirements
+- **Trust boundary**: what stays fully local vs what may interact with external systems
+- **Escalation policy**: whether multi-model escalation is allowed and under which conditions
+
+At this stage, Membria EE is configured to match the organization's existing risk posture.
+No data is ingested yet.
+
+---
+
+## 2) Configure identity, access, and tenancy
+
+Membria EE integrates with enterprise identity systems.
+
+Typical setup includes:
+
+- SSO (SAML / OIDC)
+- Role and group mapping
+- Workspace and domain separation
+- Approval roles for governance actions (LoRA, escalation, policy changes)
+
+This ensures that:
+- access is explicit
+- ownership is clear
+- every action is attributable
+
+---
+
+## 3) Define governance and policy controls
+
+Before connecting data, define:
+
+- escalation thresholds and budgets
+- allowed model classes (local only, private LLMs, council-based escalation)
+- audit log retention policies
+- approval workflows for model changes and expert adapters
+
+These policies are enforced automatically by the runtime.
+
+---
+
+## 4) Connect enterprise sources (pilot scope)
+
+Start with a **limited, representative scope**:
+
+- one or two core document systems
+- a constrained time range
+- a single business domain
+
+Validate:
+- access correctness
+- provenance tracking
+- audit log completeness
+- policy enforcement
+
+Avoid full ingestion until this pilot scope is trusted.
+
+---
+
+## 5) Run initial ingestion and validation
+
+Initial ingestion focuses on correctness, not speed.
+
+You should verify:
+
+- document coverage matches expectations
+- decision extraction does not over-trigger
+- no cross-domain data leakage
+- audit trails are complete and immutable
+
+This phase establishes baseline confidence.
+
+---
+
+## 6) Review Decision Surface with stakeholders
+
+Open the Decision Surface with domain owners, compliance, and IT.
+
+Look for:
+
+- detected decision clusters
+- unresolved or high-risk areas
+- duplicated or conflicting policies
+- visibility gaps
+
+This is often the first moment where organizations see their institutional thinking clearly.
+
+---
+
+## 7) Calibrate DBB for your organization
+
+Decision Black Box (DBB) heuristics are calibrated per organization.
+
+Early steps include:
+
+- confirming real decisions
+- dismissing false positives
+- tagging outcomes where known
+
+This tuning dramatically improves signal quality over time.
+
+---
+
+## 8) Enable controlled expansion
+
+Once pilot validation is complete:
+
+- expand to additional sources
+- increase historical range
+- enable additional domains
+- introduce expert LoRA workflows (if approved)
+
+At this point, Membria EE begins functioning as a persistent institutional memory.
+
+---
+
+## What success looks like
+
+After onboarding:
+
+- decisions are traceable
+- reasoning is explainable
+- audits are faster
+- repeated mistakes decrease
+- AI answers reference *your* institutional history, not generic patterns
+
+Membria EE does not change how people work.
+It changes what the organization **remembers**.
+
+---
+
+## Next steps
+
+- Review **Concepts** for enterprise governance and memory models
+- Review **Security and privacy** for compliance posture
+- Review **Licensing** for open vs proprietary components
+- Coordinate a staged rollout plan with domain owners
