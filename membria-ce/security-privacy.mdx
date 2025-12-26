@@ -1,15 +1,126 @@
 ---
 title: "Security and privacy"
-description: "Data handling and privacy posture for Membria CE"
+description: "Data handling, privacy model, and trust boundaries in Membria CE"
 ---
 
-# Security and privacy
+## Security and Privacy Model
 
-## Data scope
-Users explicitly choose sources and time ranges for ingestion.
+Membria CE is designed around a local-first security model.
+Your data, reasoning, and decisions belong to you and remain under your control by default.
 
-## Access controls
-Source access is permissioned and revocable.
+The system is built to minimize unnecessary data movement, avoid silent data reuse, and make every escalation explicit and auditable.
 
-## Privacy posture
-Local data remains local by default in self-hosted mode. Escalations are logged and auditable.
+---
+
+## Data Scope and Ownership
+
+Membria does not crawl, scrape, or infer data sources automatically.
+
+You explicitly choose:
+- Which sources are connected
+- What time ranges are ingested
+- What content is included or excluded
+
+Only selected data becomes part of the local reasoning context and knowledge graph.
+Raw chat logs are not treated as primary storage; decisions and derived structures are preserved instead.
+
+You retain full ownership of:
+- Source data
+- Derived knowledge
+- Decision history
+- Local embeddings and graphs
+
+---
+
+## Local-First Data Handling
+
+In self-hosted and local-first modes:
+- Source data stays on your device or private environment
+- Reasoning and inference happen locally whenever possible
+- No background synchronization occurs without explicit triggers
+
+Local data is never silently uploaded or reused across users.
+
+Membria is designed to function offline for core reasoning and decision capture.
+
+---
+
+## Escalation and External Interaction
+
+When local models are insufficient, Membria may escalate selectively.
+
+Escalation is:
+- Triggered only by explicit confidence or risk thresholds
+- Limited to the minimum context required
+- Logged with timestamp, purpose, and outcome
+
+Escalated requests never include your full workspace or raw history.
+Results are validated, distilled, and stored as structured knowledge, not raw transcripts.
+
+All escalations are visible and auditable.
+
+---
+
+## Decentralized Knowledge Backend
+
+Membria may optionally use a decentralized backend for:
+- Verified knowledge reuse
+- Result caching
+- Cross-session persistence
+
+This backend is:
+- Content-addressed
+- Append-only
+- Designed for verification, not inference
+
+It does not replace local reasoning and does not act as a central AI brain.
+Its role is persistence, traceability, and reuse.
+
+---
+
+## Access Controls and Revocation
+
+Source access is permissioned and revocable at any time.
+
+You can:
+- Disconnect sources instantly
+- Remove ingested data
+- Clear derived knowledge structures
+- Reset local memory and graphs
+
+Revocation does not require system restarts or external approval.
+
+---
+
+## Transparency and Auditability
+
+Membria does not hide uncertainty.
+
+You can inspect:
+- When decisions were captured
+- What context was used
+- Whether escalation occurred
+- What assumptions were recorded
+
+There are no silent optimizations, hidden fine-tuning, or background learning loops.
+
+---
+
+## What Membria Does Not Do
+
+Membria CE does not:
+- Train global models on your data
+- Share your data with other users
+- Optimize for advertising or engagement
+- Collect behavioral analytics unrelated to product function
+
+---
+
+## Summary
+
+Membria CE treats security and privacy as architectural constraints, not policy promises.
+
+Local reasoning comes first.
+Escalation is explicit.
+Persistence is controlled.
+Trust is earned through visibility, not abstraction.
