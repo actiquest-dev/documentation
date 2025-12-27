@@ -1,4 +1,4 @@
-# Membria Reasoning Graph Approach - Full Architecture Overview
+## Membria Reasoning Graph Approach - Full Architecture Overview
 
 This document consolidates the Membria Smart Persistence Layer (Reasoning Graph) approach across all products (CE, SMB, EE). It covers the full system structure, data flows, GraphRAG, and knowledge gap removal via LoRA patching (SkillForge).
 
