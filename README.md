@@ -1,6 +1,6 @@
-# Membria CE Knowledge Base
+# Membria Reasoning Graph
 
-This folder now hosts the **Membria CE knowledge base**—a single source of product positioning, playbooks, and signals compiled directly from `membria.md`.
+This folder now hosts the **Membria Reasoning Graph**—a single source of product positioning, playbooks, and signals compiled directly from `membria.md`.
 
 ## How it works
 - `membria.md` is the research log. Add new insights at the bottom so that the polished pages can stay aligned with the latest thinking.
