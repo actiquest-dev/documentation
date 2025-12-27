@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Membria Knowledge Base",
+  "name": "Membria Reasoning Graph",
   "colors": {
     "primary": "#0F172A",
     "light": "#2563EB",
@@ -188,7 +188,7 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Membria - Persistence Layer between you and AI",
+          "anchor": "Membria Reasoning Graph",
           "href": "https://membria.ai",
           "icon": "book-open-cover"
         },
