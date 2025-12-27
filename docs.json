@@ -17,7 +17,7 @@
             "group": "Welcome",
             "pages": [
               "index",
-              "Reasoning Graph"
+              "rg-architecture"
             ]
           },
           {
@@ -133,7 +133,6 @@
               "membria-smb/decision-surface",
               "membria-smb/decision-black-box",
               "membria-smb/dbb-heuristics",
-              "membria-smb/from-chat-to-institutional-memory",
               "membria-smb/from-chat-to-institutional-memory"
             ]
           },
