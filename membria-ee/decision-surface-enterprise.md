@@ -10,28 +10,17 @@ Unlike the SMB version with local client-side capture, Enterprise deployments co
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────────────────┐
-│  Data Sources                                            │
-│  Slack · Teams · Email · Confluence · Jira               │
-└─────────────────────────┬────────────────────────────────┘
-                          │
-                          ▼
-┌──────────────────────────────────────────────────────────┐
-│  Backend (on-premise)                                    │
-│  ├── DBB Engine — decision capture from all sources      │
-│  ├── Decision Records — immutable append-only store      │
-│  ├── GraphRAG + Ontology — relationships & context       │
-│  ├── Access Layer — role-based filtering                 │
-│  └── DS API — serves signals by scope                    │
-└─────────────────────────┬────────────────────────────────┘
-                          │
-                          ▼
-┌──────────────────────────────────────────────────────────┐
-│  Web UI (thin client)                                    │
-│  Decision Surface — renders API response by user role    │
-└──────────────────────────────────────────────────────────┘
-```
+**Data Sources** (Slack, Teams, Email, Confluence, Jira)
+
+**Backend (on-premise)**  
+- DBB Engine — decision capture from all sources  
+- Decision Records — immutable append-only store  
+- GraphRAG + Ontology — relationships & context  
+- Access Layer — role-based filtering  
+- DS API — serves signals by scope
+
+**Web UI (thin client)**  
+- Decision Surface — renders API response by user role
 
 ---
 
