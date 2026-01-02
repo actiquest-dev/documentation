@@ -181,6 +181,12 @@
               "membria-ee/deployment-hosting",
               "membria-ee/security-privacy"
             ]
+          },
+          {
+            "group": "Product",
+            "pages": [
+              "enterprise/decision-surface-enterprise"
+            ]
           }
         ]
       }
