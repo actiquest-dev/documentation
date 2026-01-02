@@ -1,5 +1,3 @@
-# Decision Surface for Enterprise
-
 > Role-based decision visibility across teams and organization
 
 ## Overview
