@@ -10,17 +10,19 @@ Unlike the SMB version with local client-side capture, Enterprise deployments co
 
 ## Architecture
 
-**Data Sources** (Slack, Teams, Email, Confluence, Jira)
+```mermaid
+flowchart TD
+  A[Data Sources<br/>Slack · Teams · Email · Confluence · Jira] --> B[Backend (on-premise)]
+  B --> C[Web UI (thin client)]
 
-**Backend (on-premise)**  
-- DBB Engine — decision capture from all sources  
-- Decision Records — immutable append-only store  
-- GraphRAG + Ontology — relationships & context  
-- Access Layer — role-based filtering  
-- DS API — serves signals by scope
+  B --> B1[DBB Engine — decision capture from all sources]
+  B --> B2[Decision Records — immutable append-only store]
+  B --> B3[GraphRAG + Ontology — relationships & context]
+  B --> B4[Access Layer — role-based filtering]
+  B --> B5[DS API — serves signals by scope]
 
-**Web UI (thin client)**  
-- Decision Surface — renders API response by user role
+  C --> C1[Decision Surface — renders API response by user role]
+```
 
 ---
 
