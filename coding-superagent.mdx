@@ -1,0 +1,260 @@
+# Coding Superagent
+
+## Executive Summary
+
+Membria introduces the **Superagent Architecture**, which transforms stateless AI agents (like Claude Code) into **decision-aware development companions** that remember project history, learn from outcomes, and prevent teams from repeating mistakes.
+
+**Core value proposition:**
+- **For developers:** AI that remembers what worked and what didn't.
+- **For teams:** Shared memory that survives personnel changes and context switches.
+- **For budgets:** Architecture that minimizes LLM token consumption by avoiding redundant context in Multi-Agent systems.
+
+---
+
+## The Problem: Stateless AI in Vibe Coding
+
+### What is Vibe Coding
+Vibe coding = describing what you want in natural language, letting AI write the code. It works great for one-off scripts and prototypes, but breaks down in long-term projects.
+
+### Where It Breaks Down
+
+| Situation | What Happens |
+|-----------|--------------|
+| Project lives > 1 week | AI doesn't remember yesterday's decisions |
+| Multiple developers | No shared context between team members |
+| Return to code after a month | "Why is it written this way?" — nobody knows |
+| Similar problem solved before | AI makes the same mistake again |
+| Bad approach tried previously | No memory → team tries it again |
+
+### The Root Cause
+Current AI coding assistants are **stateless**: every prompt is processed independently with no memory of past architectural decisions or "negative knowledge" (what failed).
+
+---
+
+## The Solution: Membria Superagent Architecture
+
+### Instead of Multiple Agents (Multi-Agent)
+Typical multi-agent systems (Orchestrator → Planner → Coder → Reviewer) burn **70,000+ tokens** per task because each agent receives full redundant context.
+
+### Membria Approach: One Agent + Smart Context
+```
+✅ MEMBRIA SUPERAGENT:
+
+User prompt
+    ↓
+┌─────────────────────────────────┐
+│  Membria Graph Query            │  ← Local, 0 tokens
+│  "What's relevant for this?"    │
+└─────────────────────────────────┘
+    ↓
+[Only relevant context: ~2K tokens]
+    ↓
+┌─────────────────────────────────┐
+│  Single Claude Code Call        │  ← 6-10K tokens total
+│  With injected context          │
+└─────────────────────────────────┘
+    ↓
+Code + Auto-captured decision record
+```
+**Result: 10x fewer tokens, persistent memory, predictable costs.**
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TD
+    subgraph "IDE / PR / CI Layer"
+        A[VS Code, GitHub PR, Jira, CI jobs]
+    end
+    A --> B(Claude Control Plane - CCP)
+    
+    subgraph CCP [Claude Control Plane (CCP)]
+        B --> C(Task Router)
+        C --> D(Agent / TENN<br/>graph + logic)
+        D --> E(Policy Engine<br/>what is allowed)
+        E --> F(MCP Server - Runtime Control)
+    end
+
+    F -->|context injection, tool exposure| G(Claude Code<br/>stateless)
+    F --> H(Debias Validators)
+    H --> I(Membria Reasoning Graph)
+    
+    subgraph Feedback [Async Feedback Loop]
+        I --> J{Outcome Capture Layer}
+        J -->|Updates Beliefs/LoRA| I
+    end
+```
+
+## Detailed Flow: Library Selection Decision
+
+### Scenario
+Developer in VS Code writes: "Add REST API for user management, need to choose a framework"
+
+### Step 1: Task Router Classification
+```
+Input: "Add REST API for user management, need to choose a framework"
+
+Classification Analysis:
+├── Keywords detected: "choose", "framework"
+├── Multiple alternatives implied: yes
+├── Architectural impact: yes (API framework affects whole service)
+└── Decision type: LIBRARY_CHOICE
+
+Result: Route to DECISION flow (not tactical)
+```
+
+### Step 2: Pre-Generation Context Fetch
+```
+Query to Reasoning Graph:
+
+MATCH (d:Decision)-[:ABOUT]->(t:Topic)
+WHERE t.name IN ["REST API", "framework", "HTTP server"]
+  AND d.repo = "current-repo"
+RETURN d, d.outcome, d.assumptions
+
+Results:
+┌─────────────────────────────────────────────────────────────────────┐
+│ Decision #47 (8 months ago)                                        │
+│ Statement: "Use Express.js for API gateway"                        │
+│ Outcome: SUCCESS                                                   │
+│ Notes: "Worked well, team familiar"                                │
+├─────────────────────────────────────────────────────────────────────┤
+│ Decision #89 (6 months ago)                                        │
+│ Statement: "Use custom middleware for authentication"              │
+│ Outcome: FAILURE                                                   │
+│ Notes: "Security vulnerability found, had to rewrite"              │
+│ Negative Knowledge: "Avoid custom auth middleware"                 │
+├─────────────────────────────────────────────────────────────────────┤
+│ Team Calibration (library choices):                                │
+│ • Average confidence: 0.78                                         │
+│ • Actual success rate: 0.61                                        │
+│ • Calibration gap: +17% (overconfident)                           │
+│ • Recommendation: Reduce stated confidence by ~15%                 │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Step 3: Decision Surface Display (in IDE)
+Developer sees inline panel before Claude generates anything:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  🧠 Membria Decision Context                                        │
+│                                                                     │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                     │
+│  📊 RELEVANT HISTORY                                                │
+│                                                                     │
+│  ✅ Express.js worked well (8 months ago)                          │
+│     "API gateway - team was familiar, stable in prod"              │
+│                                                                     │
+│  ❌ Custom middleware failed (6 months ago)                        │
+│     "Security vulnerability, 2-week rewrite"                       │
+│     ⚠️ NEGATIVE KNOWLEDGE: Avoid custom auth solutions             │
+│                                                                     │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                     │
+│  📈 TEAM CALIBRATION                                                │
+│                                                                     │
+│  Your team tends to be 17% overconfident in library choices.       │
+│  If you feel 80% confident, historical accuracy suggests ~65%.     │
+│                                                                     │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                     │
+│  💡 CONSIDERATIONS                                                  │
+│                                                                     │
+│  • Express.js: proven in this repo, team knows it                  │
+│  • Fastify: faster, but team has no experience                     │
+│  • Koa: minimal, might need more custom code                       │
+│                                                                     │
+│  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  │
+│                                                                     │
+│  Ready to proceed?                                                  │
+│                                                                     │
+│  [ Proceed with Claude ] [ Review History ] [ I'll decide myself ] │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Step 4: Developer Interaction
+Developer clicks "Proceed with Claude" and adds: "Let's go with Fastify for better performance"
+
+### Step 5: Decision Capture (DBB)
+Before code generation, system captures:
+
+```json
+{
+  "decision_id": "dec_142",
+  "timestamp": "2025-02-06T14:32:00Z",
+  "statement": "Use Fastify for REST API in user-service",
+  "alternatives_considered": [
+    {
+      "option": "Express.js",
+      "reason_rejected": "Want better performance"
+    },
+    {
+      "option": "Koa",
+      "reason_rejected": "Too minimal"
+    },
+    {
+      "option": "Custom",
+      "reason_rejected": "Negative knowledge from dec_89"
+    }
+  ],
+  "confidence": {
+    "stated": 0.75,
+    "calibrated": 0.62,
+    "calibration_note": "Adjusted for team's +17% overconfidence in library choices"
+  },
+  "assumptions": [
+    "Fastify handles our expected load (10k req/s)",
+    "Team can learn Fastify quickly",
+    "Fastify ecosystem has needed plugins"
+  ],
+  "predicted_outcome": {
+    "description": "Stable, performant API ready in 2 weeks",
+    "success_criteria": [
+      "API handles 10k req/s",
+      "No critical bugs in first month",
+      "Team onboarding < 1 week"
+    ]
+  },
+  "context_hash": "sha256:abc123...",
+  "status": "CAPTURED",
+  "linked_artifacts": {
+    "pr": null,
+    "commit": null,
+    "jira": "PROJ-456"
+  },
+  "negative_knowledge_acknowledged": [
+    "dec_89: Avoid custom auth middleware"
+  ]
+}
+```
+
+### Step 6: MCP Server Context Injection
+Claude Code receives enriched context.
+
+---
+
+## Token Economics: Superagent vs Multi-Agent
+
+### Per-Task Comparison
+
+| Aspect | Multi-Agent System | Membria Superagent |
+|--------|-------------------|--------------------|
+| **Architecture** | N agents × full context | 1 agent × smart context |
+| **Tokens per task** | 70,000+ | 6,000-10,000 |
+| **Token growth** | O(n²) | O(1) |
+| **Memory** | None (stateless) | Persistent (Graph) |
+| **Cost Structure** | Usage-based, unpredictable | Subscription-based, fixed |
+
+**Multi-agent vendors want you to use MORE agents. Membria wants you to use BETTER context to save tokens.**
+
+---
+
+## Bottom Line
+
+Multi-agent architecture solves "how to divide work" by creating a new problem: context fragmentation. **Membria Superagent** solves the root problem: **giving one agent the right context.**
+
+**Vibe coding stops being "generate from scratch every time" and becomes "generate with project memory.”**
