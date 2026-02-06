@@ -1,0 +1,382 @@
+# Membria: Target Audience & Honest Limitations
+
+## Who Membria Is For (And Who It's Not)
+
+---
+
+## Executive Summary
+
+Membria is a **team product**, not an individual tool. This document provides honest guidance on where Membria delivers value and where simpler alternatives work better.
+
+**Core insight:** Membria solves the problem of **institutional knowledge loss in teams**. If you don't have a team, you don't have this problem.
+
+---
+
+## The Problem Membria Solves
+
+```
+Team of 8 developers, project running 18 months:
+
+├── Alice made architecture decision in March
+├── Alice left the company in July
+├── Bob joins in September
+├── Bob: "Why is it built this way?"
+├── Everyone: "Historical reasons... Alice knew"
+├── Bob tries different approach
+├── Approach fails (Alice tried it, didn't work)
+├── 2 weeks wasted
+└── Repeat across dozens of decisions
+```
+
+**This is the problem.** Knowledge walks out the door. Decisions get forgotten. Mistakes repeat.
+
+---
+
+## Ideal Customer Profile
+
+### ✅ Membria IS For
+
+```
+Team characteristics:
+├── Size: 5-20 developers
+├── Project lifespan: > 12 months
+├── Turnover: people join/leave occasionally
+├── Complexity: architectural decisions matter
+├── Pain: "Why is it like this?" is a frequent question
+└── Culture: willing to invest in tooling
+
+Industry signals:
+├── Regulated industries (audit trail required)
+├── Enterprise software (long-lived codebases)
+├── Agencies with long-term client relationships
+├── Scale-ups growing engineering team
+└── Companies with remote/distributed teams
+
+Budget reality:
+├── $49/seat/month is acceptable
+├── 3-6 month ROI horizon is OK
+├── Has engineering manager who owns tooling decisions
+└── Values reducing onboarding time
+```
+
+### ❌ Membria is NOT For
+
+```
+Solo developers:
+├── You ARE the institutional memory
+├── You remember your own decisions
+├── README.md per project is sufficient
+├── $49/month for memory you already have = waste
+└── Exception: agency owner with 50+ clients over 5+ years
+
+Small teams (2-3 people):
+├── Sync happens naturally (daily standups)
+├── Everyone knows everything
+├── Slack search is good enough
+├── Low turnover impact
+└── CLAUDE.md + good docs = sufficient
+
+Short projects (< 6 months):
+├── Not enough time to accumulate decisions
+├── Outcomes won't materialize before project ends
+├── No negative knowledge will form
+├── ROI = zero
+└── Setup cost > benefit
+
+Early-stage startups:
+├── Everything changes constantly
+├── "Decisions" get reversed weekly
+├── Need speed, not documentation
+├── Team is 2-4 people who talk constantly
+└── Premature optimization of knowledge management
+
+Contractors/freelancers:
+├── Project ends, relationship ends
+├── Client owns the codebase anyway
+├── Handoff document is sufficient
+├── No long-term maintenance responsibility
+└── Per-project README works fine
+```
+
+---
+
+## Why Solo Developers Don't Need Membria
+
+### Argument: "Solo dev with many projects"
+
+```
+Claim:
+├── Solo dev juggles 5 projects
+├── Switches context constantly
+├── Membria remembers decisions across all projects
+├── Value: cross-project memory
+
+Reality check: ❌
+```
+
+### Counter-argument 1: Context doesn't transfer
+
+```
+Decision in Project A: "Use Redis for caching"
+Context A: High load, distributed system, 10k req/s
+
+Project D: Simple CRUD for small business
+Membria: "You used Redis in A!"
+Reality: Redis is overkill here, SQLite is fine
+
+Cross-project decisions are CONTEXTUAL.
+What worked in A may be wrong for D.
+```
+
+### Counter-argument 2: Solo dev IS the memory
+
+```
+Team scenario:
+├── Alice decides X
+├── Bob doesn't know
+├── Carol redoes work
+└── Need: shared memory system
+
+Solo scenario:
+├── I decided X
+├── I know why
+├── I remember context
+└── Need: nothing, I AM the memory
+```
+
+### Counter-argument 3: README.md is free
+
+```
+Project A/README.md:
+  ## Architecture Decisions
+  - Redis for cache (high load requirement)
+  - Fastify over Express (performance)
+  
+  ## What Didn't Work
+  - Custom auth middleware (security issues)
+
+Time to write: 10 minutes
+Cost: $0
+Accessibility: always, even offline
+Maintenance: update when needed
+
+vs Membria:
+Cost: $49/month = $588/year
+For what? Queryable version of README?
+```
+
+### Counter-argument 4: Outcome tracking is obvious for solo
+
+```
+Membria value prop: "Compare predicted vs actual outcomes"
+
+Solo dev reality:
+├── Delivered project → client happy → SUCCESS
+├── Delivered project → client unhappy → FAILURE
+├── This is immediately obvious
+└── No formal tracking needed
+
+Calibration makes sense when:
+├── Multiple people with different accuracy
+├── Need to identify WHO consistently fails
+├── Need metrics for management review
+
+Solo dev = self-managing, no bureaucracy needed
+```
+
+---
+
+## Why Small Teams (2-3) Can Skip Membria
+
+### Natural sync is sufficient
+
+```
+3-person team:
+├── Daily standup: 15 minutes
+├── Everyone hears every decision
+├── Slack channel: all discussions visible
+├── PR reviews: everyone sees everything
+└── Implicit shared memory through proximity
+```
+
+### Low turnover impact
+
+```
+If 1 of 3 people leaves:
+├── 2 people still remember everything
+├── Onboarding 1 new person is manageable
+├── Pair programming for 2 weeks = knowledge transfer
+└── No system needed
+
+Membria ROI requires:
+├── Enough turnover that knowledge is lost
+├── Team large enough that not everyone knows everything
+├── Neither applies to 3-person team
+```
+
+---
+
+## Honest Limitations (Even for Ideal Customers)
+
+### 1. Cold start problem
+
+```
+Day 1 with Membria:
+├── Empty graph
+├── No past decisions
+├── No negative knowledge
+├── No calibration data
+├── Value = zero
+
+vs Day 1 with CLAUDE.md:
+├── Write context in 30 minutes
+├── Claude immediately understands project
+├── Value = immediate
+
+Membria requires 2-3 months to become useful
+```
+
+### 2. Discipline still required
+
+```
+Membria workflow:
+1. Decision detected
+2. Developer must CONFIRM (1 click) ← still requires action
+3. If ignored → graph stays empty
+
+What happens in practice:
+├── "I'll confirm later" → never
+├── "This isn't a decision" → dismiss everything
+├── "Deadline, no time" → skip
+└── Graph = empty or garbage
+
+Less discipline than MD, but NOT zero discipline
+```
+
+### 3. Adoption requires buy-in
+
+```
+To make Membria work:
+├── Buy-in from entire team
+├── IDE integration setup
+├── CI/CD integration
+├── Issue tracker integration
+├── Team training
+├── Workflow changes
+├── Champion who drives adoption
+└── 3-6 months until ROI
+
+vs CLAUDE.md:
+├── Create file
+├── Write context
+└── Done in 30 minutes
+```
+
+### 4. Negative knowledge can become innovation blocker
+
+```
+Scenario:
+├── 2023: Tried library X, didn't work
+├── Negative knowledge: "X doesn't work"
+├── 2025: X releases v2.0, completely rewritten
+├── Developer wants to try new X
+├── Membria: ⚠️ "X failed before!"
+└── Team stuck on old decisions
+```
+
+### 5. Privacy and security concerns
+
+```
+Membria stores:
+├── All team decisions
+├── Who decided what
+├── Mistakes and failures
+├── Confidence levels
+├── Reasoning behind decisions
+
+Questions:
+├── Where is data stored?
+├── Who has access?
+├── Can it be used against employees?
+│   "Your decisions fail 40% of the time"
+├── Compliance (GDPR, SOC2)?
+└── What if Membria shuts down?
+```
+
+---
+
+## Comparison: When to Use What
+
+| Situation | Recommendation | Why |
+|-----------|---------------|-----|
+| Solo developer | README.md per project | Free, simple, you ARE the memory |
+| 2-3 person team | CLAUDE.md + good docs | Natural sync is enough |
+| Short project (< 6 months) | ADR in repo | Won't reach Membria ROI |
+| Early startup | Nothing formal | Everything changes too fast |
+| Contractor/freelancer | Handoff document | Relationship ends with project |
+| **5-20 person team** | **Membria** | **Shared memory problem is real** |
+| **Project > 12 months** | **Membria** | **Enough time to reach ROI** |
+| **Regulated industry** | **Membria** | **Audit trail requirement** |
+| **High turnover environment** | **Membria** | **Knowledge preservation critical** |
+| **Growing engineering org** | **Membria** | **...** |
+
+---
+
+## Honest Pitch
+
+### Don't say:
+
+> "Membria helps all developers write better code with AI"
+
+### Do say:
+
+> "Membria is for engineering teams of 5-20 people working on long-lived projects, where decisions get forgotten, mistakes repeat, and onboarding new people takes too long. If you've ever said 'we tried that before but I don't remember why it failed' — that's the problem we solve."
+
+---
+
+## Qualification Questions for Sales
+
+Before engaging a prospect, ask:
+
+1. **Team size?**
+   - < 5: probably not a fit
+   - 5-20: ideal
+   - > 20: enterprise conversation
+
+2. **Project lifespan?**
+   - < 6 months: not a fit
+   - 6-12 months: maybe
+   - > 12 months: ideal
+
+3. **Have you experienced knowledge loss from turnover?**
+   - No: may not feel the pain
+   - Yes: strong fit
+
+4. **Do you have repeated mistakes / "we tried that" moments?**
+   - No: may not need Membria
+   - Yes: core use case
+
+5. **Is someone willing to champion adoption?**
+   - No: will fail
+   - Yes: can succeed
+
+---
+
+## Summary
+
+| Audience | Membria Fit | Alternative |
+|----------|-------------|-------------|
+| Solo dev | ❌ No | README.md |
+| 2-3 person team | ❌ No | CLAUDE.md + docs |
+| Short project | ❌ No | ADR in repo |
+| Early startup | ❌ No | Move fast, document later |
+| Freelancer | ❌ No | Handoff docs |
+| **5-20 person team** | **✅ Yes** | **—** |
+| **Project > 12 months** | **✅ Yes** | **—** |
+| **Regulated industry** | **✅ Yes** | **—** |
+| **High turnover environment** | **✅ Yes** | **—** |
+| **Growing engineering org** | **✅ Yes** | **—** |
+
+**Membria is a team product for teams with team problems.**
+
+If you don't have a team, or your team is small enough that everyone knows everything, simpler tools work fine. That's honest, and that's OK — focus on customers who genuinely need the product.
