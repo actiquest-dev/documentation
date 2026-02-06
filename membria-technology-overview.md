@@ -418,6 +418,17 @@ Recommendation: Surface for open discussion.
 -   Key decision-makers identified and retained.
 -   Cultural gaps bridged proactively.
 
+### Case 7: Persistent Context for CLI Agents (Claude Code)
+
+**Problem:** CLI agents like Claude Code lose project-specific reasoning context between sessions. Re-explaining architectural constraints or "why we avoided Library X" consumes developer time and token budget.
+
+**Solution:** Membria CE acts as a persistent memory layer for Claude Code (via MCP). Decisions, "Negative Knowledge" (failed attempts), and architectural assumptions are stored in the local Reasoning Graph.
+
+**Result:**
+- **Zero Context Reset:** Claude Code remembers reasoning from previous sessions.
+- **Token Efficiency:** 30% reduction in re-explanation prompts.
+- **Automated Documentation:** Coding decisions are captured as they happen in the terminal.
+
 ---
 
 ### Technical Architecture
