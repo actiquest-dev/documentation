@@ -14,11 +14,12 @@
         "tab": "Home / Overview",
         "groups": [
           {
-            "group": "Welcome",
+            "group": "Home / Overview",
             "pages": [
               "index",
               "membria-technology-overview",
-              "rg-architecture"
+              "rg-architecture",
+              "superagent-architecture"
             ]
           },
           {
