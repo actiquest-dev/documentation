@@ -36,10 +36,9 @@ Reasoning Graph is implemented as a set of interconnected subsystems:
 | 4 | **Vector Memory (Embeddings)** | Semantic memory: embeddings of fragments, nodes, events, case similarity |
 | 5 | **Knowledge Cache (Local + Shared)** | Reuse of verified answers, reasoning patterns, conclusions |
 | 6 | **Retrieval Orchestrator (GraphRAG Router)** | Router that decides: what to retrieve (graph, vectors, cache), context volume, escalation needs |
-| 7 | **Decision Intelligence Engine** | Layer for **VoI scoring**, **POMDP belief tracking**, and **sequencing optimization** |
-| 8 | **Model Runtime (Local-first + Council)** | Fast local model handles 80-95 percent of work; complex cases escalate to Council |
-| 9 | **LoRA Lifecycle + Router Policy** | Mechanism for accumulating expertise: new LoRA adapters emerge from recurring gaps, are validated, deployed/rolled back |
-| 10 | **Decision Surface (DS)** | UI/signal system showing: open loops, hidden disagreements, drift, and VoI-ranked risks |
+| 7 | **Model Runtime (Local-first + Council)** | Fast local model handles 80-95 percent of work; complex cases escalate to Council |
+| 8 | **LoRA Lifecycle + Router Policy** | Mechanism for accumulating expertise: new LoRA adapters emerge from recurring gaps, are validated, deployed/rolled back |
+| 9 | **Decision Surface (DS)** | UI/signal system showing: what's open, what's drifting, what's risky, what needs approval |
 
 ---
 
@@ -83,19 +82,6 @@ Decision:
 - alternatives[]   (if extracted)
 - rationale        (reasoning, preferably as structured points)
 - assumptions[]
-- value_of_information: {
-    score: float,
-    basis: string,
-    computed_at: timestamp
-  }
-- belief_state: {
-    state: "consensus" | "surface_agreement" | "misunderstanding",
-    prob_true_consensus: float,
-    prob_surface_only: float,
-    prob_misunderstanding: float,
-    confidence: float,
-    last_updated: timestamp
-  }
 - constraints[]
 - owner            (who decides)
 - status           (draft / pending / approved / overturned)
@@ -672,61 +658,381 @@ For SMB:
 
 ---
 
-## 11. Decision Intelligence Layer
+## 11. Decision Intelligence Layer - MIT Decision Theory Integration
 
-The Decision Intelligence (DI) Layer extends Reasoning Graph's capabilities from mere persistence to **optimizing human-AI ensemble decisions**.
+Beyond capturing and organizing decisions, Reasoning Graph can apply **decision theory algorithms** to optimize decision-making itself.
 
-### 11.1 Value of Information (VoI) Scoring
-Membria prioritizes open loops and information gathering based on the **Value of Information (VoI)**.
-- **Goal:** Focus the human user on decisions where more information leads to the greatest increase in expected utility.
-- **Calculation:** $VoI = E[Utility | Info] - E[Utility | No Info] - Cost(Info)$.
-- **DS Integration:** Open loops are ranked by VoI descending, ensuring high-stakes "unknowns" aren't lost in the noise.
+### 11.1 Where Decision Intelligence Connects
 
-### 11.2 POMDP Belief State Tracking
-Membria uses **Partially Observable Markov Decision Processes (POMDP)** to maintain a probablistic distribution over the "true consensus" of a team.
-- **States:** `Consensus`, `Surface Agreement` (masking skepticism), `Misunderstanding` (conflicting mental models).
-- **Signal Infusion:** DBB infuses signals (skeptical questions, silence, delayed actions) into the Bayesian update engine.
-- **Hidden Disagreement:** When $P(Consensus)$ is low despite explicit "+1s", the system flags a "Hidden Disagreement" on the Decision Surface.
+Decision Intelligence operates at multiple layers of Reasoning Graph:
 
-### 11.3 Decision Sequencing Optimizer
-Using **Heuristic Priority Queue + Uncertainty Quantification**, Membria recommends the optimal order for dependent decisions.
-- **Critical Path:** Identifies bottleneck decisions (e.g., "Budget Approval") that block parallel workstreams.
-- **Heuristic Ranking:** MCTS was found to be overkill for typical decision graph sizes (10-50 nodes). The system uses a deterministic priority queue to rank next valid decisions based on VoI, Urgency, and Blocking power.
-- **Simulation:** Explores sequence permutations to minimize "idle reasoning time" and project duration.
+```
+Graph Memory (DBB) -> Enriched Decisions -> GraphRAG -> Retrieval Orchestrator -> DS
+                          |
+                          v
+                  Decision Intelligence
+                   (VoI, POMDP, Calib)
+```
+
+### 11.2 Extended Decision Object
+
+DBB produces standard Decision objects (section 3.2). Decision Intelligence extends them:
+
+```
+Decision (enriched):
+- decision_id
+- statement
+- alternatives[]
+- rationale
+- assumptions[]
+- owner
+- status
+- evidence_links[]
+- confidence
+
++ NEW FIELDS:
+- value_of_information    (Float64, cached)
+- belief_state            (probability distribution over consensus)
+- assumption_beliefs[]    (Beta distributions per assumption)
+- dependencies[]          (links to blocking/blocked decisions)
+- predicted_outcome       (before execution)
+- actual_outcome          (after execution)
+- calibration_delta       (predicted vs actual)
+```
+
+### 11.3 Five Decision Intelligence Components
+
+#### 11.3.1 Value of Information (VoI)
+
+**Where it lives:** Graph Memory (computed property on Decision nodes)
+
+**What it does:** Scores each Open Loop / Pending decision by impact:
+
+```
+VoI(D) = E[utility | decision with more info]
+       - E[utility | decision without info]
+       - cost(gathering_info)
+```
+
+**Implementation in RG:**
+1. For each decision, extract:
+   - Alternative outcomes if decision made without info vs with info
+   - Cost to gather info (time, resources)
+   - Impact on downstream decisions
+
+2. Store VoI as cached property:
+   ```
+   Decision.value_of_information = {
+     score: Float64,        // $180k
+     basis: String,         // "revenue impact if pricing wrong"
+     updated_at: Timestamp,
+     data_sources: [edges]  // which outcomes/impacts used
+   }
+   ```
+
+3. GraphRAG Retrieval uses VoI for ranking:
+   - When DS queries for "open decisions", sort by VoI DESC
+   - High VoI decisions surfaced first for resolution
+
+**Benefit to Reasoning Graph:** Prioritization becomes **principled** not **urgent**. Low-VoI decisions can be deferred without penalty.
 
 ---
 
-### 8.5 LoRA Types and Boundaries
+#### 11.3.2 Belief State Tracking (POMDP)
 
-| LoRA Type | Purpose | Can Modify | Cannot Modify |
-|-----------|---------|------------|---------------|
-| **Calibration** | Adjust confidence scores | Output confidence | Reasoning steps |
-| **Domain** | Add domain knowledge | Fact retrieval | Causal claims |
-| **Debiasing** | Inject debiasing prompts | Reasoning prompts | User decisions |
+**Where it lives:** Graph Memory (edge property on Decision nodes)
 
-> [!WARNING]
-> **FORBIDDEN:** LoRA that masks bias without addressing root cause.
-> **REQUIRED:** All LoRA include reasoning trace audit.
+**What it does:** Maintains probability distribution P(true_consensus | observed_signals) for each decision
+
+**Implementation in RG:**
+1. Every signal that relates to a decision updates its belief state:
+   ```
+   Signal types (observed):
+   - explicit_agreement ("+1", "agreed", "approved")
+   - explicit_disagreement ("-1", "objection")
+   - silence (person was present but said nothing)
+   - skeptical_question (doubt signal)
+   - action_taken (hiring started, vendor contacted, etc.)
+   - action_deferred (no action after decision)
+   - follow_up_discussion (topic reopened)
+   ```
+
+2. Bayesian update (Discrete State Filter):
+   ```
+   Prior: P(true_consensus | evidence_{t-1})
+   Likelihood: P(signal | true_consensus vs surface_agreement vs misunderstanding)
+   Posterior: P(state | evidence_t)
+
+   Store in Decision.belief_state:
+   {
+     state: "consensus",        // max probability outcome
+     prob_true_consensus: 0.40,
+     prob_surface_only: 0.35,
+     prob_misunderstanding: 0.25,
+     confidence: 0.40,
+     last_updated: Timestamp,
+     signal_history: [evidence_links]
+   }
+   ```
+
+3. DS shows alert when confidence < threshold:
+   ```
+   âš ï¸ Decision "Hire 5 engineers in Q2"
+   Appears decided, but belief confidence: 40%
+   Observed signals suggest disagreement.
+   Recommendation: resurface for explicit discussion.
+   ```
+
+**Benefit to Reasoning Graph:** Detects **hidden disagreement** before it surfaces as execution failure. Prevents "decided but will fail" decisions.
 
 ---
 
-## Appendix D: System 2 Triggers (Resonance Detection)
+#### 11.3.3 Assumption Calibration
 
-Membria implements "Friction by Design" to counter cognitive biases like **Hindsight Bias** and **Confirmation Bias**.
+**Where it lives:** Graph Memory (properties on Assumption nodes + outcome links)
 
-### D.1 Monitored Resonance Patterns
+**What it does:** Tracks prediction vs reality for every assumption, updates belief using Bayesian updating
 
-| Human Bias | LLM Failure Mode | Detection Signal |
-|------------|------------------|------------------|
-| **Confirmation** | Hallucinated support | Graph has no evidence for cited fact |
-| **Anchoring** | First-option fixation | No alternatives in reasoning trace |
-| **Overconfidence** | Certainty language | Confidence > 0.9 + low evidence count |
-| **Sunk Cost** | Past investment cited | RELIED_ON edges to superseded decisions |
+**Implementation in RG:**
+1. Every Assumption captures initial confidence:
+   ```
+   Assumption:
+   - statement: "Vendor X is reliable"
+   - confidence: 0.75  // from decision maker
+   - prior_belief: Beta(Î±=3, Î²=1)  // Beta distribution
+   - evidence_links: [past outcomes with vendor X]
+   ```
 
-### D.2 Friction Calibration
-- **Threshold:** Resonance score > 0.6
-- **Escape:** User explicitly acknowledges bias risk
-- **Cooldown:** Max 2 frictions per decision session
+2. When outcome is recorded, update belief:
+   ```
+   Outcome recorded: "Vendor X succeeded"
+   Update: Beta(3, 1) -> Beta(4, 1)
+   Updated confidence: 0.76
+
+   Outcome recorded: "Vendor X failed (missed deadline)"
+   Update: Beta(4, 1) -> Beta(4, 2)
+   Updated confidence: 0.67
+   ```
+
+3. Aggregate calibration patterns:
+   ```
+   Team Calibration Report:
+   - Product decisions: predicted 75%, actual 87% success -> underconfident
+   - Hiring decisions: predicted 80%, actual 45% success -> overconfident by 35%
+   - Vendor decisions: predicted 85%, actual 83% success -> well-calibrated
+   ```
+
+4. LoRA training candidate:
+   - Recurring overconfidence pattern in hiring -> candidate for LoRA adapter
+   - Train on: hiring decision reasoning -> calibrated confidence scores
+   - Deploy as: apply confidence reduction when hiring decisions detected
+
+**Benefit to Reasoning Graph:**
+- Detect systematic biases (hindsight bias, overconfidence, underestimation)
+- Automatic LoRA candidate generation from real calibration data
+- Improves future decision confidence scoring
+
+---
+
+#### 11.3.4 Decision Sequencing Optimizer
+
+**Where it lives:** GraphRAG Router (Retrieval Orchestrator extension)
+
+**What it does:** Recommends optimal order for dependent decisions to minimize blocking and total time
+
+**Implementation in RG:**
+1. Graph stores decision dependencies:
+   ```
+   Decision D1: Tech stack
+   - BLOCKS: [D2, D3, D4]  // new relationships
+
+   Decision D5: Budget
+   - BLOCKS: [D1, D6]
+
+   Decision D7: Vendor
+   - BLOCKS: [D8]
+   ```
+
+2. MCTS-like algorithm explores sequences:
+   ```
+   Algorithm: Recommend Sequence(decisions, dependencies)
+
+   Sample trajectories:
+   - Path 1: D1 -> wait for D5 -> blocked (score: bad)
+   - Path 2: D5 -> D1 -> [D2,D3,D4 parallel] -> score: good
+   - Path 3: D7 -> D5 -> D1 -> [rest parallel] -> score: best
+
+   Score function:
+   - minimize: total completion time
+   - minimize: idle periods (waiting time)
+   - maximize: parallelism opportunities
+   ```
+
+3. Surface recommendation in DS:
+   ```
+   Decision Sequence Optimizer
+
+   Current state: 5 pending decisions, 3 blocked
+   Completion time: 6 weeks
+
+   Recommended sequence:
+   1. PRIORITY: Budget decision (D5) - unblocks D1 and D6
+   2. Then: Tech stack (D1) - unblocks D2, D3, D4
+   3. Then: Vendor (D7) - unblocks D8
+   4. Parallel: remaining decisions
+
+   Expected completion time: 3 weeks (50% faster)
+   ```
+
+**Benefit to Reasoning Graph:** Eliminate decision bottlenecks without changing decisions themselves. Same work, smarter order.
+
+---
+
+#### 11.3.5 Real-Time Outcome Learning
+
+**Where it lives:** LoRA Lifecycle (section 8) + Knowledge Cache
+
+**What it does:**
+1. Link outcomes back to original decisions
+2. Measure prediction accuracy per team/type
+3. Generate LoRA candidates from calibration data
+4. Auto-improve future decision confidence scoring
+
+**Implementation in RG:**
+1. Outcome recorded for decision D:
+   ```
+   Decision recorded: "Launch feature in Q2 with 85% confidence"
+   Outcome recorded: "Feature launched in Q2 on-time, positive user feedback"
+
+   Result: Prediction correct âœ“
+   Calibration: 85% predicted = 100% actual -> slight underconfidence
+
+   Recorded in LoRA training set:
+   {
+     input: "Launch feature with constraint: Q2, limited team",
+     output: "confidence: 0.87",  // adjusted from 0.85
+     feedback: "prediction_correct"
+   }
+   ```
+
+2. Aggregate patterns:
+   ```
+   Product Team Calibration:
+   - 20 decisions over 6 months
+   - Avg predicted: 76%, Avg actual: 78%
+   - Well-calibrated, slight overconfidence in risky decisions
+
+   Hiring Team Calibration:
+   - 15 decisions over 6 months
+   - Avg predicted: 82%, Avg actual: 52%
+   - Systematically overconfident (30% gap)
+   - Candidate for LoRA adapter: "hiring_decision_confidence_reducer"
+   ```
+
+3. LoRA deployment:
+   ```
+   LoRA: hiring_decision_confidence_reducer
+
+   Trigger: Decision contains keywords ["hire", "recruiting", "headcount"]
+   Effect: Multiply confidence by 0.75 (30% reduction)
+
+   Eval results:
+   - Accuracy improved: 52% -> 68%
+   - Escalation rate reduced: 40% -> 15%
+   - No hallucination increase
+
+   Status: APPROVED, deployed
+   ```
+
+**Benefit to Reasoning Graph:** Decision confidence scoring becomes data-driven. System learns systematically from accumulated outcomes.
+
+---
+
+### 11.4 Integration with Existing Subsystems
+
+| Subsystem | Integration Point | Change |
+|-----------|------------------|--------|
+| **DBB** | Decision object expansion | Add VoI, belief_state, dependencies fields |
+| **Graph Memory** | New node/edge types | BLOCKS relationship, assumption_belief properties |
+| **Vector Memory** | Semantic search | Index VoI scores for "high-impact decisions" queries |
+| **Knowledge Cache** | Reasoning patterns | Cache calibration patterns + LoRA justifications |
+| **GraphRAG Router** | Retrieval ranking | Sort results by VoI; filter by belief confidence |
+| **Model Runtime** | Confidence scoring | Apply LoRA adapters for calibrated confidence |
+| **LoRA Lifecycle** | Data source | VoI gaps + calibration patterns = LoRA candidates |
+| **Decision Surface** | Visualization | Show VoI scores, belief state, sequence recommendations |
+
+---
+
+### 11.5 Data Flow Example: Complete Cycle
+
+```
+1. DECISION CAPTURE (DBB)
+   User makes decision in Slack:
+   "We'll use Vendor X for infrastructure (75% confidence)"
+
+   DBB captures:
+   Decision {
+     statement: "Use Vendor X",
+     confidence: 0.75,
+     owner: "CTO"
+   }
+
+2. VoI SCORING (Graph Memory)
+   - Estimate: if wrong choice, cost = $120k/year in downtime
+   - Estimate: gathering additional vendor info = 2 weeks, cost = $5k
+   - VoI = (0.75 * $120k) - $5k = $85k
+
+   Decision.value_of_information = 85000
+
+3. BELIEF STATE INIT (Graph Memory)
+   - CTO explicitly agreed
+   - VP Eng silent
+   - 1 follow-up question ("What about compliance?")
+
+   Belief state:
+   prob_true_consensus: 0.60
+   prob_surface_only: 0.30
+   prob_misunderstanding: 0.10
+
+   Decision Surface shows:
+   "Vendor X selected (high VoI=$85k, belief confidence=60%)"
+
+4. DEPENDENCY LINKING (Graph Memory)
+   - This decision blocks: DevOps config, Security review, Cost budgeting
+   - This decision depends on: no other active decisions
+
+   Sequencing shows:
+   "Unblock 3 decisions immediately if approved"
+
+5. DECISION EXECUTION & OUTCOME (6 months later)
+   - Vendor performed well
+   - Confidence was 75%, actual success = yes
+   - Outcome: Prediction was correct
+
+   Calibration: CTO's estimates = accurate (not overconfident)
+
+6. LoRA TRAINING (if pattern)
+   - Aggregate: CTO made 10 similar decisions, 8 correct
+   - LoRA candidate: "cto_infrastructure_decisions" (well-calibrated, high value)
+   - Deploy as: trust CTO confidence scores in infrastructure domain
+
+7. NEXT DECISION (future, CTO makes similar decision)
+   - Confidence scoring now uses LoRA adapter
+   - If CTO says "85% confidence" in infrastructure, system believes it
+   - Escalation threshold reduced for this domain
+```
+
+---
+
+### 11.6 Safety Guardrails
+
+Decision Intelligence never replaces human judgment. Guardrails:
+
+1. **VoI is suggestion, not mandate** - high VoI decisions *should* be prioritized, but team can override
+2. **Belief state is visibility, not veto** - low confidence alerts, but decision stands; team can investigate
+3. **Calibration feedback is learning, not adjustment** - patterns identified, LoRA candidates proposed; humans approve deployment
+4. **Sequencing is recommendation, not enforcement** - optimal sequence suggested; team can change order
+5. **LoRA requires governance** - never auto-deploys; requires eval, canary, approval
 
 ---
 
@@ -740,5 +1046,6 @@ Key principles:
 - Budget-aware retrieval - controlled context, not maximum dump
 - Governed learning - LoRA with eval, rollback, justification
 - Human-in-the-loop - Reasoning Graph never decides, only supports decisions
+- **Decision Intelligence** - applies decision theory to optimize decision-making (NEW)
 
-Result: Intelligence compounds instead of resetting.
+Result: Intelligence compounds instead of resetting. Decision-making improves systematically through data-driven calibration

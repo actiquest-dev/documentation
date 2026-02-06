@@ -1,0 +1,82 @@
+---
+title: "Causal Memory"
+description: "Distinguishing between observation and intervention in Graph Memory."
+---
+
+# Causal Memory Layer
+
+The Causal Memory layer extends Membria's Reasoning Graph by introducing formal structural causal models (SCM). Its primary goal is to distinguish between mere correlation (observation) and true causality (intervention), preventing agents from relying on heuristics that do not hold under empirical testing.
+
+## 1. The Intervention Layer ($do(x)$)
+
+In a standard RAG system, data is passive ($P(Y|X)$). Membria treats **Decisions** as active interventions ($P(Y|do(X))$).
+
+### Commitment Events as Operators
+An intervention is only recorded when a **Commitment Event** (e.g., PR merge, contract signature, API call execution) occurs. This allows the system to differentiate between:
+- **Observation:** "Users are complaining about feature X" (Context).
+- **Intervention:** "We disabled feature X" (Action).
+
+### Belief State Integration
+Every intervention triggers a **Bayesian update** in the POMDP engine. The system calculates $P(Consensus)$ for the intervention and monitors for surface-only agreement using signal extraction (Phase 3 of Roadmap).
+
+### Causal Validity Rule
+If $Outcome(Y)$ is identical for both $do(Action)$ and $do(Nothing)$ within the same context, the action is classified as **Ritual** (non-causal). The system will block future reasoning paths that suggest this action for the same outcome.
+
+---
+
+## 2. Stratified Retrieval (Confounder Control)
+
+To solve the **Confounding Problem** ($X \leftarrow Z \rightarrow Y$), Membria uses vector-based context stratification.
+
+### The Algorithm
+When an agent proposes a causal link $X \rightarrow Y$:
+1. **Identify Confounders ($Z$):** The Retrieval Orchestrator scans the graph for variables $Z$ that historically correlate with both $X$ and $Y$ (e.g., Seasonality, Marketing Spend).
+2. **Stratify Context:** The FalkorDB query is restricted to subgraphs where $Z$ matches the current state.
+3. **Compare Outcomes:** The system evaluates the distribution of $Y$ given $X$ *only* within that stratum.
+
+> [!IMPORTANT]
+> This ensures that if "Sales dropped in July" during a PR crisis, the system correctly attributes the drop to "Low Season" ($Z$) rather than the "PR Crisis" ($X$) if other "Low Season" periods without crises showed the same drop.
+
+---
+
+## 3. Negative Knowledge Artifacts
+
+Negative Knowledge is the formalized record of failed causal hypotheses.
+
+### Schema in FalkorDB
+Each `NegativeKnowledge` node contains:
+- `Hypothesis_Vector`: Semantic embedding of the rejected idea.
+- `Causal_Weight`: Set to $\approx 0$ or negative.
+- `Evidence_Links`: Pointers to the specific Decisions and Outcomes that invalidated the link.
+- `Context_Constraints`: Conditions under which the link was proven false.
+
+---
+
+## 4. FalkorDB Atomic Implementation
+
+By storing vectors directly in graph nodes, FalkorDB allows for **Atomic Causal Checks**.
+
+```cypher
+// Atomic check for proposal X in context Z
+CALL db.idx.vector.queryNodes('Assumptions', 'vector_index', $proposal_vector, 3)
+YIELD node as assumption, score
+MATCH (assumption)<-[:RELIED_ON]-(d:Decision)-[:HAS_OUTCOME]->(o:Outcome)
+WHERE d.context_z_vector ~= $current_z_vector
+RETURN assumption.statement, avg(o.delta) as causal_impact
+```
+
+## 5. Assumption Calibration with Stratification
+
+Beta updates must be stratified to avoid mixing signals from different contexts (e.g., market conditions, regions).
+
+**Formula:**
+`Beta(α, β) → Beta(α + w·outcome, β + w·(1-outcome))`
+
+Where:
+`w = recency_weight × confounder_match_score`
+
+**Stratification Dimensions:**
+- **Geographic/Cultural Context:** "Vendor is reliable" (True in EU, False in APAC).
+- **Temporal Recency:** Weighted decay ensures recent outcomes dominate.
+- **Identified Confounders:** Outcomes are linked to confounders (e.g., "Market Boom") to prevent false attribution of skill.
+

@@ -1,0 +1,63 @@
+---
+title: "Architecture Governance"
+description: "Edge decay, RBAC, override protocols, and active causal discovery."
+---
+
+# Enterprise Governance Layer
+
+The Governance Layer provides the necessary guardrails for deploying Membria's Reasoning Graph in a multi-tenant, high-stakes enterprise environment. It integrates **VoI-based prioritization** and **POMDP belief tracking** to ensure decision integrity.
+
+### Half-Life Model (Revised)
+
+Causal relationships in business are not static. Market conditions change, rendering past "truths" invalid. Membria implements a domain-specific decay model to track "Knowledge Volatility":
+
+- **Market dynamics:** 90 days half-life.
+- **Vendor relationships:** 180 days half-life.
+- **Regulatory/legal:** STEPPED (valid until explicit change event).
+- **Technical architecture:** 365 days half-life.
+
+**Mathematical Logic:**
+- **Decay Function:** $Belief_{t} = Belief_{t_0} \cdot e^{-\lambda(t-t_0)}$
+- **Evidence Refresh:** When a new `Outcome` is recorded, the decay timer resets. The weight is updated via Beta-distribution infusion ($Outcome("success"): Beta(\alpha, \beta) \to Beta(\alpha+1, \beta)$).
+- **Conflict Acceleration:** If a new outcome contradicts an existing edge → accelerate decay (half-life $\div$ 2).
+
+---
+
+## 2. Multi-Tenant Graph RBAC
+
+To ensure data privacy and prevent cross-departmental information leaks, Membria implements fine-grained access control at the graph level.
+
+### Policy-Based Retrieval
+- **Node Sensitivity:** Every node has a `sensitivity_level` (Public, Internal, Secret).
+- **Access Scope:** The `Retrieval Orchestrator` automatically injects security predicates into Cypher queries based on the user's `session_token`.
+- **Atomic Locking:** Secret nodes are excluded from the Vector Index used by general-purpose agents.
+
+---
+
+## 3. Conflict Resolution & Human Override
+
+When the Causal Layer contradicts a Human Decision or a Reasoning-based proposal, a formal resolution protocol must be followed.
+
+### The Override Log
+If a human decision-maker chooses to proceed against a "Negative Knowledge" alert:
+1. **Explicit Justification:** The user must provide a rationale (recorded as a `SUPERSEDES` relationship).
+2. **Context Shift Label:** The system tags the decision with `HYPOTHESIS_CONTEXT_SHIFT`, signaling that the user believes the old causal model is no longer valid.
+3. **High-Stakes Flag:** These overrides are automatically escalated for monitoring.
+
+---
+
+## 4. Causal Discovery Agent (Debriefing Loop)
+
+When a prediction fails, the system searches for the missing **Confounder**.
+
+### The Recursive Search
+The Causal Discovery Agent triggers a post-outcome debriefing session:
+- **Search:** It queries external APIs for variables that moved during the Decision Window.
+- **Candidate Generation:** It proposes new `Variable` nodes that could explain the deviation.
+- **Node Injection:** If confirmed, the new Confounder is added to the graph.
+
+---
+
+## 5. Multi-Agent Consensus (Collision Prevention)
+
+Transactional locking and simulation to prevent "Causal Collisions" between autonomous agents.

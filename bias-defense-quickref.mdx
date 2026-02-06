@@ -1,0 +1,37 @@
+---
+title: "Bias Defense Quick Reference"
+description: "Operational cheat sheet for intervention triggers and red flags"
+---
+
+# Bias Defense Quick Reference
+
+## Detection → Intervention Map
+
+**Overconfidence detected?**
+*   → Trigger **Pre-Mortem**
+*   → Require 3 distinct failure scenarios
+
+**Hidden disagreement detected?**
+*   → **Block** quick-approve buttons
+*   → Require explicit signoff from silent parties (forcing signal explication)
+
+**Anchoring detected?**
+*   → Force **"Alternatives Considered"** field
+*   → Show historical decisions that used different anchors
+
+**Confirmation detected?**
+*   → Inject **Devil's Advocate** prompt
+*   → Surface best-match contradicting evidence from Graph
+
+---
+
+## Red Flags for Manual Review
+
+> [!WARNING]
+> If any of these flags are raised, the system acts as a "Brake" rather than an accelerator.
+
+*   **LLM Signal Confidence < 0.7**: Too ambiguous for automation.
+*   **VoI Estimate Variance > 50%**: Stakeholders fundamentally disagree on impact; averaging is dangerous.
+*   **Resonance Score > 0.6**: User and AI are reinforcing each other's hallucinations.
+*   **Cultural Context Mismatch**: Signal extraction model does not match team's communication style (e.g., Low Context model on High Context team).
+*   **LoRA Confidence Adjustment > 30%**: The adapter is aggressively overriding the base model's uncertainty.

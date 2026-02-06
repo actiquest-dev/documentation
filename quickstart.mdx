@@ -21,11 +21,14 @@ DBB runs on the client layer. It watches chats, docs, and notes, extracts decisi
 
 ## Step 2. Read the Decision Surface
 
-Decision Surface is the client dashboard. It shows open loops, drift, pending reviews, and signals derived from DBB records. It does not read raw chat.
+Decision Surface is the client dashboard. It shows open loops, drift, pending reviews, and signals derived from DBB records. It uses **VoI (Value of Information)** to prioritize your focus and **POMDP belief tracking** to detect hidden disagreement.
 
 <Columns cols={2}>
-  <Card title="Open Loops" icon="circle-exclamation">
-    Unresolved decisions, conflicted assumptions, and unanswered questions.
+  <Card title="Open Loops (VoI)" icon="circle-exclamation">
+    Unresolved decisions ranked by impact. Focus on loops with high Value of Information.
+  </Card>
+  <Card title="Hidden Disagreement" icon="masks-theater">
+    Surface agreement that masks real skepticism (low consensus confidence).
   </Card>
   <Card title="Drift" icon="arrows-spin">
     Evidence that a belief changed after the decision was captured.

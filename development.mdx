@@ -12,10 +12,10 @@ description: 'How the client captures decisions and surfaces signals without bac
 DBB watches interaction streams (chat, docs, notes). It detects commitment phrases, extracts context and alternatives, and freezes reasoning before outcomes contaminate memory.
 </Step>
 <Step title="Create immutable decision records">
-Each decision record includes assumptions, alternatives, confidence, and predictions. Records are append-only; outcomes are attached later without rewriting the original.
+Each decision record includes assumptions, alternatives, confidence, and predictions. The system automatically computes **Value of Information (VoI)** and maintains a **POMDP belief state** for every record.
 </Step>
 <Step title="Render signals in the Decision Surface">
-DS presents open loops, drift, pending outcomes, and track record signals. It does not read raw chat, only DBB outputs.
+DS presents VoI-ranked open loops, hidden disagreement (POMDP alerts), drift, and track record signals. It does not read raw chat, only DBB outputs.
 </Step>
 </Steps>
 
@@ -24,6 +24,19 @@ DS presents open loops, drift, pending outcomes, and track record signals. It do
 - Inline capture cues near messages that became decision candidates.
 - Decision Surface cards with signal summaries.
 - A low-friction panel for confirm/edit/reject.
+
+### Signal Extraction Quality
+
+Each extracted signal includes:
+- `signal_type`: AGREEMENT | SILENCE | SKEPTICAL | ACTION
+- `confidence`: 0.0-1.0 (LLM extraction confidence)
+- `cultural_modifier`: high_context | low_context
+- `behavioral_confirmation`: bool (did action follow words?)
+
+**Rules:**
+- **Confidence < 0.7** → Flag for human review.
+- **SILENCE** → Require `behavioral_confirmation` within 48h.
+- **Cultural modifier** is applied based on team settings (e.g., silence in High Context != agreement).
 
 ## Client vs backend
 

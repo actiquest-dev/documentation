@@ -17,7 +17,17 @@
             "group": "Welcome",
             "pages": [
               "index",
+              "membria-technology-overview",
               "rg-architecture"
+            ]
+          },
+          {
+            "group": "Core Architecture",
+            "pages": [
+              "cognitive-safety",
+              "causal-memory",
+              "architecture-governance",
+              "bias-defense-quickref"
             ]
           },
           {
@@ -186,6 +196,46 @@
             "group": "Product",
             "pages": [
               "membria-ee/decision-surface-enterprise"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Russian Documentation",
+        "groups": [
+          {
+            "group": "Обзор (Overview)",
+            "pages": [
+              "docs-ru/index",
+              "docs-ru/membria-technology-overview",
+              "docs-ru/quickstart"
+            ]
+          },
+          {
+            "group": "Архитектура (Architecture)",
+            "pages": [
+              "docs-ru/rg-architecture",
+              "docs-ru/causal-memory",
+              "docs-ru/architecture-governance",
+              "docs-ru/cognitive-safety",
+              "docs-ru/bias-defense-quickref"
+            ]
+          },
+          {
+            "group": "Membria CE (Community)",
+            "pages": [
+              "docs-ru/membria-ce/overview",
+              "docs-ru/membria-ce/getting-started",
+              "docs-ru/membria-ce/concepts",
+              "docs-ru/membria-ce/client",
+              "docs-ru/membria-ce/client-runtime"
+            ]
+          },
+          {
+            "group": "Разработка (Roadmap)",
+            "pages": [
+              "docs-ru/development",
+              "docs-ru/IMPLEMENTATION-ROADMAP"
             ]
           }
         ]

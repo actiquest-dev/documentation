@@ -1,0 +1,85 @@
+---
+title: "Cognitive Safety & LLM Bias Firewall"
+description: "Architectural safeguards against bias amplification in AI-assisted decision making"
+---
+
+# Cognitive Safety Layer
+
+> [!IMPORTANT]
+> **Core Principle:** Membria treats LLM outputs as "untrusted signals" that must be validated, calibrated, and periodically challenged to prevent the amplification of cognitive biases (Anchoring, Confirmation, Demand-Chasing).
+
+## 1. LLM Bias Firewall
+
+The Bias Firewall is a validation layer that sits between raw model outputs and the Reasoning Graph. It prevents hallucinated consensus and demand-chasing behavior from corrupting the institutional memory.
+
+### 1.1 Risks Amplified by LLMs
+*   **Anchoring:** LLMs fixate on the first plausible option presented in valid-sounding prose.
+*   **Confirmation Bias:** LLMs tend to generate arguments supporting the user's implied preference.
+*   **Demand-Chasing:** Models adjust their recommendations to match the user's tone or leading questions (adjustment rates up to 100% vs 40% for humans).
+
+### 1.2 Firewall Logic
+All extracted decision signals must pass the following checks:
+
+#### A. Rule-Based Validation
+*   **No "Ghost" Signals:** A signal cannot be attributed to a user who has not performed an explicit action (e.g., typing, clicking, approving) in the session log.
+*   **Evidence Hard-Link:** Every `DECISION_CANDIDATE` must cite at least one specific message ID or document fragment.
+*   **Future Sanity:** Decisions cannot reference timestamps in the future.
+
+#### B. Ensemble Disagreement Detection
+For High-Stakes decisions (VoI > Threshold):
+*   **Mechanism:** Running the extraction prompt on 2+ distinct models (e.g., GPT-4o and Claude 3.5 Sonnet).
+*   **Condition:** Both models must agree on the `decision_outcome` and `confidence_score` (within 10% delta).
+*   **Failure:** If models disagree, the signal is flagged as `AMBIGUOUS` and requires human review.
+
+#### C. Confidence Thresholding
+*   **< 0.7:** Flag for manual review. Do not auto-promote to Decision.
+*   **0.7 - 0.9:** Show as "Candidate" with "Confirm" button.
+*   **> 0.9:** Auto-capture (if active listening mode is enabled).
+
+---
+
+## 2. Resonance Detection (System 2 Triggers)
+
+"Resonance" occurs when human bias and LLM hallucinations align (e.g., a user wants to believe a risk is low, and the LLM hallucinates evidence that it is).
+
+### 2.1 Monitored Patterns
+
+| Human Bias | LLM Failure Mode | Detection Signal |
+| :--- | :--- | :--- |
+| **Confirmation** | Hallucinated support | Graph has no `EVIDENCE` edges for the cited fact. |
+| **Anchoring** | First-option fixation | Reasoning trace contains no `ALTERNATIVES` list. |
+| **Overconfidence** | Certainty language | Confidence > 0.9 but evidence count is low (< 2). |
+| **Sunk Cost** | Past investment cited | `RELIED_ON` edges point to superseded/expired decisions. |
+
+### 2.2 Friction by Design
+When Resonance Score > 0.6:
+1.  **Block Quick Actions:** Disable "One-click Approve".
+2.  **Force Deliberation:** Require the user to fill a "Counter-Evidence" field.
+3.  **Cooldown:** Max 2 friction interventions per decision session to avoid fatigue.
+
+---
+
+## 3. Debiasing Intervention Library
+
+When a specific bias pattern is detected, the system injects a targeted "System 2 Trigger":
+
+| Detected Pattern | Intervention Technique | Prompt Injection |
+| :--- | :--- | :--- |
+| **Anchoring** | Decomposition | "Please list 3 alternatives to this proposal before confirming." |
+| **Confirmation** | Devil's Advocate | "What is the strongest argument *against* this decision?" |
+| **Overconfidence** | Pre-Mortem | "Imagine it's 1 year later and this decision failed. What went wrong?" |
+| **Sunk Cost** | Fresh Start | "If you were a new CEO starting today, would you continue this project?" |
+
+## 4. Signal Extraction Quality Schema
+
+Each extracted signal includes:
+```typescript
+type Signal = {
+  signal_type: "AGREEMENT" | "SILENCE" | "SKEPTICAL" | "ACTION";
+  confidence: number; // 0.0 - 1.0 (LLM confidence)
+  cultural_modifier: "HIGH_CONTEXT" | "LOW_CONTEXT"; // From team settings
+  behavioral_confirmation: boolean; // Did action follow words?
+}
+```
+**Rules:**
+*   `SILENCE` signals require `behavioral_confirmation` within 48h to be retained as valid agreement tokens.
