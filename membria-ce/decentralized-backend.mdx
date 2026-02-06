@@ -97,7 +97,7 @@ graph TB
     KnowledgeCreator <--> JSONFiles
     KnowledgeCreator <--> PeaqSubgraph
     PeaqSubgraph --> PeaqConsensus
-    KnowledgeCreator -->|"New Answer"| Router
+    KnowledgeCreator -->|"New Answer + DI Signals"| Router
 
     %% Background Processing
     PeaqSubgraph --> EventProcessor
@@ -141,7 +141,7 @@ Gateways validate the proposal against the contract and vote via Peaq transactio
 
 ### Step 4: Finalize the result
 
-A validation event is recorded on Peaq with final status and confidence score.
+A validation event is recorded on Peaq with final status and confidence score. This result is returned to the client along with **DI Signals** (e.g., belief-state delta for the POMDP tracker) to update the Decision Surface.
 
 ## 4: Arweave write protocol
 

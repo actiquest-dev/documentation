@@ -19,6 +19,7 @@ flowchart LR
   ORCH --> GR[GraphRAG Engine\nGraph + Vectors + Ranking]
   ORCH --> SLM[Local SLM Runtime]
   ORCH --> DBB[Decision Black Box\nExtraction Engine]
+  ORCH --> DI[Decision Intelligence Engine\nVoI + POMDP]
 
   ORCH -->|Escalate| GW[Escalation Gateway]
   GW --> KCG[Global Knowledge Cache\nDecentralized]
@@ -28,6 +29,7 @@ flowchart LR
   CUR -->|Write-back| KCG
   CUR -->|CAG cache| MEM
   CUR -->|Ontology updates| GR
+  CUR -->|DI feedback| DI
   CUR --> SF[SkillForge\nLoRA lifecycle]
   SF --> SLM
 ```
@@ -82,6 +84,7 @@ sequenceDiagram
   participant S as Streams (Chats/Tools)
   participant P as Parser (ThoughtUnits)
   participant B as DBB Engine
+  participant DI as DI Engine
   participant G as GraphRAG Store
   participant D as Decisions Store
   participant DS as Decision Surface
@@ -89,11 +92,15 @@ sequenceDiagram
   S->>P: New message / event
   P->>B: ThoughtUnit + metadata
   B->>B: Detect decision candidates
+  B->>DI: Emit signals (latency, cues)
+  DI->>DI: Update POMDP belief state
+  DI->>DI: Compute VoI score
   B->>D: Upsert Decision object
+  DI->>D: Update VoI / Priority
   B->>G: Add/update entities/relations
-  DS->>D: Query decisions + status
+  DS->>D: Query decisions + status (VoI prioritized)
   DS->>G: Fetch precedents + links
-  DS-->>DS: Render cards
+  DS-->>DS: Render cards (POMDP alerts)
 ```
 
 ---
@@ -124,4 +131,23 @@ sequenceDiagram
     CU->>KC: (Optional) write shared artifact
     OR-->>UI: Respond with citations
   end
+```
+
+---
+
+## 6) Decision Intelligence Loop
+
+```mermaid
+flowchart TD
+  SIG[DBB Signals\nLatency - Red-teaming - Logic] --> POMDP[POMDP Tracker\nBelief Model]
+  POMDP -->|Confidence Gap| ALERT[Hidden Disagreement Alert]
+  
+  DEC[Decision Object\nStakes - Uncertainty] --> VOI[VoI Scorer\nValue of Information]
+  VOI -->|Priority| RANK[DS Ranking]
+  
+  RANK --> UI[Decision Surface]
+  ALERT --> UI
+  
+  MCTS[Optimal Sequence Explorer] -->|Optimization| PLAN[Recommended Roadmap]
+  PLAN --> UI
 ```

@@ -55,6 +55,7 @@ DBB looks for **decision patterns**, such as:
 - Approval events
 - Rejected alternatives
 - Commitments tied to actions or owners
+- **Sub-lingual markers:** Team response latency, skepticism cues, and redundancy in reasoning (signals for **POMDP Hidden Divergence**).
 
 Signals are detected probabilistically, with confidence scores.
 
@@ -69,6 +70,7 @@ When confidence crosses a threshold, DBB extracts:
 - Considered alternatives (if present)
 - Responsible parties (if identifiable)
 - Timestamp and source references
+- **DI Metadata:** Potential impact markers (stakes) for **VoI scoring** and coordination cues.
 
 This extraction is **structural**, not interpretive.
 
@@ -166,7 +168,8 @@ DBB turns **daily collaboration into durable knowledge** -- without adding proce
 
 DBB feeds the Decision Surface.
 The Decision Surface shows:
-- Open decisions
+- **VoI-ranked Open loops** (prioritized by potential impact)
+- **Hidden Divergence Alerts** (POMDP-detected consensus gaps)
 - Unresolved assumptions
 - Drift and contradictions
 - Historical outcomes

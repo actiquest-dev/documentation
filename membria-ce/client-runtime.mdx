@@ -10,7 +10,8 @@ Membria CE Client is a **runtime** that sits between the user and a fleet of AI 
 - A **normal chat** experience (expected baseline for power users).
 - A **persistent intelligence layer** that compounds over time: memory, GraphRAG, and expert skill adapters.
 - A **Decision Black Box (DBB)** that extracts durable decision artifacts from noisy work streams.
-- A **Decision Surface (DS)** that reads DBB + memory (not raw chat) to show what matters.
+- A **Decision Surface (DS)** that reads DBB + memory (not raw chat) to show what matters, ranked by **Value of Information (VoI)**.
+- A **Decision Intelligence (DI) Engine** that tracks **POMDP belief states** to detect hidden disagreement and optimizes decision sequencing.
 - A **local-first execution model** (when self-hosted is available), with **cloud escalation** and a **decentralized knowledge cache** to prevent intelligence reset.
 
 The client must feel fast, predictable, and explainable. Latency spikes and "RAG slowness" must be actively mitigated with caching, staged retrieval, and optimistic UX.
@@ -55,6 +56,9 @@ The client must feel fast, predictable, and explainable. Latency spikes and "RAG
 - **ThoughtUnit:** a normalized atomic fragment extracted from sources (message/doc chunk) with metadata.
 - **DBB:** Decision Black Box; agent/process that detects decisions and turning points and logs them structurally.
 - **DS:** Decision Surface; the "home screen" built from DBB + memory graph.
+- **DI Engine:** Decision Intelligence Engine; optimizes human-AI collaboration through VoI scoring, POMDP state tracking, and sequencing.
+- **VoI:** Value of Information; the expected utility gain from acquiring more data before deciding.
+- **POMDP:** Partially Observable Markov Decision Process; used to track the probabilistic state of team consensus.
 
 ---
 
@@ -78,6 +82,7 @@ The client runtime must be compatible with both Cloud and Self-Hosted modes with
 - **Local stores**: SQLite (transactional), DuckDB (analytics), embedding store, graph store.
 - **GraphRAG Engine**: indexing, retrieval, ranking, citation assembly.
 - **DBB Engine**: event stream ingestion -> extraction -> decision objects.
+- **Decision Intelligence (DI) Engine**: VoI scoring, POMDP belief updates, sequencing optimization.
 - **Escalation Gateway**: Council calls, KCG lookup, cost controls.
 - **Curator**: verification, fusion, provenance, write-back policy.
 - **SkillForge**: LoRA management and optional training workflow.
@@ -280,28 +285,40 @@ A Decision object should include:
 - evidence links (thought units, PRs, docs)
 - outcome hooks (what to check, when)
 
-DBB stores structure; raw logs can stay in source systems, referenced via URIs.
+DBB stores structure; raw logs can stay in source systems, referenced via URIs. It emits signals (latency, confidence, red-teaming cues) to the DI Engine for belief state updates.
 
 ---
 
-## 12. Decision Surface (DS)
+## 12. Decision Intelligence (DI) Engine
 
-### 12.1 Why DS is the home screen
+### 12.1 Mission
+The DI Engine optimizes the decision-making loop by processing DBB signals and graph data.
+
+### 12.2 Capabilities
+- **VoI Scoring:** Dynamically computes the Value of Information for every "Open Loop". If a decision is high-stakes but low-data, its VoI rises, bringing it to the top of the DS.
+- **POMDP Belief Tracking:** Models the consensus as a hidden state. It uses Bayesian updates from interaction signals to detect "Surface Agreement" (high explicit agreement, low underlying consensus confidence).
+- **MCTS Sequencing:** Explores the tree of potential decisions to recommend orderings that minimize the project's critical path.
+
+---
+
+## 13. Decision Surface (DS)
+
+### 13.1 Why DS is the home screen
 Power users drown in context. DS answers:
 - "What is open?"
 - "Where did I drift?"
 - "What must be decided?"
 - "What did we decide before, and how did it turn out?"
 
-### 12.2 DS reads DBB, not chat
+### 13.2 DS reads DBB, not chat
 DS is built from:
-- decisions table + links
-- stability flags
-- unresolved loops
-- precedent links
-- outcome tracking state
+- **VoI-ranked Open loops** (unresolved threads prioritized by potential utility)
+- **Hidden Disagreement alerts** (POMDP-derived warnings of low consensus)
+- **Assumption drift** (beliefs that changed across time/sources)
+- **Precedents** (similar past decisions and their outcomes)
+- **Outcome tracking state**
 
-### 12.3 DS cards (safer, less scary semantics)
+### 13.3 DS cards (safer, less scary semantics)
 Avoid jargon as defaults. Prefer "normal people" labels:
 - Open loops
 - Decisions awaiting sign-off
@@ -313,30 +330,30 @@ Advanced labels can exist behind an "expert mode".
 
 ---
 
-## 13. UI behaviors relevant to runtime
+## 14. UI behaviors relevant to runtime
 
-### 13.1 Modes
+### 14.1 Modes
 - **Chat:** primary interaction surface
 - **Decision Surface:** daily dashboard derived from DBB
 - **Search:** explainable retrieval with citations and link chains
 
-### 13.2 Source handling (files, links, snippets)
+### 14.2 Source handling (files, links, snippets)
 Files are never "silently dumped into context".
 Instead:
 - user adds sources into a **Sources Tray**
 - each source has scope: include/ignore, time range, permissions
 - retrieval uses citations; the model sees only retrieved chunks
 
-### 13.3 Speed UX (non-negotiable)
+### 14.3 Speed UX (non-negotiable)
 - show partial progress ("retrieving", "verifying", "caching")
 - allow user to continue interacting while deep retrieval runs
 - persist results into DS artifacts when relevant
 
 ---
 
-## 14. Observability and metrics
+## 15. Observability and metrics
 
-### 14.1 Required telemetry (privacy-safe)
+### 15.1 Required telemetry (privacy-safe)
 - latency by stage (route, retrieval, rank, generate, verify)
 - cache hit ratio (local + KCG)
 - escalation rate
@@ -344,7 +361,7 @@ Instead:
 - DBB extraction rate + false positive rate
 - DS engagement (cards opened, decisions reviewed)
 
-### 14.2 Debug views for power users
+### 15.2 Debug views for power users
 Optional "verbose panel":
 - shows plan and stages
 - never exposes sensitive tokens/keys
@@ -352,7 +369,7 @@ Optional "verbose panel":
 
 ---
 
-## 15. Security model
+## 16. Security model
 
 - explicit source authorization and revocation
 - encryption at rest for local stores (optional but recommended)
@@ -362,7 +379,7 @@ Optional "verbose panel":
 
 ---
 
-## 16. Deployment modes
+## 17. Deployment modes
 
 ### 16.1 Cloud first
 - client UI + thin local cache
@@ -376,18 +393,19 @@ Optional "verbose panel":
 
 ---
 
-## 17. Roadmap (runtime-facing)
+## 18. Roadmap (runtime-facing)
 
 1. Cloud MVP: Chat + Sources + explainable retrieval + caching.
 2. DBB MVP: decision extraction from chat + minimal DS.
-3. Council + Curator + KCG caching loop.
+3. Decision Intelligence Phase: VoI ranking and POMDP belief tracking.
+4. Council + Curator + KCG caching loop.
 4. Self-hosted runtime: local SLM + local stores + local GraphRAG.
 5. SkillForge: curated LoRA updates + evaluation harness.
 6. GPU acceleration: optional graph ranking and embedding speedups.
 
 ---
 
-## 18. Open questions
+## 19. Open questions
 
 - Best graph store for embedded self-hosted mode?
 - KCG tenancy: what is shared vs private by default?

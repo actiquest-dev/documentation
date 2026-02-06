@@ -11,9 +11,16 @@ Unlike traditional AI tools that reset context on every conversation, Membria in
 
 Membria CE runs local-first.
 Your primary model, reasoning context, and decision capture live on your device.
-When local intelligence is not enough, Membria escalates selectively and stores validated results in a decentralized knowledge backend — used for persistence, verification, and reuse, not for replacing local reasoning.
+When local intelligence is not enough, Membria escalates selectively. The system enhances local reasoning with a **Decision Intelligence layer**, using **Value of Information (VoI)** to prioritize loops and **POMDP belief tracking** to detect hidden disagreement.
+Validated results are stored in a decentralized knowledge backend — used for persistence, verification, and reuse, not for replacing local reasoning.
 
 Over time, Membria becomes your second memory:
 capturing decisions, tracking assumptions, linking outcomes, and building a long-term reasoning graph that grows more accurate and more personal the more you use it.
+
+### Vibe Coding Revolution: Superagent Architecture
+Membria CE fundamentally changes the AI-assisted development process (Vibe Coding) by replacing expensive and inefficient multi-agent systems with the **Membria Superagent** architecture.
+- **The Stateless Coding Problem:** CLI agents (like Claude Code) forget yesterday's decisions.
+- **The Membria Solution:** Instead of spawning multiple agents with redundant context, Membria provides a single agent (Claude) with "smart context" from the local reasoning graph.
+- **The Result:** 10x token savings and code that respects project history, architectural decisions, and past mistakes (Negative Knowledge).
 
 Membria CE is designed for power users, AI builders, and independent thinkers who want an AI that compounds intelligence instead of starting from scratch every day.

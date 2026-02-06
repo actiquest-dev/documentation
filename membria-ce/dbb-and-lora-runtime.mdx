@@ -11,6 +11,7 @@ Decision Black Box (DBB) is a backend reasoning agent responsible for:
 - Detecting decisions, not conversations
 - Extracting reasoning context at the moment decisions happen
 - Preserving causal structure for Decision Surface (DS)
+- Providing signal data for **Decision Intelligence** (VoI scoring and POMDP updates)
 - Operating silently without interrupting user workflows
 
 DBB is not a UX feature. It is an inference-time system that turns noisy interaction streams into durable decision records.
@@ -111,6 +112,7 @@ Each recorded decision includes:
 - Source references (chat IDs, commit hashes, docs)
 - Assumptions detected
 - Initial prediction (if available)
+- **DI Signals:** Latency, skeptical cues, redundancy markers, and confidence deltas for belief state updates.
 
 Decisions are append-only. No overwrites.
 
@@ -121,12 +123,13 @@ Decisions are append-only. No overwrites.
 - DS reads only DBB outputs
 - Raw chat history is never surfaced directly
 - DS reflects:
-  - Open decisions
+  - **VoI-ranked Open loops**
+  - **Hidden Disagreement (POMDP)**
   - Drift
   - Unresolved assumptions
   - Outcome deltas
 
-DBB is the sole authority on what counts as a decision.
+DBB provides the raw structural truth; the **Decision Intelligence Engine** provides the prioritization and belief-state overlays.
 
 ---
 
@@ -148,9 +151,25 @@ DBB never blocks actions, pauses interaction, or forces confirmation. Silence an
 
 ---
 
-# Part II - LoRA Router Policy
+---
 
-## 8. Purpose of LoRA Routing
+## 8. Integration with Decision Intelligence (DI) Engine
+
+DBB is the primary sensor for the DI Engine.
+
+### 8.1 VoI Scoring Loop
+DBB extracts the "stakes" and "missing data" from the stream. The DI Engine uses these to compute **Value of Information (VoI)**, which DS uses to rank open loops.
+
+### 8.2 POMDP Belief Update
+DBB captures sub-lingual metadata:
+- Response latency between team members
+- Skeptical questioning patterns
+- Red-teaming cues
+These are emitted as signals to the DI Engine's **POMDP (Partially Observable Markov Decision Process)** tracker to detect "Surface Agreement."
+
+---
+
+## 9. LoRA Router Policy
 
 Membria does not rely on a single monolithic model. Instead:
 - A base SLM handles most interactions
@@ -161,7 +180,7 @@ Goal: maximize speed and personalization without hallucination.
 
 ---
 
-## 9. LoRA Types
+## 10. LoRA Types
 
 | LoRA type | Scope |
 | --- | --- |
@@ -174,7 +193,7 @@ All LoRAs are versioned, immutable, and explicitly activated.
 
 ---
 
-## 9.1 LoRA Ownership and Governance Model
+## 11. LoRA Ownership and Governance Model
 
 Each LoRA adapter in Membria belongs to a single explicit scope:
 - Personal LoRA - owned by an individual user
@@ -196,7 +215,7 @@ Governance guarantees:
 
 ---
 
-## 10. Router Inputs
+## 12. Router Inputs
 
 The LoRA Router evaluates:
 - Query intent
@@ -207,9 +226,9 @@ The LoRA Router evaluates:
 
 ---
 
-## 11. Routing Policy (Default)
+## 13. Routing Policy (Default)
 
-### 11.1 Normal Path (approx 80-90%)
+### 13.1 Normal Path (approx 80-90%)
 
 Base SLM + Personal LoRA (if exists) + Local GraphRAG
 
@@ -218,7 +237,7 @@ Used when:
 - Query within known domain
 - No conflicting signals
 
-### 11.2 Expert Path
+### 13.2 Expert Path
 
 Base SLM + Personal LoRA + Domain LoRA + Local GraphRAG
 
@@ -227,7 +246,7 @@ Triggered when:
 - Past evaluations show LoRA benefit
 - Confidence borderline but acceptable
 
-### 11.3 Escalation Path
+### 13.3 Escalation Path
 
 Triggered when:
 - Confidence < minimum threshold
@@ -243,16 +262,16 @@ Escalated outputs may generate new LoRA candidates.
 
 ---
 
-## 12. LoRA Evaluation & Promotion
+## 14. LoRA Evaluation & Promotion
 
-### 12.1 Evaluation Dataset
+### 14.1 Evaluation Dataset
 
 Each LoRA maintains:
 - Fixed test prompts
 - Known failure cases
 - Drift detection metrics
 
-### 12.2 Promotion Rules
+### 14.2 Promotion Rules
 
 A LoRA may become default only if:
 - Improves accuracy
@@ -263,7 +282,7 @@ Otherwise it remains optional or is deprecated.
 
 ---
 
-## 13. Rollback Policy
+## 15. Rollback Policy
 
 Rollback is instantaneous:
 - Disable LoRA
@@ -273,7 +292,7 @@ Rollback does not affect DBB history and does not modify past decisions.
 
 ---
 
-## 13.1 LoRA Safety Invariants
+## 16. LoRA Safety Invariants
 
 The following invariants are enforced across all deployments:
 - LoRA adapters never modify historical DBB records
@@ -285,7 +304,7 @@ LoRA adapters are treated as runtime expertise overlays, not memory.
 
 ---
 
-## 14. Key Design Principles
+## 17. Key Design Principles
 
 - Decisions > conversations
 - Silence > interruption
@@ -295,13 +314,13 @@ LoRA adapters are treated as runtime expertise overlays, not memory.
 
 ---
 
-## 15. Summary
+## 18. Summary
 
 DBB ensures that important moments are captured without user effort. LoRA routing ensures that expertise compounds without degrading trust. Together, they form the reasoning backbone of Membria CE.
 
 ---
 
-## 16. Council Cost and Escalation Governance
+## 19. Council Cost and Escalation Governance
 
 Escalation to the Council of LLMs is governed by explicit policies.
 

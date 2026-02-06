@@ -84,6 +84,7 @@
             "pages": [
               "membria-ce/client",
               "membria-ce/client-runtime",
+              "membria-ce/claude-integration",
               "membria-ce/dbb-and-lora-runtime",
               "membria-ce/diagrams"
             ]

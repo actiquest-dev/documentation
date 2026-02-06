@@ -99,6 +99,14 @@ When new facts contradict old ones, the old edge is invalidated rather than dele
 
 Graph-based retrieval outperforms vector-only retrieval for global reasoning and multi-hop queries. Graph traversal is more expensive, but hybrid methods (vector + graph) dramatically reduce cost while preserving structural integrity.
 
+### 5.5 Institutional Memory as an Active Deliberation Layer (DI)
+
+Beyond storage, Membria EE uses an integrated **Decision Intelligence (DI) Engine** to turn memory into proactive insight. 
+
+- **Value of Information (VoI):** By analyzing the historical utility of similar precedents, the DI Engine can rank open decisions in the present based on their expected effect on project outcomes.
+- **POMDP Divergence Detection:** The system uses the historical belief states and communication patterns stored in the graph to calibrate its **POMDP model**, detecting when currently proposed consensus deviates from a team's historically consistent logic.
+- **Sequence Modeling (MCTS):** Using Monte Carlo Tree Search, the system projects how a current decision chain might propagate risk or opportunity based on thousands of historically similar decision paths.
+
 ---
 
 ## 6. Strategic Outlook

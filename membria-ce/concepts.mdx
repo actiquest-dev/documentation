@@ -24,6 +24,12 @@ See [Client overview](/membria-ce/client) and [Runtime diagrams](/membria-ce/dia
 DBB is the capture engine that detects decisions and records structured evidence with confidence scores.
 See [DBB and LoRA runtime](/membria-ce/dbb-and-lora-runtime) and [Client runtime RFC](/membria-ce/client-runtime).
 
+### Decision Intelligence Engine (DI)
+The DI engine runs on top of captured decisions to optimize human focus.
+- **Value of Information (VoI):** Prioritizes open loops based on the expected utility of gathering more data.
+- **POMDP Belief Tracking:** Maintains a probabilistic model of team consensus to detect "hidden disagreement."
+- **Decision Sequencing:** Uses a **Priority Queue** (Value/Urgency) to recommend the optimal order for decision making without opaque simulations.
+
 ### ThoughtUnits and GraphRAG
 ThoughtUnits are normalized fragments that feed the graph and vector layers. GraphRAG uses the temporal graph + vectors to produce explainable retrieval.
 See [Client runtime RFC](/membria-ce/client-runtime) and [Runtime diagrams](/membria-ce/diagrams).
@@ -35,6 +41,11 @@ See [Decentralized backend](/membria-ce/decentralized-backend) and [KCG and gate
 ### Escalation and Council governance
 Escalation routes queries to stronger models only when local confidence fails. The Council output is verified and written back with provenance.
 See [Decentralized backend](/membria-ce/decentralized-backend), [KCG and gateways](/membria-ce/kcg-gateways), and [Client runtime RFC](/membria-ce/client-runtime).
+
+### Cognitive Safety Layer
+A local "System 2" check that protects you from your own biases.
+- **Bias Firewall:** Warns if you are falling for Confirmation Bias.
+- **Resonance Detection:** Flags if the AI is just telling you what you want to hear.
 
 ### LoRA adapters and SkillForge
 LoRA adapters provide scoped expertise without changing the base model or rewriting history.

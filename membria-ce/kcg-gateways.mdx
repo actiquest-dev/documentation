@@ -19,7 +19,7 @@ KCG + DoD + Peaq + Arweave is the backend for Membria CE, regardless of whether 
 2. **Write payload**: DoD agent packages JSON-LD, tags it, uploads to Arweave, receives ArTxID.
 3. **Propose on Peaq**: a lightweight event links payload to the originating query via `cause`.
 4. **Gateway consensus**: validators fetch, verify, and vote (batched to reduce cost).
-5. **Finalize**: validation event closes the Intent; knowledge becomes queryable.
+5. **Finalize**: validation event closes the Intent; knowledge becomes queryable. The gateway returns the result plus **DI Signals** (VoI/POMDP state shifts) to the client.
 
 ## Gateway read path
 
@@ -39,4 +39,4 @@ Gateways never read chat. They:
 
 ## Why this matters
 
-The backend graph is the source of truth for knowledge updates, council escalations, and immutable storage. Client captures decisions; backend validates and stores knowledge. They are separate by design but interlock through DoD.
+The backend graph is the source of truth for knowledge updates, council escalations, and immutable storage. Client captures decisions; backend validates and stores knowledge. They are separate by design but interlock through DoD to feed the client's **Decision Intelligence Engine**.

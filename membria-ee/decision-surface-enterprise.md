@@ -128,6 +128,8 @@ Available options depend on user role:
 | Decisions Pending | Own (full context) | Team (oldest, blockers) | Cross-team blockers |
 | Assumption Drift | Own topics | Team topics | Strategic topics |
 | Escalations | From own decisions | From team | Critical only |
+| **VoI Ranking** | Personal loop priority | Team impact priority | **Strategic utility ranking** |
+| **Alignment (POMDP)** | N/A | **Hidden Divergence Alerts** | Org-wide alignment drift |
 | Reasoning | ✅ Own only | ❌ | ❌ (except by trigger) |
 | Outcomes | ✅ Own | ✅ Team | ✅ Company |
 
@@ -283,9 +285,9 @@ All pattern descriptions must include context:
 
 ---
 
-## Tensions detection
+## Strategic Alignment (POMDP Tracker)
 
-Decision Surface can identify implicit disagreements within teams — situations where team members act on different assumptions without explicit discussion.
+Decision Surface uses a **POMDP (Partially Observable Markov Decision Process)** model to identify implicit disagreements or "Hidden Divergence" within teams—situations where team members act on different assumptions despite formal consensus.
 
 ### How it works
 
@@ -293,14 +295,14 @@ The system analyzes decision records across team members for:
 
 1. **Topic bimodality** — same topic, divergent approaches
 2. **Assumption drift** — vocabulary changes over time without new decision
-3. **Contradictory commitments** — overlapping decisions with different directions
+- **Reasoning Redundancy Gap** — team members agreeing but using contradictory logic.
 
 ### Detection method
 
-Using seeded k-means clustering on decision embeddings:
-- Bimodality coefficient > 0.555 indicates split in team approach
-- Alert generated for Director when detected
-- No individual attribution — only topic and pattern shown
+The **Decision Intelligence Engine** analyzes signals across domains:
+- **Response Latency Symmetry** — detection of "Surface Agreement" (too-fast +1s).
+- **Skepticism Metadata** — cues from red-teaming or hedging.
+- **Hidden Divergence Alert** generated for Director when confidence in consensus drops below threshold.
 
 ### Example alert
 

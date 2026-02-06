@@ -22,13 +22,26 @@ The Decision Surface is built entirely on top of the Decision Black Box (DBB).
 
 It aggregates and visualizes:
 
-- Active decisions
+- **VoI-ranked Open loops** (prioritized by potential impact)
+- **Hidden Divergence Alerts** (detected via POMDP)
 - Unresolved assumptions
 - Repeated or contradictory reasoning
 - Decisions without outcomes
 - Areas where escalation or rework is happening
 
-Nothing appears on the Decision Surface unless DBB has captured a decision signal.
+Nothing appears on the Decision Surface unless DBB has captured a decision signal. The **Decision Intelligence Engine** then processes these signals to rank and flag items for the team.
+
+---
+
+## Decision Intelligence Overlay
+
+SMB workspaces use DI to focus team energy where it counts most.
+
+### VoI-based Ranking
+The "Open Loops" view is not just chronological. It is ranked by **Value of Information (VoI)**. The engine estimates the utility of resolving an open loop; high-stakes decisions with low local confidence are pushed to the top, ensuring bottlenecks are addressed first.
+
+### Hidden Divergence (POMDP) Alerts
+When the team agrees in chat but signals (timing, skepticism, red-teaming cues) suggest a high probability of a hidden disagreement, the Decision Surface flags the decision with a **Hidden Divergence Alert**. This prompts the team to revisit the rationale before moving into execution.
 
 ---
 

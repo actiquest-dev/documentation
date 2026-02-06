@@ -49,12 +49,14 @@ flowchart LR
   ORCH --> MEM["Local Memory Layer (SQLite + DuckDB)"]
   ORCH --> GR["Local GraphRAG (Temporal Ontology + Vectors)"]
   ORCH --> DBB["Decision Black Box (decision extraction agent)"]
+  ORCH --> DI["Decision Intelligence Engine (VoI + POMDP)"]
 
   ORCH -->|Escalate only if needed| COUNCIL["LLM Council (10 models)"]
   COUNCIL --> KCG["Global Knowledge Cache / KCG (decentralized)"]
   COUNCIL --> CUR["Knowledge Curator (verification + fusion)"]
   CUR -->|Updates| GR
   CUR -->|CAG / cache entries| MEM
+  CUR -->|DI signals| DI
   CUR -->|Optional training artifacts| SF["SkillForge (LoRA generation)"]
   SF --> SLM
 ```
@@ -71,12 +73,12 @@ flowchart LR
 ### 4.2 Decision Surface (DS)
 A daily "home screen" that summarizes what matters across many chats and tools:
 
-- **Open loops** (unresolved threads, missing confirmation, pending sign-off)
-- **Assumption drift** (beliefs that changed across time/sources)
-- **Precedents** (similar past decisions and their outcomes)
-- **Risks** (uncertainty flags, missing evidence, low confidence areas)
+- **Open loops (VoI-ranked)**: Unresolved threads prioritized by Value of Information.
+- **Hidden disagreements**: POMDP signals detecting where surface agreement masks real skepticism.
+- **Assumption drift**: Beliefs that changed across time/sources.
+- **Precedents**: Similar past decisions and their outcomes.
 
-DS reads from the **Decision Black Box + memory graph**, not from raw chat scrollback.
+DS reads from the **Decision Intelligence Engine + memory graph**, not from raw chat scrollback.
 
 ### 4.3 Search (rare, powerful)
 Search is not a "summarize my docs" feature. It is **explainable retrieval**:
@@ -107,7 +109,17 @@ DBB should not be a modal "blue screen". It must behave like instrumentation, no
 
 ---
 
-## 6) Orchestrator: the runtime brain
+## 6) Decision Intelligence (DI) Engine
+
+The DI engine runs on top of the DBB and memory graph to optimize joint human-AI deliberation.
+
+- **Value of Information (VoI):** Ranks open loops by the expected utility of resolvement. It tells you *which* decision needs your attention first based on potential impact.
+- **POMDP Belief Tracking:** Maintains a probabilistic model of the "true" consensus state. It flags "Hidden Disagreement" when explicit agreement (e.g., "+1") is accompanied by skeptical metadata (latency, conflicting evidence, red-teaming cues).
+- **Decision Sequencing:** Recommends the optimal order of decisions to minimize project duration or risk, identifying "bottleneck" choices before they block parallel work.
+
+---
+
+## 7) Orchestrator: the runtime brain
 
 The `Router / Orchestrator` decides:
 
@@ -125,7 +137,7 @@ Instead it uses **dynamic working memory** plus persistent stores.
 
 ---
 
-## 7) Local Memory Layer (Hybrid + Hierarchical)
+## 8) Local Memory Layer (Hybrid + Hierarchical)
 
 Membria uses a hybrid approach that is both **embedded** and **fast**:
 
@@ -155,7 +167,7 @@ This split keeps the client lightweight while enabling fast local search and ana
 
 ---
 
-## 8) Local GraphRAG and "ThoughtUnits"
+## 9) Local GraphRAG and "ThoughtUnits"
 
 The client normalizes imported sources into **ThoughtUnits** (lightweight parsing, not expensive reasoning):
 
@@ -173,7 +185,7 @@ GraphRAG uses:
 
 ---
 
-## 9) When local AI is not enough: Council + Global Cache
+## 10) When local AI is not enough: Council + Global Cache
 
 Membria is designed to run cheaply most of the time.
 When a knowledge gap is detected, it escalates.
@@ -197,7 +209,7 @@ If confidence is low, the orchestrator escalates.
 
 ---
 
-## 10) SkillForge and LoRA patches (Selective, domain-shaped)
+## 11) SkillForge and LoRA patches (Selective, domain-shaped)
 
 **LoRA patches** are small expert adapters that increase capability in specific domains.
 They do not make a model "generally smarter", but they can close *repeatable, domain-specific* gaps.
@@ -250,7 +262,7 @@ flowchart TD
 
 ---
 
-## 11) Latency and "magic" speed
+## 12) Latency and "magic" speed
 
 RAG can be slow by design. Membria mitigates this with:
 
@@ -261,7 +273,7 @@ RAG can be slow by design. Membria mitigates this with:
 
 ---
 
-## 12) Security, privacy, and permissions
+## 13) Security, privacy, and permissions
 
 Security is not optional because the client touches your full work life.
 
@@ -274,7 +286,7 @@ Security is not optional because the client touches your full work life.
 
 ---
 
-## 13) Positioning (updated)
+## 14) Positioning (updated)
 
 Membria CE is not "another chatbot UI".
 It is a system that lets power users run **a persistent, explainable, self-improving intelligence layer** across tools and models.

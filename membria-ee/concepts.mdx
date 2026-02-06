@@ -116,6 +116,16 @@ These workflows integrate directly into the Decision Surface and audit system, e
 
 ---
 
+## Enterprise Decision Intelligence (DI) & Strategic Alignment
+
+Membria EE incorporates the **Decision Intelligence Engine** to bridge the gap between tactical interaction and strategic risk management.
+
+- **Strategic Value of Information (VoI):** Evaluates open decisions across the entire enterprise. It identifies which "Open Loops" have the highest strategic utility and risk exposure, allowing leadership to prioritize focus on high-stakes unresolved items.
+- **Cross-Domain Alignment (POMDP):** Large organizations often suffer from "Surface Consensus." The DI engine tracks the belief states across different business units (Knowledge Domains) to detect latent misalignment or "Hidden Divergence" even when formal approvals are in place.
+- **Uncertainty-Aware Sequencing (Priority Queue):** Instead of computationally expensive tree search (MCTS), EE uses a robust **Priority Queue** to order decisions. It scores potential "next moves" by their Value of Information (VoI) and Urgency, unlocking bottlenecks (Critical Path) with O(N log N) predictability.
+
+---
+
 ### Policy-Governed Memory Activation
 
 Critical decisions can require:
@@ -125,6 +135,26 @@ Critical decisions can require:
 
 This allows Reasoning Graph to operate safely in regulated environments.
 
+---
+
+## Enterprise Cognitive Safety Layer
+
+For regulated industries, "AI Hallucinations" are not just errors—they are liabilities. Membria EE implements a **System 2 Safety Layer** that actively monitors reasoning for cognitive biases.
+
+### 1. Resonance Detection & Bias Firewall
+If an AI model agrees with a user too quickly (Resonance Score > 0.6) or exhibits known cognitive biases (Confirmation Bias, Sunk Cost Fallacy), the system intervenes.
+- **Trigger:** High semantic similarity between user prompt and AI response + top-choice logit dominance.
+- **Action:** Forced "Devil's Advocate" check or Human-in-the-loop review.
+
+### 2. Debiasing Interventions
+The system injects mandatory "System 2" pauses into the workflow:
+- **Anchoring Check:** "You are basing this heavily on the first number cited ($5M). Have you considered the alternative scenarios?"
+- **Pre-Mortem:** "Before approving, list 3 reasons this decision could fail."
+
+This ensures that AI serves as a check on human reasoning, not just an amplifier of it.
+
+---
+
 ### Design Principles
 
 Membria EE concepts are guided by the following principles:
@@ -132,6 +162,7 @@ Membria EE concepts are guided by the following principles:
 - **Isolation before sharing**
 - **Policies over heuristics**
 - **Auditability over convenience**
+- **Safety over speed (System 2)**
 - **Explicit governance over implicit behavior**
 - **Local-first by default**
 
