@@ -1,0 +1,141 @@
+---
+title: "Superagent Architecture"
+description: "Token-efficient AI development via context injection vs. Multi-Agent duplication."
+---
+
+## Executive Summary
+
+Membria introduces the **Superagent Architecture**, which transforms stateless AI agents (like Claude Code) into **decision-aware development companions** that remember project history, learn from outcomes, and prevent teams from repeating mistakes.
+
+**Core value proposition:**
+- **For developers:** AI that remembers what worked and what didn't.
+- **For teams:** Shared memory that survives personnel changes and context switches.
+- **For budgets:** Architecture that minimizes LLM token consumption.
+
+---
+
+## The Problem: Stateless AI in Vibe Coding
+
+### What is Vibe Coding
+Vibe coding = describing what you want in natural language, letting AI write the code. It works great for one-off scripts and prototypes, but breaks down in long-term projects.
+
+### Where It Breaks Down
+
+| Situation | What Happens |
+|-----------|--------------|
+| Project lives > 1 week | AI doesn't remember yesterday's decisions |
+| Multiple developers | No shared context between team members |
+| Return to code after a month | "Why is it written this way?" — nobody knows |
+| Similar problem solved before | AI makes the same mistake again |
+| Bad approach tried previously | No memory → team tries it again |
+
+### The Root Cause
+Current AI coding assistants are **stateless**: every prompt is processed independently with no memory of past architectural decisions or "negative knowledge" (what failed).
+
+---
+
+## The Solution: Membria Superagent Architecture
+
+### Instead of Multiple Agents (Multi-Agent)
+Typical multi-agent systems (Orchestrator → Planner → Coder → Reviewer) burn **70,000+ tokens** per task because each agent receives full redundant context.
+
+### Membria Approach: One Agent + Smart Context
+```
+✅ MEMBRIA SUPERAGENT:
+
+User prompt
+    ↓
+┌─────────────────────────────────┐
+│  Membria Graph Query            │  ← Local, 0 tokens
+│  "What's relevant for this?"    │
+└─────────────────────────────────┘
+    ↓
+[Only relevant context: ~2K tokens]
+    ↓
+┌─────────────────────────────────┐
+│  Single Claude Code Call        │  ← 6-10K tokens total
+│  With injected context          │
+└─────────────────────────────────┘
+    ↓
+Code + Auto-captured decision record
+```
+**Result: 10x fewer tokens, persistent memory, predictable costs.**
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TD
+    subgraph "IDE / PR / CI Layer"
+        A[VS Code, GitHub PR, Jira, CI jobs]
+    end
+    A --> B(Claude Control Plane - CCP)
+    
+    subgraph CCP [Claude Control Plane (CCP)]
+        B --> C(Task Router)
+        C --> D(Agent / TENN<br/>graph + logic)
+        D --> E(Policy Engine<br/>what is allowed)
+        E --> F(MCP Server - Runtime Control)
+    end
+
+    F -->|context injection, tool exposure| G(Claude Code<br/>stateless)
+    F --> H(Debias Validators)
+    H --> I(Membria Reasoning Graph)
+    
+    subgraph Feedback [Async Feedback Loop]
+        I --> J{Outcome Capture Layer}
+        J -->|Updates Beliefs/LoRA| I
+    end
+```
+
+## Vibe Coding Outcomes
+
+### 1. Fewer "Generate → Break → Redo" Cycles
+**Without Membria:** Claude generates custom middleware → PR fails security review → Rewrite → 2 days lost.
+**With Membria:** Claude receives context *"Avoid custom auth middleware (Negative Knowledge)"* → Generates correct code using standard libraries (e.g., passport.js).
+**Outcome: 60% reduction in rework time.**
+
+### 2. Code Stays Understandable After a Month
+Membria links code choices to specific Decision Records. You don't have to guess why Fastify was chosen over Express; the reason is in the Graph.
+**Outcome: Self-documenting codebase.**
+
+### 3. AI Stops Repeating Mistakes
+When a bug is fixed, Membria records it as "Negative Knowledge." The next time Claude generates similar code, it receives context to avoid that specific pattern.
+**Outcome: Project-specific learning.**
+
+### 4. No More "Let's Try This" Without Consequences
+Membria checks the Graph: "Tried this library 2 months ago? Yes. It failed due to X. **Don't repeat.**"
+**Outcome: Team remembers what was already tried.**
+
+### 5. Faster Onboarding
+New developers instantly see **why** the architecture is the way it is by viewing the Decision Graph evolution, reducing context loss.
+**Outcome: Onboarding time reduced by 50%.**
+
+### 6. Confidence in Generated Code
+Membria shows historical success/failure rates for similar patterns used by the team, increasing developer confidence in accepting generated code.
+
+---
+
+## Token Economics: Superagent vs Multi-Agent
+
+### Per-Task Comparison
+
+| Aspect | Multi-Agent System | Membria Superagent |
+|--------|-------------------|--------------------|
+| **Architecture** | N agents × full context | 1 agent × smart context |
+| **Tokens per task** | 70,000+ | 6,000-10,000 |
+| **Token growth** | O(n²) | O(1) |
+| **Memory** | None (stateless) | Persistent (Graph) |
+| **Cost Structure** | Usage-based, unpredictable | Subscription-based, fixed |
+
+**Multi-agent vendors want you to use MORE agents. Membria wants you to use BETTER context to save tokens.**
+
+---
+
+## Bottom Line
+
+Multi-agent architecture solves "how to divide work" by creating a new problem: context fragmentation. **Membria Superagent** solves the root problem: **giving one agent the right context.**
+
+**Vibe coding stops being "generate from scratch every time" and becomes "generate with project memory.”**
+---

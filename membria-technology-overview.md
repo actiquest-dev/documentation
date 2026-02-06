@@ -384,8 +384,6 @@ Recommendation: Surface for open discussion.
 
 ### Case 4: Investment Committee
 
-**Problem:** Investment decisions made in meetings. Months later, unclear why a deal was approved/rejected. "Hindsight bias" prevented learning.
-
 **Solution:** DBB captured logic *before* decision, with confidence levels. Outcomes linked later without altering original thesis.
 
 **Result:**
@@ -395,7 +393,7 @@ Recommendation: Surface for open discussion.
 
 ### Case 5: Compliance & Audit
 
-**Problem:** Documentation of decisions was required in a regulated industry. Manual process was inconsistent, incomplete, and loathed by the team.
+**Problem:** Decision documentation required in regulated industry. Manual process was inconsistent.
 
 **Solution:** Membria automatically captured decisions with all supporting evidence. Immutable records satisfied audit requirements.
 
@@ -406,17 +404,155 @@ Recommendation: Surface for open discussion.
 
 ### Case 6: M&A Integration
 
-**Problem:** Acquiring company needed to understand how the target company made decisions. Cultural and process differences were opaque.
+**Problem:** Acquiring company needed to understand target company's decision flow.
 
-**Solution:** Membria's Reasoning Graph revealed:
--   How decisions actually flowed (vs. the org chart).
--   Where the real centers of influence resided.
--   Recurring tensions and patterns.
+**Solution:** Reasoning Graph revealed decision flow, influence centers, and recurring tensions.
 
 **Result:**
 -   Integration plan based on reality, not assumptions.
--   Key decision-makers identified and retained.
--   Cultural gaps bridged proactively.
+
+### Case 7: Persistent Context for CLI Agents (Claude Code)
+
+**Problem:** CLI agents like Claude Code lose project-specific reasoning context between sessions. Re-explaining architectural constraints or "why we avoided Library X" consumes developer time and token budget.
+
+**Solution:** Membria CE acts as a persistent memory layer for Claude Code (via MCP). Decisions, "Negative Knowledge" (failed attempts), and architectural assumptions are stored in the local Reasoning Graph.
+
+**Result:**
+- **Zero Context Reset:** Claude Code remembers reasoning from previous sessions.
+- **Token Efficiency:** 30% reduction in re-explanation prompts.
+- **Automated Documentation:** Coding decisions are captured as they happen in the terminal.
+
+---
+
+## Token Economics: Superagent vs Multi-Agent
+
+### Per-Task Comparison
+
+| Aspect | Multi-Agent System | Membria Superagent |
+|--------|-------------------|--------------------|
+| **Architecture** | N agents × full context | 1 agent × smart context |
+| **Tokens per task** | 70,000+ | 6,000-10,000 |
+| **Token growth** | O(n²) | O(1) |
+| **Memory** | None (stateless) | Persistent (Graph) |
+| **Cost Structure** | Usage-based, unpredictable | Subscription-based, fixed |
+
+**Multi-agent vendors want you to use MORE agents. Membria wants you to use BETTER context to save tokens.**
+
+---
+
+## Bottom Line
+
+Multi-agent architecture solves "how to divide work" by creating a new problem: context fragmentation. **Membria Superagent** solves the root problem: **giving one agent the right context.**
+
+**Vibe coding stops being "generate from scratch every time" and becomes "generate with project memory.”**
+
+
+### Case 7: Persistent Context for CLI Agents (Claude Code)
+
+**Problem:** CLI agents like Claude Code lose project-specific reasoning context between sessions. Re-explaining architectural constraints or "why we avoided Library X" consumes developer time and token budget.
+
+**Solution:** Membria CE acts as a persistent memory layer for Claude Code (via MCP). Decisions, "Negative Knowledge" (failed attempts), and architectural assumptions are stored in the local Reasoning Graph.
+
+**Result:**
+- **Zero Context Reset:** Claude Code remembers reasoning from previous sessions.
+- **Token Efficiency:** 30% reduction in re-explanation prompts.
+- **Automated Documentation:** Coding decisions are captured as they happen in the terminal.
+
+---
+
+## Token Economics: Superagent vs Multi-Agent
+
+### Per-Task Comparison
+
+| Aspect | Multi-Agent System | Membria Superagent |
+|--------|-------------------|--------------------|
+| **Architecture** | N agents × full context | 1 agent × smart context |
+| **Tokens per task** | 70,000+ | 6,000-10,000 |
+| **Token growth** | O(n²) | O(1) |
+| **Memory** | None (stateless) | Persistent (Graph) |
+| **Cost Structure** | Usage-based, unpredictable | Subscription-based, fixed |
+
+**Multi-agent vendors want you to use MORE agents. Membria wants you to use BETTER context to save tokens.**
+
+---
+
+## Bottom Line
+
+Multi-agent architecture solves "how to divide work" by creating a new problem: context fragmentation. **Membria Superagent** solves the root problem: **giving one agent the right context.**
+
+**Vibe coding stops being "generate from scratch every time" and becomes "generate with project memory.”**
+
+
+### Case 7: Persistent Context for CLI Agents (Claude Code)
+
+**Problem:** CLI agents like Claude Code lose project-specific reasoning context between sessions. Re-explaining architectural constraints or "why we avoided Library X" consumes developer time and token budget.
+
+**Solution:** Membria CE acts as a persistent memory layer for Claude Code (via MCP). Decisions, "Negative Knowledge" (failed attempts), and architectural assumptions are stored in the local Reasoning Graph.
+
+**Result:**
+- **Zero Context Reset:** Claude Code remembers reasoning from previous sessions.
+- **Token Efficiency:** 30% reduction in re-explanation prompts.
+- **Automated Documentation:** Coding decisions are captured as they happen in the terminal.
+
+---
+
+## Token Economics: Superagent vs Multi-Agent
+
+### Per-Task Comparison
+
+| Aspect | Multi-Agent System | Membria Superagent |
+|--------|-------------------|--------------------|
+| **Architecture** | N agents × full context | 1 agent × smart context |
+| **Tokens per task** | 70,000+ | 6,000-10,000 |
+| **Token growth** | O(n²) | O(1) |
+| **Memory** | None (stateless) | Persistent (Graph) |
+| **Cost Structure** | Usage-based, unpredictable | Subscription-based, fixed |
+
+**Multi-agent vendors want you to use MORE agents. Membria wants you to use BETTER context to save tokens.**
+
+---
+
+## Bottom Line
+
+Multi-agent architecture solves "how to divide work" by creating a new problem: context fragmentation. **Membria Superagent** solves the root problem: **giving one agent the right context.**
+
+**Vibe coding stops being "generate from scratch every time" and becomes "generate with project memory.”**
+
+
+### Case 7: Persistent Context for CLI Agents (Claude Code)
+
+**Problem:** CLI agents like Claude Code lose project-specific reasoning context between sessions. Re-explaining architectural constraints or "why we avoided Library X" consumes developer time and token budget.
+
+**Solution:** Membria CE acts as a persistent memory layer for Claude Code (via MCP). Decisions, "Negative Knowledge" (failed attempts), and architectural assumptions are stored in the local Reasoning Graph.
+
+**Result:**
+- **Zero Context Reset:** Claude Code remembers reasoning from previous sessions.
+- **Token Efficiency:** 30% reduction in re-explanation prompts.
+- **Automated Documentation:** Coding decisions are captured as they happen in the terminal.
+
+---
+
+## Token Economics: Superagent vs Multi-Agent
+
+### Per-Task Comparison
+
+| Aspect | Multi-Agent System | Membria Superagent |
+|--------|-------------------|--------------------|
+| **Architecture** | N agents × full context | 1 agent × smart context |
+| **Tokens per task** | 70,000+ | 6,000-10,000 |
+| **Token growth** | O(n²) | O(1) |
+| **Memory** | None (stateless) | Persistent (Graph) |
+| **Cost Structure** | Usage-based, unpredictable | Subscription-based, fixed |
+
+**Multi-agent vendors want you to use MORE agents. Membria wants you to use BETTER context to save tokens.**
+
+---
+
+## Bottom Line
+
+Multi-agent architecture solves "how to divide work" by creating a new problem: context fragmentation. **Membria Superagent** solves the root problem: **giving one agent the right context.**
+
+**Vibe coding stops being "generate from scratch every time" and becomes "generate with project memory.”**
 
 ### Case 7: Managing CLI Agents (Claude Code) via Causal Layer
 
