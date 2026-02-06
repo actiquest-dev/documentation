@@ -418,16 +418,21 @@ Recommendation: Surface for open discussion.
 -   Key decision-makers identified and retained.
 -   Cultural gaps bridged proactively.
 
-### Case 7: Persistent Context for CLI Agents (Claude Code)
+### Case 7: Managing CLI Agents (Claude Code) via Causal Layer
 
-**Problem:** CLI agents like Claude Code lose project-specific reasoning context between sessions. Re-explaining architectural constraints or "why we avoided Library X" consumes developer time and token budget.
+**Problem: "Regression of Wisdom" and Common Sense Hallucinations.**
+CLI agents like Claude Code suggest solutions based on general LLM "common sense." However, this often contradicts the project's specific history. An agent might suggest a pattern that was already rejected due to production failures, wasting time on a "Regression of Wisdom."
 
-**Solution:** Membria CE acts as a persistent memory layer for Claude Code (via MCP). Decisions, "Negative Knowledge" (failed attempts), and architectural assumptions are stored in the local Reasoning Graph.
+**Solution: Membria CE as a Causal Overseer.**
+Membria CE intercepts agent proposals and performs a **Causal Conflict Check** via FalkorDB:
+1.  **Vector Match:** Maps the agent's reasoning vector against historical assumptions in the local graph.
+2.  **Negative Artifact Collision:** Identifies if the proposal aligns with a `NEGATIVE_KNOWLEDGE` artifact (a proven failure).
+3.  **Debias Intervention:** Membria issues a system alert: *"Stop. Your reasoning aligns with a hypothesis that proved false in PR #123 (Outcome: performance regression). Weight: 0.05. Re-evaluate based on Causal Memory."*
 
 **Result:**
-- **Zero Context Reset:** Claude Code remembers reasoning from previous sessions.
-- **Token Efficiency:** 30% reduction in re-explanation prompts.
-- **Automated Documentation:** Coding decisions are captured as they happen in the terminal.
+- **Zero Hindsight Bias:** Prevents agents from repeating past project-specific mistakes.
+- **Deterministic Guardrails:** Replaces LLM "guessing" with structural evidence from the Reasoning Graph.
+- **Improved Velocity:** Agents spend 0% time on previously invalidated paths.
 
 ---
 
