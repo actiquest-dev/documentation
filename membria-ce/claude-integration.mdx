@@ -65,141 +65,38 @@ Code + Auto-captured decision record
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     IDE / PR / CI Layer                             │
-│               (VS Code, GitHub PR, Jira, CI jobs)                   │
-└─────────────────────────────────────────────────────────────────────┘
-                                   │
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Claude Control Plane (CCP)                       │
-│                                                                     │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │                      Task Router                             │   │
-│  │                                                              │   │
-│  │  Classification:                                             │   │
-│  │  • Tactical (no capture): "fix typo", "add logging"         │   │
-│  │  • Decision (full flow): "choose library", "design API"     │   │
-│  │  • Learning (outcome): "PR merged", "tests failed"          │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-│                                   │                                 │
-│         ┌─────────────────────────┼─────────────────────────┐      │
-│         ▼                         ▼                         ▼      │
-│  ┌─────────────┐         ┌─────────────┐         ┌─────────────┐  │
-│  │  Tactical   │         │  Decision   │         │  Learning   │  │
-│  │    Task     │         │    Task     │         │    Task     │  │
-│  │             │         │             │         │             │  │
-│  │ Direct exec │         │ Full flow   │         │Link outcome │  │
-│  └──────┬──────┘         └──────┬──────┘         └──────┬──────┘  │
-│         │                       │                       │          │
-│         │                       ▼                       │          │
-│         │        ┌──────────────────────────┐          │          │
-│         │        │  PRE-GENERATION          │          │          │
-│         │        │  CONTEXT FETCH           │          │          │
-│         │        │                          │          │          │
-│         │        │  Query Reasoning Graph:  │          │          │
-│         │        │  • Past decisions        │          │          │
-│         │        │  • Failed approaches     │          │          │
-│         │        │  • Negative knowledge    │          │          │
-│         │        │                          │          │          │
-│         │        │  Cost: 0 tokens (local)  │          │          │
-│         │        └────────────┬─────────────┘          │          │
-│         │                     ▼                        │          │
-│         │        ┌──────────────────────────┐          │          │
-│         │        │  DECISION SURFACE        │◄─────────┼──────┐   │
-│         │        │  (inline in IDE)         │          │      │   │
-│         │        │                          │          │  Developer
-│         │        │  Shows before generation:│          │  sees this
-│         │        │  • Similar past decisions│          │  BEFORE
-│         │        │  • What failed before    │          │  code gen
-│         │        │  • Team accuracy here    │          │      │   │
-│         │        └────────────┬─────────────┘          │          │
-│         │                     ▼                        │          │
-│         │        ┌──────────────────────────┐          │          │
-│         │        │  DECISION CAPTURE (DBB)  │          │          │
-│         │        │                          │          │          │
-│         │        │  Records (immutable):    │          │          │
-│         │        │  • What was decided      │          │          │
-│         │        │  • Alternatives rejected │          │          │
-│         │        │  • Confidence level      │          │          │
-│         │        └────────────┬─────────────┘          │          │
-│         │                     │                        │          │
-│         ▼                     ▼                        ▼          │
-│  ┌─────────────────────────────────────────────────────────────┐  │
-│  │                    Agent / TENN                              │  │
-│  │                   (graph + logic)                            │  │
-│  └─────────────────────────────────────────────────────────────┘  │
-└───────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                 Policy Engine (Graph-Informed)                      │
-│                                                                     │
-│  Static rules: security, compliance, style                         │
-│  Dynamic rules: team-specific patterns from Graph                  │
-│  Resonance detection: human bias + AI bias alignment check         │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│              MCP Server (Claude Runtime Control)                    │
-│                                                                     │
-│  Context injection:                                                │
-│  • Decision context from capture                    ◄── Claude     │
-│  • Negative knowledge ("don't do X")                    Code       │
-│  • Team preferences and patterns                    (stateless)    │
-│                                                                     │
-│  Tool exposure, mode enforcement, output validation                │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                  Post-Generation Validators                         │
-│                                                                     │
-│  • Code matches captured decision?                                 │
-│  • Negative knowledge respected?                                   │
-│  • Overconfident language detected?                                │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Membria Reasoning Graph                          │
-│                                                                     │
-│  Stores:                                                           │
-│  • Decision records (immutable)                                    │
-│  • Assumptions and their outcomes                                  │
-│  • Negative knowledge (what failed)                                │
-│  • Team calibration data                                           │
-│  • Relationships: BLOCKS, RELIES_ON, SUPERSEDES                    │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    │ (asynchronous)
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                      Outcome Capture Layer                          │
-│                                                                     │
-│  Commitment Events (auto-detected):                                │
-│  ┌─────────────────────────────────────────────────────────────┐   │
-│  │ PR merged        → Decision executed                        │   │
-│  │ Tests pass       → Positive signal                          │   │
-│  │ Tests fail       → Negative signal                          │   │
-│  │ Incident created → Strong negative                          │   │
-│  │ 30 days stable   → Positive outcome                         │   │
-│  │ 90 days stable   → Strong positive outcome                  │   │
-│  └─────────────────────────────────────────────────────────────┘   │
-└───────────────────────────────────────────────────────────────────┘
-```
+```mermaid
+flowchart TD
+    subgraph "IDE / PR / CI Layer"
+        A[VS Code, GitHub PR, Jira, CI jobs]
+    end
+    A --> B(Claude Control Plane - CCP)
+    
+    subgraph CCP [Claude Control Plane (CCP)]
+        B --> C(Task Router)
+        C --> D(Agent / TENN<br/>graph + logic)
+        D --> E(Policy Engine<br/>what is allowed)
+        E --> F(MCP Server - Runtime Control)
+    end
 
----
+    F -->|context injection, tool exposure| G(Claude Code<br/>stateless)
+    F --> H(Debias Validators)
+    H --> I(Membria Reasoning Graph)
+    
+    subgraph Feedback [Async Feedback Loop]
+        I --> J{Outcome Capture Layer}
+        J -->|Updates Beliefs/LoRA| I
+    end
+```
 
 ## Vibe Coding Outcomes
 
 ### 1. Fewer "Generate → Break → Redo" Cycles
-Membria blocks Claude from suggesting approaches that failed previously (e.g., custom auth middleware that had security issues 6 months ago).
+**Without Membria:** Claude generates custom middleware → PR fails security review → Rewrite → 2 days lost.
+**With Membria:** Claude receives context *"Avoid custom auth middleware (Negative Knowledge)"* → Generates correct code using standard libraries (e.g., passport.js).
 **Outcome: 60% reduction in rework time.**
 
-### 2. Code Stays Understandable
+### 2. Code Stays Understandable After a Month
 Membria links code choices to specific Decision Records. You don't have to guess why Fastify was chosen over Express; the reason is in the Graph.
 **Outcome: Self-documenting codebase.**
 
@@ -207,18 +104,32 @@ Membria links code choices to specific Decision Records. You don't have to guess
 When a bug is fixed, Membria records it as "Negative Knowledge." The next time Claude generates similar code, it receives context to avoid that specific pattern.
 **Outcome: Project-specific learning.**
 
+### 4. No More "Let's Try This" Without Consequences
+Membria checks the Graph: "Tried this library 2 months ago? Yes. It failed due to X. **Don't repeat.**"
+**Outcome: Team remembers what was already tried.**
+
+### 5. Faster Onboarding
+New developers instantly see **why** the architecture is the way it is by viewing the Decision Graph evolution, reducing context loss.
+**Outcome: Onboarding time reduced by 50%.**
+
+### 6. Confidence in Generated Code
+Membria shows historical success/failure rates for similar patterns used by the team, increasing developer confidence in accepting generated code.
+
 ---
 
 ## Token Economics: Superagent vs Multi-Agent
 
-| Aspect | Multi-Agent | Membria Superagent |
-|--------|-------------|-------------------|
-| Tokens per task | 70,000+ | 6,000-10,000 |
-| Monthly cost (5 devs) | $640-2,400 | $245 (fixed) |
-| Memory | Ephemeral | Persistent (Graph) |
-| Scalability | Linear cost growth | Fixed subscription |
+### Per-Task Comparison
 
-**Multi-agent vendors want you to use MORE agents to earn more. Membria wants you to use BETTER context to save tokens.**
+| Aspect | Multi-Agent System | Membria Superagent |
+|--------|-------------------|--------------------|
+| **Architecture** | N agents × full context | 1 agent × smart context |
+| **Tokens per task** | 70,000+ | 6,000-10,000 |
+| **Token growth** | O(n²) | O(1) |
+| **Memory** | None (stateless) | Persistent (Graph) |
+| **Cost Structure** | Usage-based, unpredictable | Subscription-based, fixed |
+
+**Multi-agent vendors want you to use MORE agents. Membria wants you to use BETTER context to save tokens.**
 
 ---
 
@@ -227,3 +138,4 @@ When a bug is fixed, Membria records it as "Negative Knowledge." The next time C
 Multi-agent architecture solves "how to divide work" by creating a new problem: context fragmentation. **Membria Superagent** solves the root problem: **giving one agent the right context.**
 
 **Vibe coding stops being "generate from scratch every time" and becomes "generate with project memory.”**
+---
